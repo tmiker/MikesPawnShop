@@ -1,0 +1,4 @@
+Products.Read.API
+	HTTP Rest Controller:	GET
+	if GRPC Server:			POST, PUT, DELETE
+		How clear cache???

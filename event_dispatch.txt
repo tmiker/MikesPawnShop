@@ -1,0 +1,43 @@
+Domain Event Dispatching: The DbContext override ensures domain events are published after successful persistence, 
+maintaining consistency between domain changes and side effects.
+
+public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+{
+    var result = await base.SaveChangesAsync(cancellationToken);
+    await DispatchDomainEventsAsync();
+    return result;
+}
+
+The call to SaveChangesAsync is made in the command handler, e.g. ...
+
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
+{
+    private readonly IOrderRepository _orderRepository;
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IPricingService _pricingService;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public async Task<CreateOrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    {
+        // Validate customer exists
+        var customer = await _customerRepository.GetByIdAsync(request.CustomerId);
+        if (customer == null)
+            return CreateOrderResult.Failure("Customer not found");
+
+        // Create new order aggregate
+        var order = new Order(OrderId.New(), request.CustomerId, request.ShippingAddress);
+        
+        // Add items with business rule validation
+        foreach (var item in request.Items)
+        {
+            var pricing = await _pricingService.CalculatePriceAsync(item.ProductId, customer.Tier);
+            order.AddOrderItem(item.ProductId, item.Quantity, pricing.UnitPrice);
+        }
+
+        // Persist changes atomically
+        await _orderRepository.AddAsync(order);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return CreateOrderResult.Success(order.Id);
+    }
+}

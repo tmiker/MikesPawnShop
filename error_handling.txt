@@ -1,0 +1,12 @@
+Custom Exceptions to handle
+	Products Domain
+		ProductEventStoreException 
+			thrown by ProductEventStore 
+
+Standard Exceptions
+	Products Domain
+		InvalidArgumentException
+			ProductEventStore
+				if string passed for Status Enumeration name is not valid for Product Aggregate throws
+					The Enumeration Status should be used in handler methods using the property 
+					and converted to the string name in the method before being passed to the domain

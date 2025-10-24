@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="CQRS\CommandHandlers\" />
+    <Folder Include="CQRS\CommandResults\" />
+    <Folder Include="CQRS\Commands\" />
+    <Folder Include="CQRS\Queries\" />
+    <Folder Include="CQRS\QueryHandlers\" />
+    <Folder Include="CQRS\QueryResults\" />
+    <Folder Include="Temp\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Products.Shared\Products.Shared.csproj" />
+    <ProjectReference Include="..\Products.Write.Domain\Products.Write.Domain.csproj" />
+    <ProjectReference Include="..\Products.Write.Infrastructure\Products.Write.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
