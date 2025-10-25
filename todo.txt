@@ -1,1 +1,3 @@
-Handlers use of cancellation token ???
+CQRS Handlers use of cancellation token ???
+
+Passing CorrelationId using headers to Exception Handlers ???

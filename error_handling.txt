@@ -3,7 +3,7 @@ Custom Exceptions to handle
 		ProductEventStoreException 
 			thrown by ProductEventStore 
 
-Standard Exceptions
+Standard Exceptions to handle
 	Products Domain
 		InvalidArgumentException
 			ProductEventStore
@@ -11,7 +11,27 @@ Standard Exceptions
 					The Enumeration Status should be used in handler methods using the property 
 					and converted to the string name in the method before being passed to the domain
 
-Dispatcher Exceptions thrown
-	Service Locator Dispatcher for initial Development
-		ArgumentNullException
-		InvalidOperationException
+	Dispatcher Exceptions thrown
+		Service Locator Dispatcher for initial Development
+			ArgumentNullException
+			InvalidOperationException
+
+Global Exception Handling Implementation
+	Using IExceptionHandler Middleware in ASP.NET Core Web API (see read side for Custom Middleware approach)
+		Handles all exceptions thrown in the application pipeline
+		Maps exceptions to appropriate HTTP status codes and response messages
+		Custom Exception Classes - define domain-specific exceptions to better map errors for user understanding and security / encapsulation
+			BaseException : Exception abstract class
+			ConflictException : BaseException - simple exception for 409 Conflict HTTP status code
+			NotFoundException : BaseException - option to include entity name and a key inlieu of standard message for 404 Not Found HTTP status code
+			BadRequestException : BaseException - simple exception for 400 Bad Request HTTP status code
+			ValidationException : BaseException - includes a dictionary of validation errors for 400 BadRequest HTTP status code
+			...
+			others as needed
+			...
+			??? UnauthorizedException : BaseException - simple exception for 401 Unauthorized HTTP status code
+			??? UnauthenticatedException : BaseException - simple exception for 403 Unauthenticated HTTP status code
+				vs standard attributes based approach
+
+		Option to use Global Exception Handler or Handlers targeted to specific exception types
+
