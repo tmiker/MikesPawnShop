@@ -22,7 +22,6 @@ builder.Services.AddProblemDetails(options =>
     {
         context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
         context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
-
         // Add correlation ID if available
         if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
         {

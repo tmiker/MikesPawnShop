@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ExceptionHandling\ExceptionHandlers\PendingIncorporation\" />
     <Folder Include="Temp\" />
   </ItemGroup>
 
