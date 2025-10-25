@@ -12,8 +12,6 @@ namespace Products.Write.Domain.Events
         public string CorrelationId { get; init; } = default!;
         public string Status { get; init; } = default!;
 
-        public StatusUpdated() { }
-
         public StatusUpdated(Guid aggregateId, string aggregateType, int aggregateVersion,
             string correlationId, string status)   // validate valid status from enumeration
         {

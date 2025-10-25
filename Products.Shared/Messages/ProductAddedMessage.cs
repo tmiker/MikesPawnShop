@@ -1,16 +1,12 @@
-﻿using Products.Write.Domain.Base;
-using Products.Write.Domain.Enumerations;
-
-namespace Products.Write.Domain.Events
+﻿namespace Products.Shared.Messages
 {
-    public class ProductAdded : IDomainEvent
+    public class ProductAddedMessage
     {
         public Guid AggregateId { get; init; }
         public string AggregateType { get; init; } = default!;
         public int AggregateVersion { get; init; }
         public DateTime OccurredAt { get; init; }
         public string CorrelationId { get; init; } = default!;
-
         public string Name { get; init; } = default!;
         public string? Category { get; init; }
         public string Description { get; init; } = default!;
@@ -18,8 +14,8 @@ namespace Products.Write.Domain.Events
         public string Currency { get; init; } = default!;
         public string Status { get; init; } = default!;
 
-        public ProductAdded(Guid aggregateId, string aggregateType, int aggregateVersion, 
-            string correlationId, string name, CategoryEnum category, 
+        public ProductAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
+            string correlationId, string name, string category,
             string description, decimal price, string currency, string status)
         {
             AggregateId = aggregateId;
@@ -28,7 +24,7 @@ namespace Products.Write.Domain.Events
             OccurredAt = DateTime.UtcNow;
             CorrelationId = correlationId;
             Name = name;
-            Category = category.ToString();
+            Category = category;
             Description = description;
             Price = price;
             Currency = currency;
