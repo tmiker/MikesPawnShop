@@ -33,5 +33,8 @@ Global Exception Handling Implementation
 			??? UnauthenticatedException : BaseException - simple exception for 403 Unauthenticated HTTP status code
 				vs standard attributes based approach
 
-		Option to use Global Exception Handler or Handlers targeted to specific exception types
+		Option to use Global Exception Handler and/or Handlers targeted to specific exception types
+			Using both specific handlers and a Global Exception Handler 
+				Global is backup to catch all exceptions not specifically handled by targeted handlers - may have redundancies
+				Global handler needs to be last registered in the pipeline to catch unhandled exceptions
 

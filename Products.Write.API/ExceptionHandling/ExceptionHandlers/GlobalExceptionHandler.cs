@@ -69,9 +69,9 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             }
 
             // Handle validation exceptions specially
-            if (exception is ValidationException validationEx)
+            if (exception is ValidationException validationException)
             {
-                problemDetails.Extensions["errors"] = validationEx.Errors;
+                problemDetails.Extensions["errors"] = validationException.Errors;
             }
             return problemDetails;
         }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Products.Write.API.ExceptionHandling.ExceptionHandlers;
 using Products.Write.Application;
 using Products.Write.Infrastructure;
 using Products.Write.Infrastructure.DataAccess;
@@ -13,12 +14,34 @@ builder.Services.AddDbContext<EventStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
 });
 
+// ProblemDetails service
+builder.Services.AddProblemDetails(options =>
+{
+    // Customize problem details globally
+    options.CustomizeProblemDetails = (context) =>
+    {
+        context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
+        context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
+
+        // Add correlation ID if available
+        if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
+        {
+            context.ProblemDetails.Extensions["correlationId"] = correlationId.ToString();
+        }
+    };
+});
+
 builder.Services.RegisterInfrastructureServices();
 builder.Services.RegisterApplicationServices();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Register exception handlers in order of specificity (most specific first)
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
 
 var app = builder.Build();
 
@@ -34,7 +57,6 @@ if (app.Environment.IsDevelopment())
     });
     // app.UsePathBase("/scalar/v1");
 }
-
 
 app.UseHttpsRedirection();
 
