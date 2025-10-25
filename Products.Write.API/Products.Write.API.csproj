@@ -4,25 +4,25 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8518bcc0-91e4-4049-bd3e-fda098c46bce</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="CQRS\CommandHandlers\" />
-    <Folder Include="CQRS\CommandResults\" />
-    <Folder Include="CQRS\Commands\" />
-    <Folder Include="CQRS\Queries\" />
-    <Folder Include="CQRS\QueryHandlers\" />
-    <Folder Include="CQRS\QueryResults\" />
     <Folder Include="Temp\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Products.Shared\Products.Shared.csproj" />
+    <ProjectReference Include="..\Products.Write.Application\Products.Write.Application.csproj" />
     <ProjectReference Include="..\Products.Write.Domain\Products.Write.Domain.csproj" />
     <ProjectReference Include="..\Products.Write.Infrastructure\Products.Write.Infrastructure.csproj" />
   </ItemGroup>

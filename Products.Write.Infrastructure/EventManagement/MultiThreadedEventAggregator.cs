@@ -2,5 +2,6 @@
 {
     public class MultiThreadedEventAggregator
     {
+        // not for use on server
     }
 }

@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E
 		error_handling.txt = error_handling.txt
 		event_dispatch.txt = event_dispatch.txt
 		git_notes.txt = git_notes.txt
+		scratchpad.txt = scratchpad.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Write.Infrastructure", "Products.Write.Infrastructure\Products.Write.Infrastructure.csproj", "{460F53B0-473B-467D-964A-93AD1BE14B04}"
@@ -24,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MikesPawnShop.Console", "MikesPawnShop.Console\MikesPawnShop.Console.csproj", "{00176A22-2B1D-4BCD-BED9-4E3713AD52B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Write.Infrastructure.Tests.Unit", "Products.Write.Infrastructure.Tests.Unit\Products.Write.Infrastructure.Tests.Unit.csproj", "{C067D60B-1FDE-494C-8614-E2B812139864}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Write.Application", "Products.Write.Application\Products.Write.Application.csproj", "{63C6C17E-CF4F-42CE-8531-69166849F1F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +62,10 @@ Global
 		{C067D60B-1FDE-494C-8614-E2B812139864}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C067D60B-1FDE-494C-8614-E2B812139864}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C067D60B-1FDE-494C-8614-E2B812139864}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63C6C17E-CF4F-42CE-8531-69166849F1F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63C6C17E-CF4F-42CE-8531-69166849F1F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63C6C17E-CF4F-42CE-8531-69166849F1F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63C6C17E-CF4F-42CE-8531-69166849F1F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -22,7 +22,7 @@ namespace Products.Write.Infrastructure.Repositories
             IEnumerable<IDomainEvent> events = product.DomainEvents;
             foreach (var @event in events)
             {
-                await _eventStore.SaveAsEventRecordAsync(@event);
+                await _eventStore.SaveAsEventRecordAsync(@event);   // returns a bool but any error is logged by event store and throws ProductEventStoreException
             }
             _logger.LogInformation("Product Repository sent {count} events to the Event Store", events.Count());
         }

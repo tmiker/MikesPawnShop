@@ -1,0 +1,16 @@
+POST Console Log
+
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\visualstudio\MikesPawnShop\Products.Write.API
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (35ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 4000), @p2='?' (DbType = Int32), @p3='?' (Size = 4000), @p4='?' (Size = 4000), @p5='?' (Size = 4000), @p6='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [dbo].[Product Event Records] ([AggregateId], [AggregateType], [AggregateVersion], [CorrelationId], [EventJson], [EventType], [OccurredAt])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+info: Products.Write.Infrastructure.Repositories.ProductRepository[0]
+      Product Repository sent 1 events to the Event Store
+info: Products.Write.Application.CQRS.CommandHandlers.AddProductHandler[0]
+      AddProductHandler created product with Id: df570151-0863-46f9-ab77-09f43ad85d2e. Command CorrelationId: 944cd5a4-1ea8-4990-9380-b07275eff307
+Product Added: Heart of Darkness, Category: Books, Price: 24.95 USD
