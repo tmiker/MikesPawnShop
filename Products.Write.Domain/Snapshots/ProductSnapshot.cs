@@ -1,5 +1,6 @@
 ﻿using Products.Write.Domain.Enumerations;
 using Products.Write.Domain.ValueObjects;
+using System.Text.Json;
 
 namespace Products.Write.Domain.Snapshots
 {
@@ -17,5 +18,11 @@ namespace Products.Write.Domain.Snapshots
         public int Version { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }
+
+        public string ToJson()
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };
+            return JsonSerializer.Serialize(this, options);
+        }
     }
 }
