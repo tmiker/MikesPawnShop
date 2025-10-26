@@ -15,23 +15,7 @@ builder.Services.AddDbContext<EventStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
 });
 
-builder.Services.AddProblemDetails(); // Registers the ProblemDetails service
-
-//// ProblemDetails service - configure globally if not using ExceptionHandlers
-//builder.Services.AddProblemDetails(options =>
-//{
-//    // Customize problem details globally
-//    options.CustomizeProblemDetails = (context) =>
-//    {
-//        context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
-//        context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
-//        // Add correlation ID if available
-//        if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
-//        {
-//            context.ProblemDetails.Extensions["correlationId"] = correlationId.ToString();
-//        }
-//    };
-//});
+builder.Services.AddProblemDetails(); // Registers the ProblemDetails service - configured in ExceptionHandlers using ExceptionHandlerExtensions 
 
 builder.Services.RegisterInfrastructureServices();
 builder.Services.RegisterApplicationServices();
