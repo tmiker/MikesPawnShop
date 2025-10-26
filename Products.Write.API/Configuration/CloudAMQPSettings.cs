@@ -8,5 +8,6 @@
         public int DefaultPort { get; init; }
         public int TlsPort { get; init; }
         public string? Url { get; init; }
+        public string? TestingDummyValue { get; init; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Products.Write.API.Configuration;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.DevTests;
 
@@ -9,11 +11,13 @@ namespace Products.Write.API.Controllers
     public class DevTestsController : ControllerBase
     {
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
         private readonly ILogger<DevTestsController> _logger;
 
-        public DevTestsController(ICommandDispatcher commandDispatcher, ILogger<DevTestsController> logger)
+        public DevTestsController(ICommandDispatcher commandDispatcher, IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger)
         {
             _commandDispatcher = commandDispatcher;
+            _cloudAmqpSettings = cloudAmqpSettings;
             _logger = logger;
         }
 
@@ -29,6 +33,15 @@ namespace Products.Write.API.Controllers
             ThrowExceptionResult result = await _commandDispatcher.DispatchAsync<ThrowException, ThrowExceptionResult>(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
+        }
+
+
+        [HttpGet("getCloudAmqpSettingsTestingDummyValue")]
+        public IActionResult GetCloudAmqpTestingDummyValue(CancellationToken cancellationToken)
+        {
+            string? value = _cloudAmqpSettings.Value.TestingDummyValue;
+            if (!string.IsNullOrWhiteSpace(value)) return Ok(value);
+            return BadRequest("Unable to find the CloudAMQPSettings TestingDummyValue.");
         }
     }
 }
