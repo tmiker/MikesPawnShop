@@ -61,7 +61,10 @@ namespace Products.Read.API.Middleware
                 {
                     ["traceId"] = context.TraceIdentifier,
                     ["timestamp"] = DateTime.UtcNow,
-                    ["exception"] = _environment.IsDevelopment() ? exception.GetType().Name : null
+                    ["requestId"] = context.TraceIdentifier,
+                    ["machine"] = Environment.MachineName,
+                    ["exception"] = _environment.IsDevelopment() ? exception.GetType().Name : null,
+                    ["correlationId"] = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
                 }
             };
         }

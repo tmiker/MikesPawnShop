@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-
-namespace Products.Write.Application.Exceptions
+﻿namespace Products.Write.Application.Exceptions
 {
     public abstract class BaseException : Exception
     {
