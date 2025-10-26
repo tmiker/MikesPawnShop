@@ -4,7 +4,7 @@ namespace Products.Write.Domain.ValueObjects
 {
     public class DocumentData : ValueObject
     {
-        public string? Name { get; private set; }           // was product id + guid or sequence number
+        public string? Name { get; private set; }           // for Azure blob storage, virtual directory plus filename
         public string? Title { get; private set; }
         public int SequenceNumber { get; private set; }
         public string? DocumentUrl { get; private set; }

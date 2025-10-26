@@ -2,3 +2,22 @@ Products.Read.API
 	HTTP Rest Controller:	GET
 	if GRPC Server:			POST, PUT, DELETE
 		How clear cache???
+
+	Database Schema
+		Table: Products
+			Has int Id and Guid AggregateId
+		Table: ImageData
+			Has int Id but no AggregateId
+		Table: DocumentData
+			Has int Id but no AggregateId
+
+	Command Message Logs
+		Properties
+			MessageType: string
+			AggregateType: string
+			AggregateId: Guid
+			AggregateVersion: int
+			Payload: string (message as JSON)
+			OccurredAt: DateTime
+			ReceivedAt: DateTime
+			CorrelationId: string
