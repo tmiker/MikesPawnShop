@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Products.Write.API.ExceptionHandling.Exceptions;
+using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
@@ -19,6 +19,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("************* THE GLOBAL EXCEPTION HANDLER WAS CALLED *****************");
             // Log the exception with structured logging
             _logger.LogError(exception,
                 "Exception occurred: {Message} | RequestId: {RequestId} | Path: {Path} | Method: {Method}",
@@ -61,6 +62,8 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
             problemDetails.Extensions["timestamp"] = DateTime.UtcNow;
             problemDetails.Extensions["requestId"] = httpContext.TraceIdentifier;
+            problemDetails.Extensions["machine"] = Environment.MachineName;
+            problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
             // Add development-only information
             if (_environment.IsDevelopment())
             {

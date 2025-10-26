@@ -1,4 +1,6 @@
-﻿namespace Products.Write.API.ExceptionHandling.Exceptions
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Products.Write.Application.Exceptions
 {
     public class ForbiddenException : BaseException
     {

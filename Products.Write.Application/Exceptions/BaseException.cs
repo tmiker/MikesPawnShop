@@ -1,4 +1,4 @@
-﻿namespace Products.Write.API.ExceptionHandling.Exceptions
+﻿namespace Products.Write.Application.Exceptions
 {
     public abstract class BaseException : Exception
     {

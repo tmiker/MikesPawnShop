@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Products.Write.API.ExceptionHandling.Exceptions;
+using Products.Write.Application.Exceptions;
 using System.Security;
 
 namespace Products.Write.API.ExceptionHandling.PendingIncorporation.Handlers
 {
-    public class SecurityExceptionHandler : IExceptionHandler
+    public class SecurityAwareExceptionHandler : IExceptionHandler
     {
-        private readonly ILogger<SecurityExceptionHandler> _logger;
+        private readonly ILogger<SecurityAwareExceptionHandler> _logger;
         private readonly IWebHostEnvironment _environment;
         // private readonly SecuritySettings _securitySettings;  // install nuget: DotNetOpenAuth.OAuth.Core or DotNetOpenAuth.OpenId.Core
 
-        public SecurityExceptionHandler(ILogger<SecurityExceptionHandler> logger, IWebHostEnvironment environment)
+        public SecurityAwareExceptionHandler(ILogger<SecurityAwareExceptionHandler> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;

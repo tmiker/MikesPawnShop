@@ -23,9 +23,10 @@ namespace Products.Write.Application.CQRS.CommandHandlers
 
         public async Task<AddProductResult> HandleAsync(AddProduct command, CancellationToken cancellationToken)
         {
-            string correlationId = Guid.NewGuid().ToString();
-            CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category);
-            Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, correlationId);
+            if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
+            CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);
+
+            Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, command.CorrelationId);
             Guid productId = product.Id;
 
             // Save the product - throws ProductEventStoreException if error occurs
@@ -34,7 +35,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 await _productRepository.SaveAsync(product);
 
                 // Because will throw if error occurs, we can assume success and publish product domain events
-                _logger.LogInformation("AddProductHandler created product with Id: {productId}. Command CorrelationId: {correlationId}", productId, correlationId);
+                _logger.LogInformation("AddProductHandler created product with Id: {productId}. Command CorrelationId: {correlationId}", productId, command.CorrelationId);
 
                 if (product.DomainEvents is not null && product.DomainEvents.Any())
                 {
@@ -51,3 +52,23 @@ namespace Products.Write.Application.CQRS.CommandHandlers
         }
     }
 }
+
+// ENUM.PARSE EXCEPTIONS:
+
+//ArgumentNullException
+//enumType is null.
+
+//ArgumentException
+//enumType is not an Enum.
+
+//ArgumentException
+//value is either an empty string or only contains white space.
+
+//ArgumentException
+//value is a name, but not one of the named constants defined for the enumeration.
+
+//OverflowException
+//value is outside the range of the underlying type of enumType.
+
+//InvalidOperationException
+//.NET 8 and later versions: enumType is a Boolean - backed enumeration type.

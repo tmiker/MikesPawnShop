@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Products.Write.API.ExceptionHandling.ExceptionHandlers;
-using Products.Write.API.ExceptionHandling.Exceptions;
+using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API
 {

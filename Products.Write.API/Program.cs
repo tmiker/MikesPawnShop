@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Products.Write.API.ExceptionHandling.ExceptionHandlers;
+using Products.Write.API.Middleware;
 using Products.Write.Application;
 using Products.Write.Infrastructure;
 using Products.Write.Infrastructure.DataAccess;
@@ -14,21 +15,23 @@ builder.Services.AddDbContext<EventStoreDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
 });
 
-// ProblemDetails service
-builder.Services.AddProblemDetails(options =>
-{
-    // Customize problem details globally
-    options.CustomizeProblemDetails = (context) =>
-    {
-        context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
-        context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
-        // Add correlation ID if available
-        if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
-        {
-            context.ProblemDetails.Extensions["correlationId"] = correlationId.ToString();
-        }
-    };
-});
+builder.Services.AddProblemDetails(); // Registers the ProblemDetails service
+
+//// ProblemDetails service - configure globally if not using ExceptionHandlers
+//builder.Services.AddProblemDetails(options =>
+//{
+//    // Customize problem details globally
+//    options.CustomizeProblemDetails = (context) =>
+//    {
+//        context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
+//        context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
+//        // Add correlation ID if available
+//        if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
+//        {
+//            context.ProblemDetails.Extensions["correlationId"] = correlationId.ToString();
+//        }
+//    };
+//});
 
 builder.Services.RegisterInfrastructureServices();
 builder.Services.RegisterApplicationServices();
@@ -44,7 +47,12 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handle
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+
 // Configure the HTTP request pipeline.
+
+app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

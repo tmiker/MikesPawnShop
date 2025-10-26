@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Products.Write.API.ExceptionHandling.Exceptions;
 using Products.Write.API.ExceptionHandling.PendingIncorporation.Services;
+using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.PendingIncorporation.Handlers
 {

@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E
 		architecture_notes.txt = architecture_notes.txt
 		error_handling.txt = error_handling.txt
 		event_dispatch.txt = event_dispatch.txt
+		fluent_validation.txt = fluent_validation.txt
 		git_notes.txt = git_notes.txt
 		scratchpad.txt = scratchpad.txt
 		todo.txt = todo.txt

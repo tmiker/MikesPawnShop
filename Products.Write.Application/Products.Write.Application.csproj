@@ -16,7 +16,11 @@
     <Folder Include="CQRS\Queries\" />
     <Folder Include="CQRS\QueryHandlers\" />
     <Folder Include="CQRS\QueryResults\" />
-    <Folder Include="DTOs\" />
+    <Folder Include="Temp\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

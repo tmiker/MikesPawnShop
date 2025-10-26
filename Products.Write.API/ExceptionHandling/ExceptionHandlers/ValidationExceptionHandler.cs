@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Products.Write.API.ExceptionHandling.Exceptions;
+using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
@@ -29,6 +29,11 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
             problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
             problemDetails.Extensions["timestamp"] = DateTime.UtcNow;
+            problemDetails.Extensions["requestId"] = httpContext.TraceIdentifier;
+            problemDetails.Extensions["machine"] = Environment.MachineName;
+            // Include correlation ID if available
+            problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
+
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 

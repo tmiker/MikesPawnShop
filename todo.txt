@@ -1,3 +1,5 @@
 CQRS Handlers use of cancellation token ???
 
 Passing CorrelationId using headers to Exception Handlers ???
+
+Products.Write.API - use Fluent Validation for API Controller DTOs, or use Data Annotations 

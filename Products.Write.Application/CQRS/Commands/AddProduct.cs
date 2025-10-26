@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
+using Products.Write.Application.DTOs;
 using Products.Write.Domain.Enumerations;
 
 namespace Products.Write.Application.CQRS.Commands
@@ -11,9 +12,10 @@ namespace Products.Write.Application.CQRS.Commands
         public decimal Price { get; init; }
         public string Currency { get; init; } = default!;
         public string Status { get; init; } = default!;
+        public string? CorrelationId { get; set; } = default!;
 
         public AddProduct(string name, string category,
-            string description, decimal price, string currency, string status)
+            string description, decimal price, string currency, string status, string? correlationId)
         {
             Name = name;
             Category = category;    // (CategoryEnum)Enum.Parse(typeof(CategoryEnum), category);
@@ -21,6 +23,18 @@ namespace Products.Write.Application.CQRS.Commands
             Price = price;
             Currency = currency;
             Status = status;        // Status.FromName(status);
+            CorrelationId = correlationId;
         }
+
+        public AddProduct(AddProductDTO dto, StringValues correlationId)
+        {
+            Name = dto.Name;
+            Category = dto.Category;        
+            Description = dto.Description;
+            Price = dto.Price;
+            Currency = dto.Currency;
+            Status = dto.Status;            
+            CorrelationId = correlationId!;
+        }   
     }
 }

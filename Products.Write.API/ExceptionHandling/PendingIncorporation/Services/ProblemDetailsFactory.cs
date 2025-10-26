@@ -1,5 +1,5 @@
-﻿using Products.Write.API.ExceptionHandling.Exceptions;
-using Products.Write.API.ExceptionHandling.PendingIncorporation.Models;
+﻿using Products.Write.API.ExceptionHandling.PendingIncorporation.Models;
+using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.PendingIncorporation.Services
 {

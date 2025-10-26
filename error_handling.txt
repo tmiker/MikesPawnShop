@@ -16,6 +16,10 @@ Standard Exceptions to handle
 			ArgumentNullException
 			InvalidOperationException
 
+CorrelationId for Products.Write.API 
+	Use CorrelationId Middleware to generate and/or propagate CorrelationId for each request
+	Include CorrelationId in error responses for tracking and debugging purposes
+
 Global Exception Handling Implementation
 	Using IExceptionHandler Middleware in ASP.NET Core Web API (see read side for Custom Middleware approach)
 		Handles all exceptions thrown in the application pipeline
