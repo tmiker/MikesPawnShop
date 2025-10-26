@@ -1,33 +1,24 @@
-using Microsoft.EntityFrameworkCore;
-using Products.Write.API.ExceptionHandling.ExceptionHandlers;
+using Products.Write.API;
 using Products.Write.API.Middleware;
-using Products.Write.Application;
-using Products.Write.Infrastructure;
-using Products.Write.Infrastructure.DataAccess;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDbContext<EventStoreDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
-});
+//builder.Services.AddDbContext<EventStoreDbContext>(options =>
+//{
+//    options.UseSqlServer(builder.Configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
+//});
 
 builder.Services.AddProblemDetails(); // Registers the ProblemDetails service - configured in ExceptionHandlers using ExceptionHandlerExtensions 
 
-builder.Services.RegisterInfrastructureServices();
-builder.Services.RegisterApplicationServices();
+// Register services from Composition Root
+builder.Services.ComposeApplication();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-// Register exception handlers in order of specificity (most specific first)
-builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
 
 var app = builder.Build();
 

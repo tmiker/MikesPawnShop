@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Products.Shared\Products.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Temp\" />
+  </ItemGroup>
+
 </Project>
