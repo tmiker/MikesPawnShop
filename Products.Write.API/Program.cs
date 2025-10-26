@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Products.Write.API.ExceptionHandling.ExceptionHandlers;
 using Products.Write.API.Middleware;
 using Products.Write.Application;
 using Products.Write.Infrastructure;
 using Products.Write.Infrastructure.DataAccess;
 using Scalar.AspNetCore;
+using Products.Write.API.ExceptionHandling.ExceptionHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 

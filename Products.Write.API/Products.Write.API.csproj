@@ -17,14 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Temp\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Products.Shared\Products.Shared.csproj" />
     <ProjectReference Include="..\Products.Write.Application\Products.Write.Application.csproj" />
     <ProjectReference Include="..\Products.Write.Domain\Products.Write.Domain.csproj" />
     <ProjectReference Include="..\Products.Write.Infrastructure\Products.Write.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Temp\" />
   </ItemGroup>
 
 </Project>
