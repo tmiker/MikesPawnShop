@@ -42,7 +42,7 @@ namespace Products.Write.Application
             // Register the SingleThreadedEventAggregator as a singleton
             services.AddSingleton<SingleThreadedEventAggregator>();
             // Register ProductEventHandlers as a singleton
-            services.AddSingleton<ProductEventHandlers>();
+            services.AddTransient<ProductEventHandlers>();
 
             // Build the service provider and register the event handlers with the event aggregator as IEventAggregator
             // var serviceProvider = services.BuildServiceProvider();
