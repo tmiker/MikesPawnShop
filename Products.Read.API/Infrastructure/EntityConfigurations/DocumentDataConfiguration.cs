@@ -19,6 +19,4 @@ namespace Products.Read.API.Infrastructure.EntityConfigurations
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
-    {
-    }
 }

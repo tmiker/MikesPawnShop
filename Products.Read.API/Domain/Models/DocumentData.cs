@@ -18,6 +18,8 @@ namespace Products.Read.API.Domain.Models
         [InverseProperty(nameof(Product.Documents))]
         public Product? Product { get; set; } = default!;
 
+        private DocumentData() { }
+
         public DocumentData(string name, string title, int sequenceNumber, string documentUrl)
         {
             Name = name;

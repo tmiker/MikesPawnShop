@@ -14,7 +14,7 @@ namespace Products.Write.API
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
             services.AddDbContext<EventStoreDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetValue<string>("ProductEventStoreSettings:LocalDevelopmentConnectionString"));
+                options.UseSqlServer(configuration.GetConnectionString("LocalDevelopmentConnectionString"));
             });
 
             services.AddOptions<CloudAMQPSettings>().Configure<IConfiguration>((options, config) =>

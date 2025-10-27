@@ -19,6 +19,8 @@ namespace Products.Read.API.Domain.Models
         [InverseProperty(nameof(Product.Images))]
         public Product Product { get; set; } = default!;
 
+        private ImageData() { }
+
         public ImageData(string name, string caption, int sequenceNumber, string imageUrl, string thumbnailUrl)
         {
             Name = name;

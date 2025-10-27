@@ -26,6 +26,8 @@ namespace Products.Read.API.Domain.Models
         public DateTime DateCreated { get; private set; }
         public DateTime DateUpdated { get; private set; }
 
+        private Product() { }
+
         public Product(Guid aggregateId, string? name, string? category, string? description, decimal price, string? currency, string? status, List<ImageData>? images, List<DocumentData>? documents, int version, DateTime dateCreated, DateTime dateUpdated)
         {
             AggregateId = aggregateId;
