@@ -15,14 +15,12 @@ namespace Products.Write.Application.CQRS.CommandHandlers
         private readonly IProductRepository _productRepository;
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<AddProductHandler> _logger;
-        private readonly IPublishEndpoint _publishEndpoint;
 
-        public AddProductHandler(IProductRepository productRepository, IEventAggregator eventAggregator, ILogger<AddProductHandler> logger, IPublishEndpoint publishEndpoint)
+        public AddProductHandler(IProductRepository productRepository, IEventAggregator eventAggregator, ILogger<AddProductHandler> logger)
         {
             _productRepository = productRepository;
             _eventAggregator = eventAggregator;
             _logger = logger;
-            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<AddProductResult> HandleAsync(AddProduct command, CancellationToken cancellationToken)
@@ -48,21 +46,6 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                         _eventAggregator.Raise(domainEvent);
                     }
                 }
-
-                //// testing
-                //ProductAddedMessage message = new ProductAddedMessage(
-                //        aggregateId: product.Id,
-                //        aggregateType: nameof(Product),
-                //        aggregateVersion: 0,
-                //        correlationId: command.CorrelationId,
-                //        name: command.Name,
-                //        category: command.Category,
-                //        description: command.Description,
-                //        price: command.Price,
-                //        currency: command.Currency,
-                //        status: command.Status
-                //    );
-                //await _publishEndpoint.Publish<ProductAddedMessage>(message, cancellationToken);
 
                 return new AddProductResult(true, productId, null);
             }
