@@ -21,3 +21,12 @@ Products.Read.API
 			OccurredAt: DateTime
 			ReceivedAt: DateTime
 			CorrelationId: string
+
+Products.Write.API
+	Refactor - Add an application service to coordinate commands
+		Should be where events are raised only if the command handler returns success
+		Coordinates any other application services that need to be called as part of the command handling
+			Straight from controller to command handler is not ideal for managing complexity and application flow
+		Change dispatcher to implement MediatR to handle commands
+		Use FluentValidation to validate commands
+		Use AutoMapper to map between DTOs and domain models
