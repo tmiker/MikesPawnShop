@@ -59,12 +59,14 @@ Should raise events only after successful transaction commit in application serv
 so should be based on what the command handler returns, not from within the handler.
 EventAggregator should be a dependency of the application service, not the command handler as currently implemented here.
 
-REFACTOR BRANCH:  EVENT HANDLING
+	
+
+REFACTOR BRANCH:  WRITE APPLICATION SERVICE 
+	DID IMPLEMENT THIS...
 	Move event aggregator to application service layer
 		EventHandlers need to publish messages for event handling
 		Registrations need to move
-
-REFACTOR BRANCH:  WRITE APPLICATION SERVICE - DID NOT IMPLEMENT THIS
+	DID NOT IMPLEMENT THIS...
 	Create an application service to coordinate command handling and event raising, as well as any other concerns
 	Call command handler from application service
 		ProductManagementService or CommandManagementService
