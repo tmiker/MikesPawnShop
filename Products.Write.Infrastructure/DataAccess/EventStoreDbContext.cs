@@ -9,6 +9,7 @@ namespace Products.Write.Infrastructure.DataAccess
         { }
 
         public DbSet<EventRecord> EventRecords { get; set; }
+        public DbSet<OutboxRecord> OutboxRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

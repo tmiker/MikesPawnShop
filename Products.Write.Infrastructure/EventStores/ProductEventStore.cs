@@ -35,16 +35,21 @@ namespace Products.Write.Infrastructure.EventStores
                 @event.CorrelationId); 
 
             _eventStoreDbContext.EventRecords.Add(eventRecord);
-            // create outbox record from event record and add to outbox records - retain atomicity without using UOW
-            OutboxRecord outboxRecord = new OutboxRecord(eventRecord);
-            // _eventStoreDbContext.OutboxRecords.Add(outboxRecord);
+            // create outbox record from event record and add to outbox records - retain atomicity without using UOW - do individually for each event vs batch
+            _eventStoreDbContext.OutboxRecords.Add(new OutboxRecord(eventRecord));
 
             bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
-            if (!success)
+
+            // consider what to do on error - how to maintain consistency 
+            if (success) _logger.LogInformation("Event saved as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+                "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+            else
             {
-                _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
-                throw new ProductEventStoreException("Error saving event as event record.");
+                _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+                    "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+                throw new ProductEventStoreException("Error saving event as event record. Contact support with CorrelationId.");
             }
+
             return success;
         }
 

@@ -87,7 +87,7 @@ namespace Products.Write.Infrastructure
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
                 var eventStore = new ProductEventStore(context, logger);
-                saveResult = await eventStore.SaveAsEventRecordAsync(productAdded);
+                // saveResult = await eventStore.SaveAsEventRecordAsync(productAdded);
             }
 
             List<IDomainEvent> actualResult = new List<IDomainEvent>();
