@@ -8,7 +8,6 @@ using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.Dispatchers;
 using Products.Write.Application.EventManagement;
-using Products.Write.Application.Services;
 using System.Security.Authentication;
 
 namespace Products.Write.Application
@@ -54,9 +53,6 @@ namespace Products.Write.Application
                 aggregator.Register(handlers);
                 return aggregator;
             });
-
-            // Register Application Services
-            // services.AddScoped<IProductCommandManagementService, ProductCommandManagementService>();
 
             // Register Dispatchers
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();

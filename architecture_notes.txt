@@ -63,6 +63,8 @@ REFACTOR BRANCH:  EVENT HANDLING
 	Move event aggregator to application service layer
 		EventHandlers need to publish messages for event handling
 		Registrations need to move
+
+REFACTOR BRANCH:  WRITE APPLICATION SERVICE - DID NOT IMPLEMENT THIS
 	Create an application service to coordinate command handling and event raising, as well as any other concerns
 	Call command handler from application service
 		ProductManagementService or CommandManagementService

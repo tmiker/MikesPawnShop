@@ -12,13 +12,11 @@ namespace Products.Write.API.Controllers
     public class ProductsManagementController : ControllerBase
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IProductCommandManagementService _commandManagementService;
         private readonly ILogger<ProductsManagementController> _logger;
 
-        public ProductsManagementController(ICommandDispatcher commandDispatcher, IProductCommandManagementService commandManagementService, ILogger<ProductsManagementController> logger)
+        public ProductsManagementController(ICommandDispatcher commandDispatcher, ILogger<ProductsManagementController> logger)
         {
             _commandDispatcher = commandDispatcher;
-            _commandManagementService = commandManagementService;
             _logger = logger;
         }
 
