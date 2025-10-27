@@ -56,7 +56,7 @@ namespace Products.Write.Application
             });
 
             // Register Application Services
-            services.AddScoped<IProductCommandManagementService, ProductCommandManagementService>();
+            // services.AddScoped<IProductCommandManagementService, ProductCommandManagementService>();
 
             // Register Dispatchers
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();

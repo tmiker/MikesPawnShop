@@ -30,8 +30,8 @@ namespace Products.Write.API.Controllers
             // (https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.ihttpcontextaccessor?view=aspnetcore-9.0).
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddProduct command = new AddProduct(addProductDTO, correlationId);
-            AddProductResult result = await _commandManagementService.ExecuteCommandAsync<AddProduct, AddProductResult>(command, cancellationToken);
-            // AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
+            // AddProductResult result = await _commandManagementService.ExecuteCommandAsync<AddProduct, AddProductResult>(command, cancellationToken);
+            AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }

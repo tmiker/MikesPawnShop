@@ -23,9 +23,8 @@ namespace Products.Write.Infrastructure.Repositories
             {
                 foreach (var domainEvent in product.DomainEvents)
                 {
-                    // if (domainEvent.AggregateVersion > 0 && domainEvent.AggregateVersion % 10 == 0) needsSnapshotUpdate = true;
-                    bool eventSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
-                    if (!eventSaved) success = false;
+                    bool recordSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
+                    if (!recordSaved) success = false;
                 }
             }
 
