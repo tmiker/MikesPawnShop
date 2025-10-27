@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandHandlers;
 using Products.Write.Infrastructure.Abstractions;
 

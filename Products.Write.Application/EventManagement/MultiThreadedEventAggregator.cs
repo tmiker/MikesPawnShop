@@ -1,4 +1,4 @@
-﻿namespace Products.Write.Infrastructure.EventManagement
+﻿namespace Products.Write.Application.EventManagement
 {
     public class MultiThreadedEventAggregator
     {

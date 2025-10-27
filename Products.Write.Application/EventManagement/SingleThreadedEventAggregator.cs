@@ -1,7 +1,7 @@
-﻿using Products.Write.Domain.Base;
-using Products.Write.Infrastructure.Abstractions;
+﻿using Products.Write.Application.Abstractions;
+using Products.Write.Domain.Base;
 
-namespace Products.Write.Infrastructure.EventManagement
+namespace Products.Write.Application.EventManagement
 {
     public class SingleThreadedEventAggregator : IEventAggregator
     {

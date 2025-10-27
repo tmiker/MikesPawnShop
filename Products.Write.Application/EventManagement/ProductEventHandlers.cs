@@ -1,7 +1,7 @@
-﻿using Products.Write.Domain.Events;
-using Products.Write.Infrastructure.Abstractions;
+﻿using Products.Write.Application.Abstractions;
+using Products.Write.Domain.Events;
 
-namespace Products.Write.Infrastructure.EventManagement
+namespace Products.Write.Application.EventManagement
 {
     public class ProductEventHandlers : IRegisterableEventHandlers
     {

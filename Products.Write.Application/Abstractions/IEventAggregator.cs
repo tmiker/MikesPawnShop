@@ -1,7 +1,7 @@
-﻿using Products.Write.Domain.Base;
-using Products.Write.Infrastructure.EventManagement;
+﻿using Products.Write.Application.EventManagement;
+using Products.Write.Domain.Base;
 
-namespace Products.Write.Infrastructure.Abstractions
+namespace Products.Write.Application.Abstractions
 {
     public interface IEventAggregator
     {
