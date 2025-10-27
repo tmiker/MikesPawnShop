@@ -25,7 +25,7 @@ namespace Products.Write.Infrastructure.EventStores
 
         public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
         {
-            EventRecord record = new EventRecord(
+            EventRecord eventRecord = new EventRecord(
                 @event.AggregateId,
                 @event.AggregateType,
                 @event.AggregateVersion,
@@ -34,11 +34,15 @@ namespace Products.Write.Infrastructure.EventStores
                 @event.OccurredAt,
                 @event.CorrelationId); 
 
-            _eventStoreDbContext.EventRecords.Add(record);
+            _eventStoreDbContext.EventRecords.Add(eventRecord);
+            // create outbox record from event record and add to outbox records - retain atomicity without using UOW
+            OutboxRecord outboxRecord = new OutboxRecord(eventRecord);
+            // _eventStoreDbContext.OutboxRecords.Add(outboxRecord);
+
             bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
             if (!success)
             {
-                _logger.LogError("Error saving event as event record. Aggregate Type: {agg_type}, Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+                _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
                 throw new ProductEventStoreException("Error saving event as event record.");
             }
             return success;

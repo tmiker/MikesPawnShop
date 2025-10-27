@@ -23,6 +23,7 @@ namespace Products.Write.API
             });
 
             // Register exception handlers in order of specificity (most specific first)
+            services.AddExceptionHandler<ProductEventStoreExceptionHandler>();
             services.AddExceptionHandler<ValidationExceptionHandler>();
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
