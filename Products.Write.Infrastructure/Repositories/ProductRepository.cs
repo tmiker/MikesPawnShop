@@ -16,15 +16,21 @@ namespace Products.Write.Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task SaveAsync(Product product)
+        public async Task<bool> SaveAsync(Product product)
         {
-            if (product.DomainEvents is null || !product.DomainEvents.Any()) return;
-            IEnumerable<IDomainEvent> events = product.DomainEvents;
-            foreach (var @event in events)
+            bool success = true;
+            if (product.DomainEvents != null && product.DomainEvents.Any())
             {
-                await _eventStore.SaveAsEventRecordAsync(@event);   // returns a bool but any error is logged by event store and throws ProductEventStoreException
+                foreach (var domainEvent in product.DomainEvents)
+                {
+                    // if (domainEvent.AggregateVersion > 0 && domainEvent.AggregateVersion % 10 == 0) needsSnapshotUpdate = true;
+                    bool eventSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
+                    if (!eventSaved) success = false;
+                }
             }
-            _logger.LogInformation("Product Repository sent {count} events to the Event Store", events.Count());
+
+            _logger.LogInformation("Product Repository sent {count} events to the Event Store", product.DomainEvents?.Count);
+            return success;
         }
 
         public async Task<Product> GetProductByIdAsync(Guid aggregateId)

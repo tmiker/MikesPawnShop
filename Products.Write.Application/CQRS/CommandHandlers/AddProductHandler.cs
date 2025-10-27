@@ -32,25 +32,26 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             Guid productId = product.Id;
 
             // Save the product - throws ProductEventStoreException if error occurs
-            if (!cancellationToken.IsCancellationRequested)
-            {
-                await _productRepository.SaveAsync(product);
+            bool success = await _productRepository.SaveAsync(product);
 
-                // Because will throw if error occurs, we can assume success and publish product domain events
+            // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
+            if (success)
+            {
                 _logger.LogInformation("AddProductHandler created product with Id: {productId}. Command CorrelationId: {correlationId}", productId, command.CorrelationId);
 
                 if (product.DomainEvents is not null && product.DomainEvents.Any())
                 {
                     foreach (var domainEvent in product.DomainEvents)
                     {
-                        _eventAggregator.Raise(domainEvent);
+                        // publish the event to the bus
+                        _eventAggregator.Raise(domainEvent);    
                     }
                 }
 
                 return new AddProductResult(true, productId, null);
             }
 
-            return new AddProductResult(false, Guid.Empty, "Operation cancelled.");
+            else return new AddProductResult(false, Guid.Empty, "An error occurred in persisting changes.");
         }
     }
 }

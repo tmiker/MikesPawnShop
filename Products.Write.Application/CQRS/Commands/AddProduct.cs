@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Products.Write.Application.DTOs;
-using Products.Write.Domain.Enumerations;
 
 namespace Products.Write.Application.CQRS.Commands
 {

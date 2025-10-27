@@ -16,7 +16,6 @@
     <Folder Include="CQRS\Queries\" />
     <Folder Include="CQRS\QueryHandlers\" />
     <Folder Include="CQRS\QueryResults\" />
-    <Folder Include="Services\" />
     <Folder Include="Temp\" />
   </ItemGroup>
 

@@ -8,6 +8,7 @@ using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.Dispatchers;
 using Products.Write.Application.EventManagement;
+using Products.Write.Application.Services;
 using System.Security.Authentication;
 
 namespace Products.Write.Application
@@ -41,7 +42,7 @@ namespace Products.Write.Application
 
             // Register the SingleThreadedEventAggregator as a singleton
             services.AddSingleton<SingleThreadedEventAggregator>();
-            // Register ProductEventHandlers as a singleton
+            // Register ProductEventHandlers 
             services.AddTransient<ProductEventHandlers>();
 
             // Build the service provider and register the event handlers with the event aggregator as IEventAggregator
@@ -53,6 +54,9 @@ namespace Products.Write.Application
                 aggregator.Register(handlers);
                 return aggregator;
             });
+
+            // Register Application Services
+            services.AddScoped<IProductCommandManagementService, ProductCommandManagementService>();
 
             // Register Dispatchers
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();
