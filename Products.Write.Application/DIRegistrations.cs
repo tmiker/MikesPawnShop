@@ -7,6 +7,7 @@ using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.Dispatchers;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
 
 namespace Products.Write.Application

@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Products.Read.API.Configuration;
 using Products.Read.API.Infrastructure.Data;
+using Products.Read.API.MessageConsumers;
+using System.Security.Authentication;
 
 namespace Products.Read.API
 {
@@ -9,6 +12,7 @@ namespace Products.Read.API
         public static IServiceCollection ComposeApplication(this IServiceCollection services)
         {
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
             services.AddDbContext<ProductsReadDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("LocalDevelopmentConnectionString"));
@@ -20,9 +24,41 @@ namespace Products.Read.API
             });
 
             // Register CloudAMQP related services
+            string amqpUrl = configuration.GetSection("CloudAMQPSettings:Url").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
+            string amqpUsername = configuration.GetSection("CloudAMQPSettings:UserVhost").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
+            string amqpPassword = configuration.GetSection("CloudAMQPSettings:Password").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
 
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<ProductAddedConsumer>();
+                x.AddConsumer<StatusUpdateConsumer>();
+                x.AddConsumer<DocumentAddedConsumer>();
+                x.AddConsumer<ImageAddedConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(new Uri(amqpUrl), h =>
+                    {
+                        h.Username(amqpUsername);
+                        h.Password(amqpPassword);
+
+                        h.UseSsl(s =>
+                        {
+                            s.Protocol = SslProtocols.Tls12;
+                        });
+                    });
+                    cfg.ReceiveEndpoint("ProductsReadApi1Queue", e =>
+                    {
+                        e.ConfigureConsumer<ProductAddedConsumer>(context);
+                        e.ConfigureConsumer<StatusUpdateConsumer>(context);
+                        e.ConfigureConsumer<DocumentAddedConsumer>(context);
+                        e.ConfigureConsumer<ImageAddedConsumer>(context);
+                    });
+                });
+            });
 
             return services;
         }
     }
 }
+

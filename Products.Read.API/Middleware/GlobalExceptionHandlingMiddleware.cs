@@ -88,9 +88,13 @@ namespace Products.Read.API.Middleware
                 ConflictException => (StatusCodes.Status409Conflict,
                     "Conflict", "The request could not be completed due to a conflict."),
 
+                ArgumentNullException => (StatusCodes.Status400BadRequest,
+                    "Argument Null", exception.Message),
+
                 ArgumentException => (StatusCodes.Status400BadRequest,
                     "Bad Request", "The request contains invalid arguments."),
 
+                
                 InvalidOperationException => (StatusCodes.Status400BadRequest,
                     "Invalid Operation", "The operation is not valid for the current state."),
 

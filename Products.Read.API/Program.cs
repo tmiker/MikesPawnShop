@@ -7,21 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddProblemDetails();
-//// ProblemDetails service - configure globally if not using extensions in middleware
-//services.AddProblemDetails(options =>
-//{
-//    // Customize problem details globally
-//    options.CustomizeProblemDetails = (context) =>
-//    {
-//        context.ProblemDetails.Extensions["machine"] = Environment.MachineName;
-//        context.ProblemDetails.Extensions["requestId"] = context.HttpContext.TraceIdentifier;
-//        // Add correlation ID if available
-//        if (context.HttpContext.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
-//        {
-//            context.ProblemDetails.Extensions["correlationId"] = correlationId.ToString();
-//        }
-//    };
-//});
 
 // Register services from Composition Root
 builder.Services.ComposeApplication();
