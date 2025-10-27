@@ -7,7 +7,7 @@ namespace Products.Read.API.MessageConsumers
     {
         public async Task Consume(ConsumeContext<ProductAddedMessage> context)
         {
-
+            await Task.Run(() => Console.WriteLine($"Product Added: AggregateId = {context.Message.AggregateId}, Name = {context.Message.Name}"));
         }
     }
 }

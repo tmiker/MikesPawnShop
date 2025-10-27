@@ -6,6 +6,7 @@ namespace Products.Write.Infrastructure.EventManagement
     public class ProductEventHandlers : IRegisterableEventHandlers
     {
         public const string AggregateType = "Product";
+        // private readonly IPublishEndpoint _publishEndpoint;
 
         public void RegisterWithEventAggregator(IEventAggregator eventAggregator)
         {
