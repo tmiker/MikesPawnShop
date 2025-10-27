@@ -19,6 +19,9 @@ namespace Products.Read.API
                 config.GetSection(nameof(CloudAMQPSettings)).Bind(options);
             });
 
+            // Register CloudAMQP related services
+
+
             return services;
         }
     }

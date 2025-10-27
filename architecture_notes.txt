@@ -30,3 +30,31 @@ Products.Write.API
 		Change dispatcher to implement MediatR to handle commands
 		Use FluentValidation to validate commands
 		Use AutoMapper to map between DTOs and domain models
+
+		
+Old DevOps app is incorrectly raising events in the repository (what the heck?) - raising event with event aggregator calls publish to send MT message
+(Note this app raises events in the command handlers after successful transaction commit as determined by saveasync return value)
+
+        public async Task SaveAsync(Project project)
+        {
+            bool needsSnapshotUpdate = false;
+
+            IEnumerable<IDomainEvent>? events = project.GetDomainEvents();
+            if (events != null && events.Any())
+            {
+                foreach (var domainEvent in events)
+                { 
+                    if (domainEvent.AggregateVersion > 0 && domainEvent.AggregateVersion % 10 == 0) needsSnapshotUpdate = true;
+                    var success = await _projectEventStore.SaveAsEventRecordAsync(domainEvent);
+                    if (success) _eventAggregator.Raise(domainEvent);
+                }
+            }
+            if (needsSnapshotUpdate)
+            {
+                await _projectEventStore.SaveAsSnapshotRecordAsync(project.GetSnapshot());
+            }
+        }
+
+Should raise events only after successful transaction commit in application service layer, 
+so should be based on what the command handler returns, not from within the handler.
+EventAggregator should be a dependency of the application service, not the command handler as currently implemented here.
