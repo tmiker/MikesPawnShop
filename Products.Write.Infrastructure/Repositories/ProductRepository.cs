@@ -16,6 +16,18 @@ namespace Products.Write.Infrastructure.Repositories
             _logger = logger;
         }
 
+        // REFACTOR TRANSACTIONS
+
+        // Separating persistence of Domain Events into two method calls ???
+        //   - e.g. StageAggregateEventsAsync - EventStore.StageAggregateEventsAsync + SaveAsync - EventStore.SaveChangesAsync ???
+        //      - No, should do all in a single method (add event records and commit transaction) for user clarity
+        //      - This is for persisting the aggregate state in the form of event records, ...
+        //          ... i.e. a single aggregate only - doing Event SOURCING, not Event DRIVEN Architecture  
+        //      - Events are the persistence mechanism for the aggregate, not for inter-service communication
+        //      - For Event Driven architecture would need a service encapsulating the command handler, ...
+        //          ... publishing these events so can have side effects on other aggregates, ...
+        //          ... with a method to be called to integrate multiple transactions across different aggregates if needed.
+
         public async Task<bool> SaveAsync(Product product)
         {
             bool success = true;
