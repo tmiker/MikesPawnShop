@@ -25,6 +25,8 @@ namespace Products.Write.Infrastructure.EventStores
 
         public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
         {
+            // THIS SHOULD ACTUALLY PROCCESS ALL EVENTS AND COMMIT ALL IN A SINGLE TRANSACTION SO WILL ROLL BACK IF ANY FAIL
+            // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
             EventRecord eventRecord = new EventRecord(
                 @event.AggregateId,
                 @event.AggregateType,

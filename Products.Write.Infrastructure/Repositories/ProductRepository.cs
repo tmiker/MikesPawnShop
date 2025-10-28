@@ -21,6 +21,8 @@ namespace Products.Write.Infrastructure.Repositories
             bool success = true;
             if (product.DomainEvents != null && product.DomainEvents.Any())
             {
+                // THIS SHOULD ACTUALLY SEND ALL EVENTS TO THE EVENT STORE IN A TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
+                // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
                 foreach (var domainEvent in product.DomainEvents)
                 {
                     bool recordSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);

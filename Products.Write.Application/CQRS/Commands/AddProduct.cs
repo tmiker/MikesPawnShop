@@ -11,7 +11,7 @@ namespace Products.Write.Application.CQRS.Commands
         public decimal Price { get; init; }
         public string Currency { get; init; } = default!;
         public string Status { get; init; } = default!;
-        public string? CorrelationId { get; set; } = default!;
+        public string? CorrelationId { get; set; } // = default!;
 
         public AddProduct(string name, string category,
             string description, decimal price, string currency, string status, string? correlationId)

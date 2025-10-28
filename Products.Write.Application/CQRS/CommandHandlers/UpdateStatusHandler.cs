@@ -1,6 +1,4 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Logging;
-using Products.Shared.Messages;
+﻿using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -10,26 +8,25 @@ using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class AddProductHandler : ICommandHandler<AddProduct, AddProductResult>
+    public class UpdateStatusHandler : ICommandHandler<UpdateStatus, UpdateStatusResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IEventAggregator _eventAggregator;
-        private readonly ILogger<AddProductHandler> _logger;
+        private readonly ILogger<UpdateStatusHandler> _logger;
 
-        public AddProductHandler(IProductRepository productRepository, IEventAggregator eventAggregator, ILogger<AddProductHandler> logger)
+        public UpdateStatusHandler(IProductRepository productRepository, IEventAggregator eventAggregator, ILogger<UpdateStatusHandler> logger)
         {
             _productRepository = productRepository;
             _eventAggregator = eventAggregator;
             _logger = logger;
         }
 
-        public async Task<AddProductResult> HandleAsync(AddProduct command, CancellationToken cancellationToken)
+        public async Task<UpdateStatusResult> HandleAsync(UpdateStatus command, CancellationToken cancellationToken)
         {
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
-            CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);
 
-            Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, command.CorrelationId);
-            Guid productId = product.Id;
+            Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
+            product.UpdateStatus(command.Status, command.CorrelationId);
 
             // Save the product - throws ProductEventStoreException if error occurs
             // THE REPOSITORY SHOULD ACTUALLY PROCESS ALL EVENTS TO THE EVENT STORE IN A SINGLE TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
@@ -47,33 +44,13 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                     foreach (var domainEvent in product.DomainEvents)
                     {
                         // publish the event to the bus
-                        _eventAggregator.Raise(domainEvent);    
+                        _eventAggregator.Raise(domainEvent);
                     }
                 }
 
-                return new AddProductResult(true, productId, null);
+                return new UpdateStatusResult(true, null);
             }
-            else return new AddProductResult(false, Guid.Empty, "An error occurred in persisting changes.");
+            else return new UpdateStatusResult(false, "An error occurred in persisting changes.");
         }
     }
 }
-
-// ENUM.PARSE EXCEPTIONS:
-
-//ArgumentNullException
-//enumType is null.
-
-//ArgumentException
-//enumType is not an Enum.
-
-//ArgumentException
-//value is either an empty string or only contains white space.
-
-//ArgumentException
-//value is a name, but not one of the named constants defined for the enumeration.
-
-//OverflowException
-//value is outside the range of the underlying type of enumType.
-
-//InvalidOperationException
-//.NET 8 and later versions: enumType is a Boolean - backed enumeration type.
