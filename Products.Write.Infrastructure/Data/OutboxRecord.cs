@@ -16,6 +16,7 @@ namespace Products.Write.Infrastructure.Data
         public string EventJson { get; set; }
         public DateTime OccurredAt { get; set; }
         public string CorrelationId { get; set; }
+        public bool IsPublished { get; set; } 
 
         public OutboxRecord(EventRecord eventRecord)
         {
@@ -27,6 +28,7 @@ namespace Products.Write.Infrastructure.Data
             EventJson = eventRecord.EventJson;
             OccurredAt = eventRecord.OccurredAt;
             CorrelationId = eventRecord.CorrelationId;
+            IsPublished = false;
         }
 
         public OutboxRecord(Guid aggregateId, string aggregateType, int aggregateVersion, string eventType, string eventJson, DateTime occurredAt, string correlationId)
@@ -38,6 +40,7 @@ namespace Products.Write.Infrastructure.Data
             EventJson = eventJson;
             OccurredAt = occurredAt;
             CorrelationId = correlationId;
+            IsPublished = false;
         }
     }
 }
