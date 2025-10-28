@@ -19,7 +19,7 @@ namespace Products.Write.Infrastructure
         private readonly JsonSerializerSettings _settings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.None };
 
         [Fact]
-        public async Task SaveAsEventRecordAsync_ValidEventArg_CallsDbContextSave()
+        public async Task SaveEventRecordsAsync_ValidEventArg_CallsDbContextSave()
         {
             // Arrange
             bool saveResult = false;
@@ -42,7 +42,8 @@ namespace Products.Write.Infrastructure
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
                 IProductEventStore eventStore = new ProductEventStore(context, logger);
-                saveResult = await eventStore.SaveAsEventRecordAsync(productAdded);
+                IEnumerable<IDomainEvent> events = new List<IDomainEvent>() { productAdded };
+                saveResult = await eventStore.SaveEventRecordsAsync(events);
             }
 
             // Assert
@@ -74,7 +75,7 @@ namespace Products.Write.Infrastructure
                 4, "Image URL", "Thumb URL");
             IDomainEvent docAdded = new DocumentAdded(aggregateId, "Product", 3, "Correlation Id 4", "Doc Name", "Title",
                 3, "Doc URL");
-            var expectedResult = new List<IDomainEvent>() { productAdded, statusUpdated, imageAdded, docAdded };
+            var expectedEventResult = new List<IDomainEvent>() { productAdded, statusUpdated, imageAdded, docAdded };
             // var expectedResult = new List<IDomainEvent>() { productAdded, imageAdded, docAdded };
             var dbContextOptions = new DbContextOptionsBuilder<EventStoreDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
@@ -90,29 +91,33 @@ namespace Products.Write.Infrastructure
                 // saveResult = await eventStore.SaveAsEventRecordAsync(productAdded);
             }
 
-            List<IDomainEvent> actualResult = new List<IDomainEvent>();
+            List<IDomainEvent> actualEventResult = new List<IDomainEvent>();
+            List<OutboxRecord> actualOutboxResult = new List<OutboxRecord>();
             using (var context = new EventStoreDbContext(dbContextOptions))
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
                 IProductEventStore eventStore = new ProductEventStore(context, logger);
 
-                saveResult = await eventStore.SaveAsEventRecordAsync(productAdded);
-                saveResult = saveResult && await eventStore.SaveAsEventRecordAsync(statusUpdated);
-                saveResult = saveResult && await eventStore.SaveAsEventRecordAsync(imageAdded);
-                saveResult = saveResult && await eventStore.SaveAsEventRecordAsync(docAdded);
+                IEnumerable<IDomainEvent> eventsToSave = new List<IDomainEvent>() { productAdded, statusUpdated, imageAdded, docAdded };
+                saveResult = await eventStore.SaveEventRecordsAsync(eventsToSave);
 
                 IEnumerable<IDomainEvent> eventsDeserializedFromStore = await eventStore.GetDomainEventsByIdAsync(aggregateId, 0, int.MaxValue);
                 foreach (var evt in eventsDeserializedFromStore)
                 {
-                    actualResult.Add(evt);
+                    actualEventResult.Add(evt);
                 }
+                actualOutboxResult = (await eventStore.GetOutboxRecordsAsync()).ToList();
             }
 
+
+
             // Assert
-            // assert the expected and actual domain events are the same
+            // assert the expected and actual domain events are the same and outbox records created
             Assert.True(saveResult);
-            Assert.Equal(expectedResult, actualResult, new DomainEventComparer());
+            Assert.Equal(expectedEventResult, actualEventResult, new DomainEventComparer());
+            Assert.Equal(4, actualOutboxResult.Count);
+            Assert.All(actualOutboxResult, o => Assert.Equal(aggregateId, o.AggregateId));
         }
 
         private class DomainEventComparer : IEqualityComparer<IDomainEvent>

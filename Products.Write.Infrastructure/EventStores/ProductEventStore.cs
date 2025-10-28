@@ -23,37 +23,73 @@ namespace Products.Write.Infrastructure.EventStores
             _logger = logger;
         }
 
-        public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
+        public async Task<bool> SaveEventRecordsAsync(IEnumerable<IDomainEvent> events)
         {
-            // THIS SHOULD ACTUALLY PROCCESS ALL EVENTS AND COMMIT ALL IN A SINGLE TRANSACTION SO WILL ROLL BACK IF ANY FAIL
-            // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
-            EventRecord eventRecord = new EventRecord(
-                @event.AggregateId,
-                @event.AggregateType,
-                @event.AggregateVersion,
-                @event.GetType().AssemblyQualifiedName ?? throw new InvalidDataException("Invalid Event Type"),
-                JsonConvert.SerializeObject(@event, _jsonSettings),
-                @event.OccurredAt,
-                @event.CorrelationId); 
+            List<EventRecord> eventRecords = new List<EventRecord>();
+            List<OutboxRecord> outboxRecords = new List<OutboxRecord>();
+            foreach (var @event in events)
+            {
+                EventRecord eventRecord = new EventRecord(
+                    @event.AggregateId,
+                    @event.AggregateType,
+                    @event.AggregateVersion,
+                    @event.GetType().AssemblyQualifiedName ?? throw new InvalidDataException("Invalid Event Type"),
+                    JsonConvert.SerializeObject(@event, _jsonSettings),
+                    @event.OccurredAt,
+                    @event.CorrelationId);
+                eventRecords.Add(eventRecord);
+                outboxRecords.Add(new OutboxRecord(eventRecord));
+            }
 
-            _eventStoreDbContext.EventRecords.Add(eventRecord);
-            // create outbox record from event record and add to outbox records - retain atomicity without using UOW - do individually for each event vs batch
-            _eventStoreDbContext.OutboxRecords.Add(new OutboxRecord(eventRecord));
+            _eventStoreDbContext.EventRecords.AddRange(eventRecords);
+            _eventStoreDbContext.OutboxRecords.AddRange(outboxRecords);
 
+            // default dbcontext transaction should retain atomicity on savechanges 
             bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
 
-            // consider what to do on error - how to maintain consistency 
-            if (success) _logger.LogInformation("Event saved as event record along with an outbox record. Aggregate Type: {agg_type}, " +
-                "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+            if (success) _logger.LogInformation("Events saved as event records along with an outbox records. Aggregate Type: {agg_type}, " +
+                "Aggregate Id: {agg_id}, Correlation Id {corr_id}", eventRecords[0].AggregateType, eventRecords[0].AggregateId, eventRecords[0].CorrelationId);
             else
             {
-                _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, " +
-                    "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+                _logger.LogError("Error saving events as event records along with an outbox records. Aggregate Type: {agg_type}, " +
+                    "Aggregate Id: {agg_id}, Correlation Id {corr_id}", eventRecords[0].AggregateType, eventRecords[0].AggregateId, eventRecords[0].CorrelationId);
                 throw new ProductEventStoreException("Error saving event as event record. Contact support with CorrelationId.");
             }
 
             return success;
         }
+
+        //public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
+        //{
+        //    // THIS SHOULD ACTUALLY PROCCESS ALL EVENTS AND COMMIT ALL IN A SINGLE TRANSACTION SO WILL ROLL BACK IF ANY FAIL
+        //    // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
+        //    EventRecord eventRecord = new EventRecord(
+        //        @event.AggregateId,
+        //        @event.AggregateType,
+        //        @event.AggregateVersion,
+        //        @event.GetType().AssemblyQualifiedName ?? throw new InvalidDataException("Invalid Event Type"),
+        //        JsonConvert.SerializeObject(@event, _jsonSettings),
+        //        @event.OccurredAt,
+        //        @event.CorrelationId); 
+
+        //    _eventStoreDbContext.EventRecords.Add(eventRecord);
+        //    // create outbox record from event record and add to outbox records - retain atomicity without using UOW - do individually for each event vs batch
+        //    _eventStoreDbContext.OutboxRecords.Add(new OutboxRecord(eventRecord));
+
+        //    bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
+
+        //    // consider what to do on error - how to maintain consistency 
+        //    if (success) _logger.LogInformation("Event saved as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+        //        "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+        //    else
+        //    {
+        //        _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+        //            "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+        //        throw new ProductEventStoreException("Error saving event as event record. Contact support with CorrelationId.");
+        //    }
+
+        //    return success;
+        //}
 
         public async Task<IEnumerable<IDomainEvent>> GetDomainEventsByIdAsync(Guid aggregateId, int minVersion = 0, int maxVersion = Int32.MaxValue)
         {
@@ -81,6 +117,12 @@ namespace Products.Write.Infrastructure.EventStores
             }
 
             return events;
+        }
+
+        public async Task<IEnumerable<OutboxRecord>> GetOutboxRecordsAsync()
+        {
+            IEnumerable<OutboxRecord> outboxRecords = await _eventStoreDbContext.OutboxRecords.ToListAsync();
+            return outboxRecords;
         }
 
         // DEV ONLY

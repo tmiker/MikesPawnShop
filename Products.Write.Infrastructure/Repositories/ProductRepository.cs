@@ -30,20 +30,31 @@ namespace Products.Write.Infrastructure.Repositories
 
         public async Task<bool> SaveAsync(Product product)
         {
-            bool success = true;
             if (product.DomainEvents != null && product.DomainEvents.Any())
             {
-                // THIS SHOULD ACTUALLY SEND ALL EVENTS TO THE EVENT STORE IN A TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
-                // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
-                foreach (var domainEvent in product.DomainEvents)
-                {
-                    bool recordSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
-                    if (!recordSaved) success = false;
-                }
+                bool success = await _eventStore.SaveEventRecordsAsync(product.DomainEvents);
+                return success; // error handling occurs in event store
+            }
+            else
+            {
+                _logger.LogInformation("Product Repository found no events to send to the Event Store for Product Id: {productId}", product.Id);
+                return true; // nothing to save, but not an error
             }
 
-            _logger.LogInformation("Product Repository sent {count} events to the Event Store", product.DomainEvents?.Count);
-            return success;
+            //bool success = true;
+            //if (product.DomainEvents != null && product.DomainEvents.Any())
+            //{
+            //    // THIS SHOULD ACTUALLY SEND ALL EVENTS TO THE EVENT STORE IN A TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
+            //    // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
+            //    foreach (var domainEvent in product.DomainEvents)
+            //    {
+            //        bool recordSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
+            //        if (!recordSaved) success = false;
+            //    }
+            //}
+
+            //_logger.LogInformation("Product Repository sent {count} events to the Event Store", product.DomainEvents?.Count);
+            //return success;
         }
 
         public async Task<Product> GetProductByIdAsync(Guid aggregateId)

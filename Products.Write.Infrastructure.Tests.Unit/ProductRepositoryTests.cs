@@ -66,7 +66,7 @@ namespace Products.Write.Infrastructure
         }
 
         [Fact]
-        public async Task SaveAsync_ValidProjectWithMultipleEventsAsArgument_CallsEventStoreSaveMethodForEachEvent()
+        public async Task SaveAsync_ValidProjectWithMultipleEventsAsArgument_CallsEventStoreSaveMethodForEvents()
         {
             // ARRANGE
             // create a product with multiple domain events to save and a SUT ProjectRepository
@@ -91,8 +91,8 @@ namespace Products.Write.Infrastructure
             await sut.SaveAsync(product);
 
             // ASSERT
-            // verify eventstore dependency method SaveAsEventRecordAsync() is called for each event
-            eventStoreMock.Verify(x => x.SaveAsEventRecordAsync(It.IsAny<IDomainEvent>()), Times.Exactly(4));
+            // verify eventstore dependency method SaveEventRecordsAsync() is called once for all events
+            eventStoreMock.Verify(x => x.SaveEventRecordsAsync(It.IsAny<IEnumerable<IDomainEvent>>()), Times.Exactly(1));
         }
     }
 }
