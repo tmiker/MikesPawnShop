@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E
 		scratchpad.txt = scratchpad.txt
 		todo.txt = todo.txt
 		user_secrets_required.txt = user_secrets_required.txt
+		validation_for.txt = validation_for.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Write.Infrastructure", "Products.Write.Infrastructure\Products.Write.Infrastructure.csproj", "{460F53B0-473B-467D-964A-93AD1BE14B04}"

@@ -12,7 +12,7 @@ namespace Products.Write.Domain.Events
         public string CorrelationId { get; init; } = default!;
 
         public string Name { get; init; } = default!;
-        public string? Category { get; init; }
+        public string Category { get; init; } = default!;
         public string Description { get; init; } = default!;
         public decimal Price { get; init; }
         public string Currency { get; init; } = default!;

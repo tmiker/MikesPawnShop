@@ -5,9 +5,17 @@ namespace Products.Read.API.MessageConsumers
 {
     public class ProductAddedConsumer : IConsumer<ProductAddedMessage>
     {
+        private readonly ILogger<ProductAddedConsumer> _logger;
+
+        public ProductAddedConsumer(ILogger<ProductAddedConsumer> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task Consume(ConsumeContext<ProductAddedMessage> context)
         {
-            await Task.Run(() => Console.WriteLine($"Product Added: AggregateId = {context.Message.AggregateId}, Name = {context.Message.Name}"));
+            var message = context.Message;
+            await Task.Run(() => _logger.LogInformation("Product Added: AggregateId = {message.AggregateId}, Name = {message.Name}", message.AggregateId, message.Name));
         }
     }
 }

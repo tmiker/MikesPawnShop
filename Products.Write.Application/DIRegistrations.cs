@@ -40,13 +40,13 @@ namespace Products.Write.Application
             });
 
             // Register the SingleThreadedEventAggregator as a singleton
-            services.AddSingleton<SingleThreadedEventAggregator>();
+            services.AddScoped<SingleThreadedEventAggregator>();
             // Register ProductEventHandlers 
-            services.AddTransient<ProductEventHandlers>();
+            services.AddScoped<ProductEventHandlers>();
 
             // Build the service provider and register the event handlers with the event aggregator as IEventAggregator
             // var serviceProvider = services.BuildServiceProvider();
-            services.AddSingleton(serviceProvider =>
+            services.AddScoped(serviceProvider =>
             {
                 IRegisterableEventHandlers handlers = serviceProvider.GetRequiredService<ProductEventHandlers>();
                 IEventAggregator aggregator = serviceProvider.GetRequiredService<SingleThreadedEventAggregator>();
@@ -64,8 +64,7 @@ namespace Products.Write.Application
 
             // Register Dev Test Handlers
             services.AddScoped<ICommandHandler<ThrowException, ThrowExceptionResult>, ThrowExceptionHandler>();
-
-
+            services.AddScoped<ICommandHandler<ProcessMultipleEvents, ProcessMultipleEventsResult>, ProcessMultipleEventsHandler>();
 
             return services;
         }

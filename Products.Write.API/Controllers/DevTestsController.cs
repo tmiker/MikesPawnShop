@@ -3,6 +3,10 @@ using Microsoft.Extensions.Options;
 using Products.Write.API.Configuration;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.DevTests;
+using Products.Write.Domain.Aggregates;
+using Products.Write.Domain.Enumerations;
+using Products.Write.Application.CQRS.Commands;
+using Products.Write.Application.CQRS.CommandResults;
 
 namespace Products.Write.API.Controllers
 {
@@ -42,6 +46,17 @@ namespace Products.Write.API.Controllers
             string? value = _cloudAmqpSettings.Value.TestingDummyValue;
             if (!string.IsNullOrWhiteSpace(value)) return Ok(value);
             return BadRequest("Unable to find the CloudAMQPSettings TestingDummyValue.");
+        }
+
+        [HttpPost("processMultipleDomainEvents")]
+        public async Task<IActionResult> ProcessMulitpleEvents(CancellationToken cancellationToken)
+        {
+            string correlationId = Guid.NewGuid().ToString();
+            ProcessMultipleEvents command = new ProcessMultipleEvents();
+
+            var result = await _commandDispatcher.DispatchAsync<ProcessMultipleEvents, ProcessMultipleEventsResult>(command, cancellationToken);
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.ErrorMessage);
         }
     }
 }

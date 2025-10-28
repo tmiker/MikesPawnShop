@@ -6,6 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddCors(setup =>
+{
+    setup.AddPolicy("AllowGetPolicy", policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowAnyHeader();
+        policy.WithMethods("GET");
+        policy.WithExposedHeaders("X-Pagination");
+    });
+});
+
 builder.Services.AddProblemDetails();
 
 // Register services from Composition Root
@@ -34,6 +45,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowGetPolicy");
 
 app.UseAuthorization();
 

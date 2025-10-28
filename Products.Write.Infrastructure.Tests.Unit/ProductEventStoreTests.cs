@@ -110,8 +110,6 @@ namespace Products.Write.Infrastructure
                 actualOutboxResult = (await eventStore.GetOutboxRecordsAsync()).ToList();
             }
 
-
-
             // Assert
             // assert the expected and actual domain events are the same and outbox records created
             Assert.True(saveResult);
