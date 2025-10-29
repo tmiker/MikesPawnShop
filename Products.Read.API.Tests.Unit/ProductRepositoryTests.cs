@@ -16,6 +16,18 @@ namespace Products.Read.API
         }
 
         [Fact]
+        public async Task UpdateProductStatusAsync_ValidInputArgument_CorrectlyUpdatesProductStatus()
+        {
+
+        }
+
+            [Fact]
+        public async Task AddProductImageAsync_ValidInputArgument_AddsImageToProduct()
+        {
+
+        }
+
+            [Fact]
         public async Task AddProductDocumentAsync_ValidInputArgument_AddsDocumentToProduct()
         {
             // Arrange
