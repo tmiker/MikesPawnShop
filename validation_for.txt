@@ -1,2 +1,7 @@
-Events
-Messages
+Products.Write
+	Commands
+	Events
+	Messages
+
+Products.Read
+	Messages
