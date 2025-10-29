@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Products.Read.API.Abstractions;
 using Products.Read.API.Configuration;
 using Products.Read.API.Infrastructure.Data;
+using Products.Read.API.Infrastructure.Repositories;
 using Products.Read.API.MessageConsumers;
 using System.Security.Authentication;
 
@@ -17,6 +19,8 @@ namespace Products.Read.API
             {
                 options.UseSqlServer(configuration.GetConnectionString("LocalDevelopmentConnectionString"));
             });
+
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddOptions<CloudAMQPSettings>().Configure<IConfiguration>((options, config) =>
             {

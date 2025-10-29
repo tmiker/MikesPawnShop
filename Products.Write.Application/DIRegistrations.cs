@@ -59,6 +59,9 @@ namespace Products.Write.Application
 
             // Register Command Handlers
             services.AddScoped<ICommandHandler<AddProduct, AddProductResult>, AddProductHandler>();
+            services.AddScoped<ICommandHandler<UpdateStatus, UpdateStatusResult>, UpdateStatusHandler>();
+            services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
+            services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();
 
             // Register Query Handlers
 

@@ -18,7 +18,7 @@ namespace Products.Read.API.Infrastructure.Repositories
             _logger = logger;
         }
 
-        public async Task<int> AddProductAsync(ProductAddedMessage message)
+        public async Task AddProductAsync(ProductAddedMessage message)
         {
             try
             {
@@ -36,15 +36,13 @@ namespace Products.Read.API.Infrastructure.Repositories
 
                 _db.Products.Add(product);
                 bool success = await _db.SaveChangesAsync() > 0;
-                if (success) return product.Id;
+                if (success) return;
                 // handle update error with no exception thrown
                 else HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
-                return -1;
             }
             catch (Exception ex)    // likely a DbUpdateException
             {
                 HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
-                return -1;
             }
         }
 
