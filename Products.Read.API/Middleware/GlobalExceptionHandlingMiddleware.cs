@@ -73,6 +73,9 @@ namespace Products.Read.API.Middleware
         {
             return exception switch
             {
+                DataConsistencyException => (StatusCodes.Status422UnprocessableEntity,
+                    "Data Synchronization Error", "Write Side Data Conflict."),
+
                 ValidationException => (StatusCodes.Status400BadRequest,
                     "Validation Error", "One or more validation errors occurred."),
 
@@ -94,7 +97,7 @@ namespace Products.Read.API.Middleware
                 ArgumentException => (StatusCodes.Status400BadRequest,
                     "Bad Request", "The request contains invalid arguments."),
 
-                
+
                 InvalidOperationException => (StatusCodes.Status400BadRequest,
                     "Invalid Operation", "The operation is not valid for the current state."),
 
