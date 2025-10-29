@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Products.Read.API.Domain.Models;
+using Products.Read.API.Exceptions;
 using Products.Read.API.Infrastructure.Data;
 using Products.Read.API.Infrastructure.Repositories;
 using Products.Shared.Messages;
@@ -55,6 +57,41 @@ namespace Products.Read.API
         }
 
         [Fact]
+        public async Task AddProductAsync_InValidProductNameArgument_ThrowsDataConsistencyExceptionException()
+        {
+            Guid aggregateId = Guid.NewGuid();
+            string aggregateType = "Product";
+            int aggregateVersion = 0;
+            string correlationId = Guid.NewGuid().ToString();
+            string productName = null!;
+            string category = "Astronomy";
+            string description = "Catadioptric Telescope";
+            decimal price = 1299.99m;
+            string currency = "USD";
+            string status = "Active";
+
+            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
+                correlationId, productName, category, description, price, currency, status);
+
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+
+            // Act
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                ProductRepository productRepository = new ProductRepository(context, logger);
+
+                // Assert
+                await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.AddProductAsync(productAddedMessage));
+            }
+        }
+
+        [Fact]
         public async Task UpdateProductStatusAsync_ValidInputArgument_CorrectlyUpdatesProductStatus()
         {
             // Arrange
@@ -99,6 +136,47 @@ namespace Products.Read.API
                 Assert.NotNull(product);
                 Assert.Equal(updatedVersion, product.Version);
                 Assert.Equal(updatedStatus, product.Status);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateProductStatusAsync_ProductNotFound_ThrowsDataConsistencyExceptionException()
+        {
+            // Arrange
+            Guid aggregateId = Guid.NewGuid();
+            string aggregateType = "Product";
+            int initialVersion = 0;
+            string correlationId = Guid.NewGuid().ToString();
+            string productName = "Meade LX8";
+            string category = "Astronomy";
+            string description = "Catadioptric Telescope";
+            decimal price = 1299.99m;
+            string currency = "USD";
+            string initialStatus = "Active";
+            int updatedVersion = 1;
+            string updatedStatus = "InActive";
+            Guid incorrectAggregateId = Guid.NewGuid();
+
+            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
+                correlationId, productName, category, description, price, currency, initialStatus);
+            StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(incorrectAggregateId, aggregateType, updatedVersion,
+                correlationId, updatedStatus);
+
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+
+            // Act
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                ProductRepository productRepository = new ProductRepository(context, logger);
+                await productRepository.AddProductAsync(productAddedMessage);
+
+                // Assert
+                await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
             }
         }
 

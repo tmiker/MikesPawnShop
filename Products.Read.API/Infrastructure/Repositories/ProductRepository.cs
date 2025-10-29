@@ -20,7 +20,9 @@ namespace Products.Read.API.Infrastructure.Repositories
 
         public async Task<int> AddProductAsync(ProductAddedMessage message)
         {
-            Product product = new Product
+            try
+            {
+                Product product = new Product
                 (
                     aggregateId: message.AggregateId,
                     name: message.Name,
@@ -32,63 +34,96 @@ namespace Products.Read.API.Infrastructure.Repositories
                     version: message.AggregateVersion
                 );
 
-            _db.Products.Add(product);
-            bool success = await _db.SaveChangesAsync() > 0;
-            if (success) return product.Id;
-            else HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
-            return -1;
+                _db.Products.Add(product);
+                bool success = await _db.SaveChangesAsync() > 0;
+                if (success) return product.Id;
+                // handle update error with no exception thrown
+                else HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+                return -1;
+            }
+            catch (Exception ex)    // likely a DbUpdateException
+            {
+                HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
+                return -1;
+            }
         }
 
         public async Task UpdateProductStatusAsync(StatusUpdatedMessage message)
         {
-            Product? product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
+            try
+            {
+                Product? product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
 
-            if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
-                
-            product!.UpdateStatus(message.Status, message.AggregateVersion);
-            bool success = await _db.SaveChangesAsync() > 0;
+                if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
 
-            if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
+                if (product!.Status == message.Status) return;
+
+                product!.UpdateStatus(message.Status, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
+
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+            }
+            catch (Exception ex)    // likely a DbUpdateException
+            {
+                HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
+            }
         }
 
         public async Task AddProductImageAsync(ImageAddedMessage message)
         {
-            Product? product = await _db.Products.Include(p => p.Images).FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
+            try
+            {
+                Product? product = await _db.Products.Include(p => p.Images).FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
 
-            if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
+                if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
 
-            ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
-            product!.AddImage(image, message.AggregateVersion);
-            bool success = await _db.SaveChangesAsync() > 0;
+                ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
+                product!.AddImage(image, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
 
-            if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+            }
+            catch (Exception ex)    // likely a DbUpdateException
+            {
+                HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
+            }
         }
 
         public async Task AddProductDocumentAsync(DocumentAddedMessage message)
         {
-            Product? product = await _db.Products.Include(p => p.Documents).FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
+            try
+            {
+                Product? product = await _db.Products.Include(p => p.Documents).FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
 
-            if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
+                if (product is null) HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
 
-            DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
-            product!.AddDocument(document, message.AggregateVersion);
-            bool success = await _db.SaveChangesAsync() > 0;
+                DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
+                product!.AddDocument(document, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
 
-            if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+            }
+            catch (Exception ex)    // likely a DbUpdateException
+            {
+                HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
+            }
         }
 
         private void HandleProductIsNullSynchronizationError(string messageType, Guid aggregateId, string correlationId)
         {
             _logger.LogError("Error: Product associated with Write Side synchronization message was not found. " +
-                "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}", messageType, aggregateId, correlationId);
+                "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}.", messageType, aggregateId, correlationId);
             throw new DataConsistencyException($"Product associated with Write Side synchronization message was not found. " +
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
         }
 
-        private void HandleProductStateSynchronizationError(string messageType, Guid aggregateId, string correlationId)
+        private void HandleProductStateSynchronizationError(string messageType, Guid aggregateId, string correlationId, Exception? ex)
         {
             _logger.LogError("Error synchronizing product state from write side message. " +
-                "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}", messageType, aggregateId, correlationId);
+                "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}.  Exception: {ex}", messageType, aggregateId, correlationId, ex);
             // return -1;
             throw new DataConsistencyException($"Error synchronizing product state from write side message. " +
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");

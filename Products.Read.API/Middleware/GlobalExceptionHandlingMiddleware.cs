@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Products.Read.API.Exceptions;
 using System.Text.Json;
 
@@ -74,7 +75,10 @@ namespace Products.Read.API.Middleware
             return exception switch
             {
                 DataConsistencyException => (StatusCodes.Status422UnprocessableEntity,
-                    "Data Synchronization Error", "Write Side Data Conflict."),
+                    "Data Synchronization Error", "Write Side Data Conflict.  Please Contact Support Immediately."),
+
+                DbUpdateException => (StatusCodes.Status422UnprocessableEntity,
+                    "Database Update Exception", "Possible Read Side Data Corruption. Please Contact Support Immediately."),
 
                 ValidationException => (StatusCodes.Status400BadRequest,
                     "Validation Error", "One or more validation errors occurred."),

@@ -9,12 +9,12 @@
         public DateTime OccurredAt { get; init; }
         public string? CorrelationId { get; init; } // = default!;
         // command data
-        public string? Name { get; init; } // = default!;
-        public string? Category { get; init; } // = default!;
-        public string? Description { get; init; } // = default!;
+        public string Name { get; init; } // = default!;
+        public string Category { get; init; } // = default!;
+        public string Description { get; init; } // = default!;
         public decimal Price { get; init; }
-        public string? Currency { get; init; } // = default!;
-        public string? Status { get; init; } // = default!;
+        public string Currency { get; init; } // = default!;
+        public string Status { get; init; } // = default!;
 
         public ProductAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
             string correlationId, string name, string category,

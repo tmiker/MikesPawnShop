@@ -9,12 +9,12 @@ namespace Products.Read.API.Domain.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public Guid AggregateId { get; private set; }
-        public string? Name { get; private set; }
-        public string? Category { get; private set; }
-        public string? Description { get; private set; }
+        public string Name { get; private set; }
+        public string Category { get; private set; }
+        public string Description { get; private set; }
         public decimal Price { get; private set; }
-        public string? Currency { get; private set; }
-        public string? Status { get; private set; }
+        public string Currency { get; private set; }
+        public string Status { get; private set; }
 
         [InverseProperty(nameof(ImageData.Product))]
         public List<ImageData>? Images { get; set; } 
@@ -24,11 +24,11 @@ namespace Products.Read.API.Domain.Models
 
         public int Version { get; set; }
         public DateTime DateCreated { get; private set; }
-        public DateTime DateUpdated { get; set; }
+        public DateTime DateUpdated { get; private set; }
 
         private Product() { }
 
-        public Product(Guid aggregateId, string? name, string? category, string? description, decimal price, string? currency, string? status, int version)
+        public Product(Guid aggregateId, string name, string category, string description, decimal price, string currency, string status, int version)
         {
             AggregateId = aggregateId;
             Name = name;
