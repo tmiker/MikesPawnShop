@@ -7,7 +7,7 @@ namespace Products.Read.API.Domain.Models
     public class ImageData
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string? Name { get; private set; }           // virtual directory plus filename
         public string? Caption { get; private set; }
         public int SequenceNumber { get; private set; }

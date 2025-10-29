@@ -17,18 +17,18 @@ namespace Products.Read.API.Domain.Models
         public string? Status { get; private set; }
 
         [InverseProperty(nameof(ImageData.Product))]
-        public List<ImageData>? Images { get; private set; } = new List<ImageData>();
+        public List<ImageData>? Images { get; set; } 
 
         [InverseProperty(nameof(DocumentData.Product))]
-        public List<DocumentData>? Documents { get; private set; } = new List<DocumentData>();
+        public List<DocumentData>? Documents { get; set; } 
 
-        public int Version { get; private set; }
+        public int Version { get; set; }
         public DateTime DateCreated { get; private set; }
-        public DateTime DateUpdated { get; private set; }
+        public DateTime DateUpdated { get; set; }
 
         private Product() { }
 
-        public Product(Guid aggregateId, string? name, string? category, string? description, decimal price, string? currency, string? status, List<ImageData>? images, List<DocumentData>? documents, int version, DateTime dateCreated, DateTime dateUpdated)
+        public Product(Guid aggregateId, string? name, string? category, string? description, decimal price, string? currency, string? status, int version)
         {
             AggregateId = aggregateId;
             Name = name;
@@ -37,11 +37,32 @@ namespace Products.Read.API.Domain.Models
             Price = price;
             Currency = currency;
             Status = status;
-            Images = images;
-            Documents = documents;
             Version = version;
-            DateCreated = dateCreated;
-            DateUpdated = dateUpdated;
+            DateCreated = DateTime.UtcNow;
+            DateUpdated = default;
+        }
+
+        public void AddImage(ImageData image, int version)
+        {
+            if (Images is null) Images = new List<ImageData>();
+            Images.Add(image);
+            Version = version;
+            DateUpdated = DateTime.UtcNow;
+        }
+
+        public void AddDocument(DocumentData document, int version)
+        {
+            if (Documents is null) Documents = new List<DocumentData>();
+            Documents.Add(document);
+            Version = version;
+            DateUpdated = DateTime.UtcNow;
+        }
+
+        public void UpdateStatus(string status, int version)
+        {
+            Status = status;
+            Version = version;
+            DateUpdated = DateTime.UtcNow;
         }
     }
 }

@@ -24,9 +24,11 @@ namespace Products.Read.API.Migrations
 
             modelBuilder.Entity("Products.Read.API.Domain.Models.DocumentData", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DocumentUrl")
                         .HasMaxLength(500)
@@ -55,9 +57,11 @@ namespace Products.Read.API.Migrations
 
             modelBuilder.Entity("Products.Read.API.Domain.Models.ImageData", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Caption")
                         .HasMaxLength(200)

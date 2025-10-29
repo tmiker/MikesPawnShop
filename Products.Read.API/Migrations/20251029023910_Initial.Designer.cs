@@ -12,7 +12,7 @@ using Products.Read.API.Infrastructure.Data;
 namespace Products.Read.API.Migrations
 {
     [DbContext(typeof(ProductsReadDbContext))]
-    [Migration("20251027004115_Initial")]
+    [Migration("20251029023910_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,9 +27,11 @@ namespace Products.Read.API.Migrations
 
             modelBuilder.Entity("Products.Read.API.Domain.Models.DocumentData", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DocumentUrl")
                         .HasMaxLength(500)
@@ -58,9 +60,11 @@ namespace Products.Read.API.Migrations
 
             modelBuilder.Entity("Products.Read.API.Domain.Models.ImageData", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Caption")
                         .HasMaxLength(200)
