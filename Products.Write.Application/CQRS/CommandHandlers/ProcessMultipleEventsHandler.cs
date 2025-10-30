@@ -3,7 +3,6 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.DTOs;
-using Products.Write.Domain.Aggregates;
 using Products.Write.Domain.Enumerations;
 using Products.Write.Infrastructure.Abstractions;
 

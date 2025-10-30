@@ -29,7 +29,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);
 
             Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, command.CorrelationId);
-            Guid productId = product.Id;
+            // Guid productId = product.Id;
 
             // Save the product - throws ProductEventStoreException if error occurs
             // THE REPOSITORY SHOULD ACTUALLY PROCESS ALL EVENTS TO THE EVENT STORE IN A SINGLE TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
@@ -51,7 +51,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                     }
                 }
 
-                return new AddProductResult(true, productId, null);
+                return new AddProductResult(true, product.Id, null);
             }
             else return new AddProductResult(false, Guid.Empty, "An error occurred in persisting changes.");
         }
