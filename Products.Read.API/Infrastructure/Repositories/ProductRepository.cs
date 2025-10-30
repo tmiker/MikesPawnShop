@@ -7,7 +7,7 @@ using Products.Shared.Messages;
 
 namespace Products.Read.API.Infrastructure.Repositories
 {
-    public class ProductRepository : IProductRepository 
+    public class ProductRepository : IProductRepository
     {
         private readonly ProductsReadDbContext _db;
         private readonly ILogger<ProductRepository> _logger;
@@ -50,27 +50,21 @@ namespace Products.Read.API.Infrastructure.Repositories
         {
             try
             {
-                Product? product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 5, 3, 2);
-                if (product is null)
-                {
-                    // May want to send to a queue to reprocess later, retry, or throw exception ...
-                    HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
-                }
-                else if (message.AggregateVersion <= product.Version) return;    // idempotency, duplicate command
-                else if (message.AggregateVersion > product.Version + 1)         // version missing 
-                {
-                    // holding queue, or retry get product - BUT COULD CREATE A LOOP - BETTER TO USE A QUEUE AND LOG A WARNING OR ERROR ...
-                    product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 30, 3, 2);
-                }
-                else  // this is the desired product, i.e. message.AggregateVersion == product.Version + 1; 
-                {
-                    // UPDATE EVEN IF STATUS THE SAME - STILL NEED TO PROCESS THE EVENT AND UPDATE THE VERSION
-                    product!.UpdateStatus(message.Status, message.AggregateVersion);
-                    bool success = await _db.SaveChangesAsync() > 0;
+                // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
+                Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
 
-                    // handle update error with no exception thrown
-                    if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
-                } 
+                // UPDATE EVEN IF STATUS THE SAME - STILL NEED TO PROCESS THE EVENT AND UPDATE THE VERSION
+                product!.UpdateStatus(message.Status, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
+
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+            }
+            catch (DuplicateProductMessageException dupEx)
+            {
+                // just log for info
+                _logger.LogInformation(dupEx.Message);
             }
             catch (Exception ex)    // likely a DbUpdateException
             {
@@ -82,27 +76,22 @@ namespace Products.Read.API.Infrastructure.Repositories
         {
             try
             {
-                Product? product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 5, 3, 2);
-                if (product is null)
-                {
-                    // May want to send to a queue to reprocess later, retry, or throw exception ...
-                    HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
-                }
-                else if (message.AggregateVersion <= product.Version) return;    // idempotency, duplicate command
-                else if (message.AggregateVersion > product.Version + 1)         // version missing 
-                {
-                    // holding queue, or retry get product - BUT COULD CREATE A LOOP - BETTER TO USE A QUEUE AND LOG A WARNING OR ERROR ...
-                    product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 30, 3, 2);
-                }
-                else  // this is the desired product, i.e. message.AggregateVersion == product.Version + 1; 
-                {
-                    ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
-                    product!.AddImage(image, message.AggregateVersion);
-                    bool success = await _db.SaveChangesAsync() > 0;
+                // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
+                Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
 
-                    // handle update error with no exception thrown
-                    if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
-                }
+                ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
+                product!.AddImage(image, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
+
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+
+            }
+            catch (DuplicateProductMessageException dupEx)
+            {
+                // just log for info
+                _logger.LogInformation(dupEx.Message);
             }
             catch (Exception ex)    // likely a DbUpdateException
             {
@@ -114,27 +103,22 @@ namespace Products.Read.API.Infrastructure.Repositories
         {
             try
             {
-                Product? product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 5, 3, 2);
-                if (product is null)
-                {
-                    // May want to send to a queue to reprocess later, retry, or throw exception ...
-                    HandleProductIsNullSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!);
-                }
-                else if (message.AggregateVersion <= product.Version) return;    // idempotency, duplicate command
-                else if (message.AggregateVersion > product.Version + 1)         // version missing 
-                {
-                    // holding queue, or retry get product - BUT COULD CREATE A LOOP - BETTER TO USE A QUEUE AND LOG A WARNING OR ERROR ...
-                    product = await GetProductAndVersionWithRetriesAsync(message.AggregateId, message.AggregateVersion, 30, 3, 2);
-                }
-                else  // this is the desired product, i.e. message.AggregateVersion == product.Version + 1; 
-                {
-                    DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
-                    product!.AddDocument(document, message.AggregateVersion);
-                    bool success = await _db.SaveChangesAsync() > 0;
+                // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
+                Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
 
-                    // handle update error with no exception thrown
-                    if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
-                }
+                DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
+                product!.AddDocument(document, message.AggregateVersion);
+                bool success = await _db.SaveChangesAsync() > 0;
+
+                // handle update error with no exception thrown
+                if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
+
+            }
+            catch (DuplicateProductMessageException dupEx)
+            {
+                // just log for info
+                _logger.LogInformation(dupEx.Message);
             }
             catch (Exception ex)    // likely a DbUpdateException
             {
@@ -142,27 +126,55 @@ namespace Products.Read.API.Infrastructure.Repositories
             }
         }
 
-        private async Task<Product?> GetProductAndVersionWithRetriesAsync(Guid aggregateId, int messageVersion, int intervalSeconds, int retryCount, int multiplier)
+        private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId, int intervalSeconds, int retryCount, int multiplier)
         {
             Product? product = null;
             while (retryCount > 0)
             {
                 product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
+
                 if (product is not null)
                 {
-                    // if product.Version == messageVersion - 1 this is the correct product version to update
-                    // if product.Version >= messageVersion the command is a duplicate - COULD THROW CUSTOM EXCEPTION AND CATCH IT ABOVE TO RETURN OUT OF ENCLOSING METHOD
-                    if (product.Version == messageVersion - 1 || product.Version >= messageVersion) return product;
+                    if (product.Version == messageVersion - 1) return product;
+                    if (product.Version >= messageVersion)
+                    {
+                        // catch in process, log for information only, do not rethrow
+                        throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
+                    }
                 }
-                else
-                {
-                    intervalSeconds = intervalSeconds * multiplier;
-                    retryCount--;
-                    await Task.Delay(intervalSeconds * 1000);
-                }
+
+                intervalSeconds = intervalSeconds * multiplier;
+                retryCount--;
+                await Task.Delay(intervalSeconds * 1000);
             }
+
+            if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!);
+            else if (product.Version <= messageVersion - 1) HandleMissingProductMessageVersionError(messageType, aggregateId, messageVersion, correlationId!);
+
             return product;
         }
+
+        //private async Task<Product?> GetProductAndVersionWithRetriesAsync(Guid aggregateId, int messageVersion, int intervalSeconds, int retryCount, int multiplier)
+        //{
+        //    Product? product = null;
+        //    while (retryCount > 0)
+        //    {
+        //        product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
+        //        if (product is not null)
+        //        {
+        //            // if product.Version == messageVersion - 1 this is the correct product version to update
+        //            // if product.Version >= messageVersion the command is a duplicate - COULD THROW CUSTOM EXCEPTION AND CATCH IT ABOVE TO RETURN OUT OF ENCLOSING METHOD
+        //            if (product.Version == messageVersion - 1 || product.Version >= messageVersion) return product;
+        //        }
+        //        else
+        //        {
+        //            intervalSeconds = intervalSeconds * multiplier;
+        //            retryCount--;
+        //            await Task.Delay(intervalSeconds * 1000);
+        //        }
+        //    }
+        //    return product;
+        //}
 
         private void HandleProductIsNullSynchronizationError(string messageType, Guid aggregateId, string correlationId)
         {
@@ -178,6 +190,15 @@ namespace Products.Read.API.Infrastructure.Repositories
                 "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}.  Exception: {ex}", messageType, aggregateId, correlationId, ex);
             // return -1;
             throw new DataConsistencyException($"Error synchronizing product state from write side message. " +
+                $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
+        }
+
+        private void HandleMissingProductMessageVersionError(string messageType, Guid aggregateId, int messageVersion, string correlationId)
+        {
+            _logger.LogError("Missing Product Message Version {missingMessageVersion}. Unable to process {messageType} message " +
+                "for AggregateId {aggregateId}, Version {messageVersion}, CorrelationId {correlationId} as the previous message " +
+                "is missing.", messageVersion - 1, messageType, aggregateId, messageVersion, correlationId);
+            throw new MissingProductVersionException($"Error synchronizing product state from write side message. " +
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
         }
     }
