@@ -52,7 +52,7 @@ namespace Products.Read.API.Infrastructure.Repositories
             {
                 // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
                 Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
-                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId);
 
                 // UPDATE EVEN IF STATUS THE SAME - STILL NEED TO PROCESS THE EVENT AND UPDATE THE VERSION
                 product!.UpdateStatus(message.Status, message.AggregateVersion);
@@ -78,7 +78,7 @@ namespace Products.Read.API.Infrastructure.Repositories
             {
                 // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
                 Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
-                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId);
 
                 ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
                 product!.AddImage(image, message.AggregateVersion);
@@ -105,7 +105,7 @@ namespace Products.Read.API.Infrastructure.Repositories
             {
                 // method GetCorrectProductAndVersionWithRetriesAsync handles null, missing versions, and duplicate messages
                 Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
-                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId, 5, 3, 2);
+                    message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId);
 
                 DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
                 product!.AddDocument(document, message.AggregateVersion);
@@ -120,67 +120,72 @@ namespace Products.Read.API.Infrastructure.Repositories
                 // just log for info
                 _logger.LogInformation(dupEx.Message);
             }
-            catch (Exception ex)    // likely a DbUpdateException
+            catch (Exception ex)    // likely a DbUpdateException or MissingProductVersionException
             {
                 HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, ex);
             }
         }
 
-        private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId, int intervalSeconds, int retryCount, int multiplier)
+        private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId) //, 
         {
+            int intervalSeconds = 3; 
+            int retryCount = 3;
+            int intervalMultiplier = 1;
+
             Product? product = null;
             while (retryCount > 0)
             {
-                product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
+                product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
+
+                //// using group join
+                //var result = await (from p in _db.Products
+                //             where p.AggregateId == aggregateId
+                //             join i in _db.ImageData on p.Id equals i.ProductId into images
+                //             join d in _db.DocumentData on p.Id equals d.ProductId into documents
+                //             select new
+                //             {
+                //                 Product = p,
+                //                 Images = images,
+                //                 Documents = documents  // .DefaultIfEmpty(),
+                //             }).FirstOrDefaultAsync();
 
                 if (product is not null)
                 {
                     if (product.Version == messageVersion - 1) return product;
                     if (product.Version >= messageVersion)
                     {
-                        // catch in process, log for information only, do not rethrow
+                        // will catch and log this in process, then return
                         throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
                     }
                 }
 
-                intervalSeconds = intervalSeconds * multiplier;
+                // requery the database if the product is null, or if product is not null but product.Version < (messageVersion - 1)
+                // as need to ensure finding the version that precedes the message version by 1
+                intervalSeconds = intervalSeconds * intervalMultiplier;
                 retryCount--;
                 await Task.Delay(intervalSeconds * 1000);
             }
 
             if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!);
-            else if (product.Version <= messageVersion - 1) HandleMissingProductMessageVersionError(messageType, aggregateId, messageVersion, correlationId!);
+            else if (product.Version < messageVersion - 1) HandleMissingProductMessageVersionError(messageType, aggregateId, messageVersion, correlationId!);
 
             return product;
         }
-
-        //private async Task<Product?> GetProductAndVersionWithRetriesAsync(Guid aggregateId, int messageVersion, int intervalSeconds, int retryCount, int multiplier)
-        //{
-        //    Product? product = null;
-        //    while (retryCount > 0)
-        //    {
-        //        product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
-        //        if (product is not null)
-        //        {
-        //            // if product.Version == messageVersion - 1 this is the correct product version to update
-        //            // if product.Version >= messageVersion the command is a duplicate - COULD THROW CUSTOM EXCEPTION AND CATCH IT ABOVE TO RETURN OUT OF ENCLOSING METHOD
-        //            if (product.Version == messageVersion - 1 || product.Version >= messageVersion) return product;
-        //        }
-        //        else
-        //        {
-        //            intervalSeconds = intervalSeconds * multiplier;
-        //            retryCount--;
-        //            await Task.Delay(intervalSeconds * 1000);
-        //        }
-        //    }
-        //    return product;
-        //}
 
         private void HandleProductIsNullSynchronizationError(string messageType, Guid aggregateId, string correlationId)
         {
             _logger.LogError("Error: Product associated with Write Side synchronization message was not found. " +
                 "Message Type: {messageType}, AggregageId: {aggId}, CorrelationId: {corrId}.", messageType, aggregateId, correlationId);
             throw new DataConsistencyException($"Product associated with Write Side synchronization message was not found. " +
+                $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
+        }
+
+        private void HandleMissingProductMessageVersionError(string messageType, Guid aggregateId, int messageVersion, string correlationId)
+        {
+            _logger.LogError("Missing Product Message Version {missingMessageVersion}. Unable to process {messageType} message " +
+                "for AggregateId {aggregateId}, Version {messageVersion}, CorrelationId {correlationId} as the previous message " +
+                "is missing.", messageVersion - 1, messageType, aggregateId, messageVersion, correlationId);
+            throw new DataConsistencyException($"Error synchronizing product state from write side message. " +
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
         }
 
@@ -193,13 +198,5 @@ namespace Products.Read.API.Infrastructure.Repositories
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
         }
 
-        private void HandleMissingProductMessageVersionError(string messageType, Guid aggregateId, int messageVersion, string correlationId)
-        {
-            _logger.LogError("Missing Product Message Version {missingMessageVersion}. Unable to process {messageType} message " +
-                "for AggregateId {aggregateId}, Version {messageVersion}, CorrelationId {correlationId} as the previous message " +
-                "is missing.", messageVersion - 1, messageType, aggregateId, messageVersion, correlationId);
-            throw new MissingProductVersionException($"Error synchronizing product state from write side message. " +
-                $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
-        }
     }
 }

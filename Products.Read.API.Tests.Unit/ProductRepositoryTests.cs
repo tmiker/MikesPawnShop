@@ -140,7 +140,7 @@ namespace Products.Read.API
         }
 
         [Fact]
-        public async Task UpdateProductStatusAsync_ProductNotFound_ThrowsDataConsistencyExceptionException()
+        public async Task UpdateProductStatusAsync_ProductNotFound_ThrowsDataConsistencyException()
         {
             // Arrange
             Guid aggregateId = Guid.NewGuid();
@@ -176,7 +176,100 @@ namespace Products.Read.API
                 await productRepository.AddProductAsync(productAddedMessage);
 
                 // Assert
+                Product product = context.Products.Single();
+                Assert.NotNull(product);
                 await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
+            }
+        }
+
+        [Fact]
+        public async Task UpdateProductStatusAsync_MissingProductVersion_ThrowsMissingProductVersionException()
+        {
+            // Arrange
+            Guid aggregateId = Guid.NewGuid();
+            string aggregateType = "Product";
+            int initialVersion = 0;
+            string correlationId = Guid.NewGuid().ToString();
+            string productName = "Meade LX8";
+            string category = "Astronomy";
+            string description = "Catadioptric Telescope";
+            decimal price = 1299.99m;
+            string currency = "USD";
+            string initialStatus = "Active";
+            int updatedVersion = 2;                 // version 1 will be missing, should throw MissingProductVersionException
+            string updatedStatus = "InActive";
+            Guid incorrectAggregateId = Guid.NewGuid();
+
+            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
+                correlationId, productName, category, description, price, currency, initialStatus);
+            StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(incorrectAggregateId, aggregateType, updatedVersion,
+                correlationId, updatedStatus);
+
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+
+            // Act
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                ProductRepository productRepository = new ProductRepository(context, logger);
+                await productRepository.AddProductAsync(productAddedMessage);
+
+                // Assert
+                Product product = context.Products.Single();
+                Assert.NotNull(product);
+                await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
+            }
+        }
+
+        [Fact]
+        public async Task UpdateProductStatusAsync_DuplicateProductMessage_IgnoresDuplicateMessage()
+        {
+            // Arrange
+            Guid aggregateId = Guid.NewGuid();
+            string aggregateType = "Product";
+            int initialVersion = 3;
+            string correlationId = Guid.NewGuid().ToString();
+            string productName = "Meade LX8";
+            string category = "Astronomy";
+            string description = "Catadioptric Telescope";
+            decimal price = 1299.99m;
+            string currency = "USD";
+            string initialStatus = "Active";
+            int firstUpdatedVersion = 4;                 // version 1 will be missing, should throw MissingProductVersionException
+            string firstUpdatedStatus = "InActive";
+            int secondUpdatedVersion = 2;
+            string secondUpdatedStatus = "Obsolete";
+
+            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
+                correlationId, productName, category, description, price, currency, initialStatus);
+            StatusUpdatedMessage firstStatusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, firstUpdatedVersion,
+                correlationId, firstUpdatedStatus);
+            StatusUpdatedMessage secondStatusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, secondUpdatedVersion,
+                correlationId, secondUpdatedStatus);
+
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+
+            // Act
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                ProductRepository productRepository = new ProductRepository(context, logger);
+                await productRepository.AddProductAsync(productAddedMessage);
+                await productRepository.UpdateProductStatusAsync(firstStatusUpdatedMessage);
+                await productRepository.UpdateProductStatusAsync(secondStatusUpdatedMessage);
+
+                // Assert
+                Product product = context.Products.Single();
+                Assert.NotNull(product);
+                Assert.Equal(firstUpdatedStatus, product.Status);
             }
         }
 
@@ -199,10 +292,11 @@ namespace Products.Read.API
             int sequenceNumber = 1;
             string imageUrl = "https://www.docs.imageUrl";
             string thumbUrl = "https://www.docs.thumbUrl";
+            int imageVersion = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
                 correlationId, productName, category, description, price, currency, status);
-            ImageAddedMessage imageAddedMessage = new ImageAddedMessage(aggregateId, aggregateType, aggregateVersion,
+            ImageAddedMessage imageAddedMessage = new ImageAddedMessage(aggregateId, aggregateType, imageVersion,
                 correlationId, imageName, caption, sequenceNumber, imageUrl, thumbUrl);
 
             NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
@@ -253,10 +347,11 @@ namespace Products.Read.API
             string title = "Meade LX8 Instructions";
             int sequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
+            int documentVersion = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
                 correlationId, productName, category, description, price, currency, status);
-            DocumentAddedMessage documentAddedMessage = new DocumentAddedMessage(aggregateId, aggregateType, aggregateVersion,
+            DocumentAddedMessage documentAddedMessage = new DocumentAddedMessage(aggregateId, aggregateType, documentVersion,
                 correlationId, documentName, title, sequenceNumber, documentUrl);
 
             NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
