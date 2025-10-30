@@ -154,7 +154,7 @@ namespace Products.Read.API.Infrastructure.Repositories
                     if (product.Version == messageVersion - 1) return product;
                     if (product.Version >= messageVersion)
                     {
-                        // will catch and log this in process, then return
+                        // will catch and log this in process, then return as not a show stopper
                         throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
                     }
                 }
