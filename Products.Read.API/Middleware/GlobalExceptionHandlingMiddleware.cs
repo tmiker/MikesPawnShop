@@ -74,14 +74,14 @@ namespace Products.Read.API.Middleware
         {
             return exception switch
             {
-                MissingProductVersionException => (StatusCodes.Status422UnprocessableEntity,
-                    "Missing Product Message", "Previous message version not found. Unable to process succeeding message.  Please Contact Support Immediately."),
+                //MissingProductVersionException => (StatusCodes.Status422UnprocessableEntity,
+                //    "Missing Product Message", "Previous message version not found. Unable to process succeeding message.  Please Contact Support Immediately."),
 
                 DataConsistencyException => (StatusCodes.Status422UnprocessableEntity,
-                    "Data Synchronization Error", "Write Side Data Conflict.  Please Contact Support Immediately."),
+                    "Data Synchronization Error", "Write Side Data Conflict.  Please Contact Support Immediately with CorrelationId."),
 
                 DbUpdateException => (StatusCodes.Status422UnprocessableEntity,
-                    "Database Update Exception", "Possible Read Side Data Corruption. Please Contact Support Immediately."),
+                    "Database Update Exception", "Possible Read Side Data Corruption. Please Contact Support Immediately with CorrelationId."),
 
                 ValidationException => (StatusCodes.Status400BadRequest,
                     "Validation Error", "One or more validation errors occurred."),
@@ -103,7 +103,6 @@ namespace Products.Read.API.Middleware
 
                 ArgumentException => (StatusCodes.Status400BadRequest,
                     "Bad Request", "The request contains invalid arguments."),
-
 
                 InvalidOperationException => (StatusCodes.Status400BadRequest,
                     "Invalid Operation", "The operation is not valid for the current state."),

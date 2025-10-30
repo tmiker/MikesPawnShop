@@ -137,18 +137,6 @@ namespace Products.Read.API.Infrastructure.Repositories
             {
                 product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
 
-                //// using group join
-                //var result = await (from p in _db.Products
-                //             where p.AggregateId == aggregateId
-                //             join i in _db.ImageData on p.Id equals i.ProductId into images
-                //             join d in _db.DocumentData on p.Id equals d.ProductId into documents
-                //             select new
-                //             {
-                //                 Product = p,
-                //                 Images = images,
-                //                 Documents = documents  // .DefaultIfEmpty(),
-                //             }).FirstOrDefaultAsync();
-
                 if (product is not null)
                 {
                     if (product.Version == messageVersion - 1) return product;
