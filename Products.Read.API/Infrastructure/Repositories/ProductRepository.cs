@@ -7,7 +7,7 @@ using Products.Shared.Messages;
 
 namespace Products.Read.API.Infrastructure.Repositories
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : IProductRepository 
     {
         private readonly ProductsReadDbContext _db;
         private readonly ILogger<ProductRepository> _logger;
