@@ -48,7 +48,7 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetPagedAndFilteredProducts(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductsResult result = await _productQueryService.GetPagedAndFilteredProductsAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(result.Products);
+            if (result.IsSuccess) return Ok(new { result.Products, result.PaginationMetadata });
             return BadRequest(result.ErrorMessage);
         }
 
@@ -56,7 +56,7 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<IEnumerable<ProductSummaryDTO>>> GetPagedAndFilteredProductSummaries(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductSummariesResult result = await _productQueryService.GetPagedAndFilteredProductSummariesAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(result.ProductSummaries);
+            if (result.IsSuccess) return Ok(new { result.ProductSummaries, result.PaginationMetadata });
             return BadRequest(result.ErrorMessage);
         }
 

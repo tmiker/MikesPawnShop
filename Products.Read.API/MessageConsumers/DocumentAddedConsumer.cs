@@ -18,8 +18,8 @@ namespace Products.Read.API.MessageConsumers
         public async Task Consume(ConsumeContext<DocumentAddedMessage> context)
         {
             var message = context.Message;
-            await Task.Run(() => _logger.LogInformation("Document Added Message Received: AggregateId = {message.AggregateId}, " +
-                "Title = {message.Title}", message.AggregateId, message.Title));
+            await Task.Run(() => _logger.LogInformation("Document Added Message Received: VERSION = {version}, AggregateId = {message.AggregateId}, " +
+                "Title = {message.Title}", message.AggregateVersion, message.AggregateId, message.Title));
 
             await _productRepository.AddProductDocumentAsync(message);
         }

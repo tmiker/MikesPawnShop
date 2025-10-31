@@ -33,6 +33,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 AddProduct addProductCommand = new AddProduct(addProductDTO, command.CorrelationId);
                 AddProductResult addProductResult = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(addProductCommand, cancellationToken);
 
+                await Task.Delay(3000);
+
                 Guid aggregateId = addProductResult.ProductId;
 
                 UpdateStatus updateStatusCommand = new UpdateStatus() { ProductId = aggregateId, Status = Status.InActive.Name, CorrelationId = command.CorrelationId };

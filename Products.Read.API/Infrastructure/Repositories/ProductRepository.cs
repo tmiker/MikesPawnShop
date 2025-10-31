@@ -128,14 +128,17 @@ namespace Products.Read.API.Infrastructure.Repositories
 
         private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId) //, 
         {
-            int intervalSeconds = 3; 
+            int intervalSeconds = 5; 
             int retryCount = 3;
-            int intervalMultiplier = 1;
+            int intervalMultiplier = 2;
 
             Product? product = null;
             while (retryCount > 0)
             {
-                product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
+                _logger.LogInformation("*********** PRODUCTS READ SIDE REPOSITORY ATTEMPTING TO GET CORRECT PRODUCT AND VERSION: ********** \n MESSAGE TYPE: {message_type}, " +
+                "MESSAGE VERSION: {message_version}, AGGREGATE ID: {aggId}, CORRELATION ID: {corrId} RETRY COUNT: {retry} ...", messageType, messageVersion, aggregateId, correlationId, retryCount);
+
+                product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
 
                 if (product is not null)
                 {
