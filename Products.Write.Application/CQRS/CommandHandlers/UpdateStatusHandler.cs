@@ -23,6 +23,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
 
         public async Task<UpdateStatusResult> HandleAsync(UpdateStatus command, CancellationToken cancellationToken)
         {
+            Console.WriteLine($"UpdateStatusHandler method HandleAsync called for Aggregate Id: {command.ProductId.ToString()} ...");
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
 
             Product product = await _productRepository.GetProductByIdAsync(command.ProductId);

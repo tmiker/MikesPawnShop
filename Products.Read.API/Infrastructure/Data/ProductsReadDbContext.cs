@@ -11,6 +11,7 @@ namespace Products.Read.API.Infrastructure.Data
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<ImageData> ImageData { get; set; } = null!;
         public DbSet<DocumentData> DocumentData { get; set; } = null!;
+        public DbSet<ProductMessageRecord> ProductMessageRecords { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
