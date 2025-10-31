@@ -67,7 +67,6 @@ namespace Products.Write.Application
 
             // Register Dev Test Handlers
             services.AddScoped<ICommandHandler<ThrowException, ThrowExceptionResult>, ThrowExceptionHandler>();
-            services.AddScoped<ICommandHandler<ProcessMultipleEvents, ProcessMultipleEventsResult>, ProcessMultipleEventsHandler>();
 
             return services;
         }

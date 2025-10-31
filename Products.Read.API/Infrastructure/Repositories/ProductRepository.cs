@@ -109,7 +109,9 @@ namespace Products.Read.API.Infrastructure.Repositories
 
                 DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
                 product!.AddDocument(document, message.AggregateVersion);
+                Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD BEFORE SAVE CHANGES: {product.Documents!.Count}");
                 bool success = await _db.SaveChangesAsync() > 0;
+                Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD AND AFTER SAVE CHANGES: {product.Documents!.Count}");
 
                 // handle update error with no exception thrown
                 if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);

@@ -8,7 +8,7 @@
         public int SequenceNumber { get; init; }
         public string DocumentUrl { get; init; } = default!;
 
-        public AddDocumentDTO(Guid productId, string? title, int sequenceNumber, string? documentUrl)
+        public AddDocumentDTO(Guid productId, string title, int sequenceNumber, string documentUrl)
         {
             ProductId = productId;
             Title = title;
