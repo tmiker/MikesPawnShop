@@ -28,8 +28,8 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

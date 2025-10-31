@@ -36,6 +36,7 @@ namespace Products.Read.API.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            Console.WriteLine($"***************** GlobalExceptionHandlingMiddleware is handling the Exception. *****************");
             context.Response.ContentType = "application/problem+json";
             var problemDetails = CreateProblemDetails(context, exception);
 
@@ -50,6 +51,7 @@ namespace Products.Read.API.Middleware
 
         private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception)
         {
+            Console.WriteLine($"***************** GlobalExceptionHandlingMiddleware private helper method CreateProblemDetails was called. *****************");
             var (statusCode, title, detail) = MapException(exception);
             return new ProblemDetails
             {

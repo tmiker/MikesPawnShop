@@ -31,7 +31,7 @@ namespace Products.Read.API.QueryServices
 
         public async Task<GetProductsResult> GetAllProductsAsync()
         {
-            IEnumerable<Product> products = await _db.Products.Include(p => p.Images).Include(p => p.Documents).ToListAsync();
+            IEnumerable<Product> products = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().ToListAsync();
             List<ProductDTO> productDTOs = MapProductsToDTOs(products); 
             return new GetProductsResult(true, productDTOs, null);
         }
@@ -39,7 +39,7 @@ namespace Products.Read.API.QueryServices
         public async Task<GetPagedAndFilteredProductsResult> GetPagedAndFilteredProductsAsync(
             string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
-            var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsQueryable();
+            var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower() == category.ToLower());
 
@@ -77,7 +77,7 @@ namespace Products.Read.API.QueryServices
 
         public async Task<GetProductByIdResult> GetProductByIdAsync(int id)
         {
-            Product? product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).FirstOrDefaultAsync(p => p.Id == id);
+            Product? product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().FirstOrDefaultAsync(p => p.Id == id);
             if (product is null) return new GetProductByIdResult(false, null, $"A product with Id {id} was not found.");
 
             ProductDTO productDTO = new ProductDTO
@@ -169,7 +169,7 @@ namespace Products.Read.API.QueryServices
 
         public async Task<GetProductSummariesResult> GetAllProductSummariesAsync()
         {
-            IEnumerable<Product> products = await _db.Products.Include(p => p.Images).Include(p => p.Documents).ToListAsync();
+            IEnumerable<Product> products = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().ToListAsync();
             List<ProductSummaryDTO> summaryDTOs = new List<ProductSummaryDTO>();
             foreach (var product in products)
             {
@@ -219,7 +219,7 @@ namespace Products.Read.API.QueryServices
 
         public async Task<GetPagedAndFilteredProductSummariesResult> GetPagedAndFilteredProductSummariesAsync(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
-            var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsQueryable();
+            var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower() == category.ToLower());
 
@@ -277,7 +277,7 @@ namespace Products.Read.API.QueryServices
 
         public async Task<GetProductSummaryByIdResult> GetProductSummaryByIdAsync(int id)
         {
-            Product? product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).FirstOrDefaultAsync(p => p.Id == id);
+            Product? product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().FirstOrDefaultAsync(p => p.Id == id);
             if (product is null) return new GetProductSummaryByIdResult(false, null, $"A product with Id {id} was not found.");
 
             ProductSummaryDTO dto = new ProductSummaryDTO

@@ -19,6 +19,8 @@ namespace Products.Read.API
             services.AddDbContext<ProductsReadDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("LocalDevelopmentConnectionString"));
+                // options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+                
             });
 
             services.AddScoped<IProductRepository, ProductRepository>();
