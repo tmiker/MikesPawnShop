@@ -33,5 +33,35 @@ namespace Products.Write.API.Controllers
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
+
+        [HttpPost("status")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
+        {
+            var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
+            UpdateStatus command = new UpdateStatus(updateStatusDTO, correlationId);    
+            UpdateStatusResult result = await _commandDispatcher.DispatchAsync<UpdateStatus, UpdateStatusResult>(command, cancellationToken);
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost("image")]
+        public async Task<IActionResult> AddImage([FromBody] AddImageDTO addImageDTO, CancellationToken cancellationToken)
+        {
+            var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
+            AddImage command = new AddImage(addImageDTO, correlationId);    
+            AddImageResult result = await _commandDispatcher.DispatchAsync<AddImage, AddImageResult>(command, cancellationToken);
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost("document")]
+        public async Task<IActionResult> AddDocument([FromBody] AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken)
+        {
+            var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
+            AddDocument command = new AddDocument(addDocumentDTO, correlationId);
+            AddDocumentResult result = await _commandDispatcher.DispatchAsync<AddDocument, AddDocumentResult>(command, cancellationToken);
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }
