@@ -8,5 +8,6 @@ namespace Products.Read.API.Abstractions
         Task UpdateProductStatusAsync(StatusUpdatedMessage message);
         Task AddProductImageAsync(ImageAddedMessage message);
         Task AddProductDocumentAsync(DocumentAddedMessage message);
+        Task<bool> PurgeAsync();
     }
 }

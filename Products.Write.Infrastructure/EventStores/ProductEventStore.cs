@@ -155,5 +155,20 @@ namespace Products.Write.Infrastructure.EventStores
             _logger.LogInformation("Product Event Store records were purged. Rows deleted: {count}", count);
             return count > 0;
         }
+
+        public async Task<bool> PurgeAsync()
+        {
+            var events = await _eventStoreDbContext.EventRecords.ToListAsync();
+            var outbox = await _eventStoreDbContext.OutboxRecords.ToListAsync();
+            _eventStoreDbContext.EventRecords.RemoveRange(events);
+            _eventStoreDbContext.OutboxRecords.RemoveRange(outbox);
+            bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
+            return success;
+
+            //var eventResult = await _eventStoreDbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE EventRecord");
+            //var outboxResult = await _eventStoreDbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE OutboxRecord");
+            //bool success = eventResult > 0 && outboxResult > 0;
+            //return success;
+        }
     }
 }

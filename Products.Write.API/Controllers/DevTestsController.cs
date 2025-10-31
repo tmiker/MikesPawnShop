@@ -47,14 +47,12 @@ namespace Products.Write.API.Controllers
             return BadRequest("Unable to find the CloudAMQPSettings TestingDummyValue.");
         }
 
-        [HttpPost("testAddProduct1")]
-        public async Task<IActionResult> TestAddProduct1(CancellationToken cancellationToken)
+        [HttpPost("purgeData")]
+        public async Task<IActionResult> PurgeData([FromBody] PurgeDataDTO purgeDataDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
-            AddProductDTO addProductDTO = new AddProductDTO("Test Product", "Astronomy", "A test product", 19.99m, "USD", "Active");
-            AddProduct command = new AddProduct(addProductDTO, correlationId);
-            AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
-            Console.WriteLine($"************** TEST ADD PRODUCT AGGREGATE ID: {result.ProductId} ****************");
+            PurgeData command = new PurgeData(purgeDataDTO.PinNumber, correlationId);
+            PurgeDataResult result = await _commandDispatcher.DispatchAsync<PurgeData, PurgeDataResult>(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }

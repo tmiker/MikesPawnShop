@@ -18,8 +18,8 @@ namespace Products.Read.API.MessageConsumers
         public async Task Consume(ConsumeContext<ImageAddedMessage> context)
         {
             var message = context.Message;
-            await Task.Run(() => _logger.LogInformation("Image Added Message Received: VERSION = {version}, AggregateId = {message.AggregateId}, " +
-                "Caption = {message.Caption}", message.AggregateVersion, message.AggregateId, message.Caption));
+            _logger.LogInformation("Image Added Message Received: VERSION = {version}, AggregateId = {message.AggregateId}, " +
+                "Caption = {message.Caption}", message.AggregateVersion, message.AggregateId, message.Caption);
 
             await _productRepository.AddProductImageAsync(message);
         }

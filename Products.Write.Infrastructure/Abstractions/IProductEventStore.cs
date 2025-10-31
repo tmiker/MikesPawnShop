@@ -15,5 +15,6 @@ namespace Products.Write.Infrastructure.Abstractions
         Task<IEnumerable<Guid>> GetUniqueAggregateIdsAsync();
         Task<bool> RemoveAllProductEventRecordsByIdAsync(Guid aggregateId);
         Task<bool> PurgeAllProductEventRecordsAsync();
+        Task<bool> PurgeAsync();
     }
 }

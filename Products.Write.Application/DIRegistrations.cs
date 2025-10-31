@@ -62,6 +62,7 @@ namespace Products.Write.Application
             services.AddScoped<ICommandHandler<UpdateStatus, UpdateStatusResult>, UpdateStatusHandler>();
             services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
             services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();
+            services.AddScoped<ICommandHandler<PurgeData, PurgeDataResult>, PurgeDataHandler>();
 
             // Register Query Handlers
 

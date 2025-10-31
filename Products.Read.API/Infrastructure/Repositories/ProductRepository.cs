@@ -191,5 +191,24 @@ namespace Products.Read.API.Infrastructure.Repositories
                 $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
         }
 
+        public async Task<bool> PurgeAsync()
+        {
+            var images = await _db.ImageData.ToListAsync(); 
+            var documents = await _db.DocumentData.ToListAsync();
+            var products = await _db.Products.ToListAsync();
+            _db.ImageData.RemoveRange(images);
+            _db.DocumentData.RemoveRange(documents);
+            _db.Products.RemoveRange(products);
+            bool success = await _db.SaveChangesAsync() > 0;
+            return success;
+
+
+            //var imageResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE ImageData");
+            //var documentResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE DocumentData");
+            //var productResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Products");
+            //bool success = imageResult > 0 && documentResult > 0 && productResult > 0;
+            //return success;
+        }
+
     }
 }

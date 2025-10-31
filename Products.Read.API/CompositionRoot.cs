@@ -42,6 +42,7 @@ namespace Products.Read.API
                 x.AddConsumer<StatusUpdateConsumer>();
                 x.AddConsumer<DocumentAddedConsumer>();
                 x.AddConsumer<ImageAddedConsumer>();
+                x.AddConsumer<DataPurgedConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -61,6 +62,7 @@ namespace Products.Read.API
                         e.ConfigureConsumer<StatusUpdateConsumer>(context);
                         e.ConfigureConsumer<DocumentAddedConsumer>(context);
                         e.ConfigureConsumer<ImageAddedConsumer>(context);
+                        e.ConfigureConsumer<DataPurgedConsumer>(context);
                     });
                 });
             });

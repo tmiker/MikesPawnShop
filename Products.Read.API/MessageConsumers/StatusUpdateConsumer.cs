@@ -18,8 +18,8 @@ namespace Products.Read.API.MessageConsumers
         public async Task Consume(ConsumeContext<StatusUpdatedMessage> context)
         {
             var message = context.Message;
-            await Task.Run(() => _logger.LogInformation("Status Updated Message Received: VERSION = {version}, AggregateId = {message.AggregateId}, " +
-                "Status = {message.Status}", message.AggregateVersion, message.AggregateId, message.Status));
+            _logger.LogInformation("Status Updated Message Received: VERSION = {version}, AggregateId = {message.AggregateId}, " +
+                "Status = {message.Status}", message.AggregateVersion, message.AggregateId, message.Status);
 
             await _productRepository.UpdateProductStatusAsync(message);
         }

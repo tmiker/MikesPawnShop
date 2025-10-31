@@ -87,5 +87,11 @@ namespace Products.Write.Infrastructure.Repositories
             }
             return products;
         }
+
+        public async Task<bool> PurgeAsync()
+        {
+            bool success = await _eventStore.PurgeAsync();
+            return success;
+        }
     }
 }
