@@ -48,7 +48,7 @@ async Task LoadData()
         }
         else Console.WriteLine($"AddProduct Request for counter {counter} failed.");
 
-        await Task.Delay(500);
+        await Task.Delay(50);
         
         if (aggregateIdStrings.Count > 0)
         {
@@ -74,13 +74,13 @@ async Task LoadData()
                         string statusError = await statusResponse.Content.ReadAsStringAsync();
                         Console.WriteLine($"UpdateStatus Request for counter {counter}, Aggregate {i} failed. Error: {statusError}");
                     }
-                    await Task.Delay(500);
+                    await Task.Delay(50);
                 }
 
                 // add an image
                 for (int i = 0; i < aggregateIdStrings.Count; i++)
                 {
-                    AddImageDTO addImageDTO = new AddImageDTO() { ProductId = Guid.Parse(aggregateIdStrings[i]), Name = $"Image {i}", Caption = $"Caption {i}", SequenceNumber = i, ImageUrl = $"ImageURL {i}", ThumbnailUrl = $"ThumbURL {i}" };
+                    AddImageDTO addImageDTO = new AddImageDTO() { ProductId = Guid.Parse(aggregateIdStrings[i]), Name = $"Image {counter}", Caption = $"Caption {counter}", SequenceNumber = counter, ImageUrl = $"ImageURL {counter}", ThumbnailUrl = $"ThumbURL {counter}" };
                     string imageUri = $"{baseUrl}/image";
                     HttpRequestMessage imageRequest = new HttpRequestMessage(HttpMethod.Post, imageUri);
                     imageRequest.Content = new StringContent(JsonSerializer.Serialize(addImageDTO), Encoding.UTF8, "application/json");
@@ -95,13 +95,13 @@ async Task LoadData()
                         string imageError = await imageResponse.Content.ReadAsStringAsync();
                         Console.WriteLine($"AddImage Request for counter {counter}, Aggregate {i} failed. Error: {imageError}");
                     }
-                    await Task.Delay(500);
+                    await Task.Delay(50);
                 }
 
                 // add a document
                 for (int i = 0; i < aggregateIdStrings.Count; i++)
                 {
-                    AddDocumentDTO addDocDTO = new AddDocumentDTO(Guid.Parse(aggregateIdStrings[i]), $"Image {i}",$"Title {i}", i, $"DocumentURL {i}");
+                    AddDocumentDTO addDocDTO = new AddDocumentDTO(Guid.Parse(aggregateIdStrings[i]), $"Document {counter}",$"Title {counter}", counter, $"DocumentURL {counter}");
                     string docUri = $"{baseUrl}/document";
                     HttpRequestMessage docRequest = new HttpRequestMessage(HttpMethod.Post, docUri);
                     docRequest.Content = new StringContent(JsonSerializer.Serialize(addDocDTO), Encoding.UTF8, "application/json");
@@ -116,7 +116,7 @@ async Task LoadData()
                         string docError = await docResponse.Content.ReadAsStringAsync();
                         Console.WriteLine($"AddDocument Request for counter {counter}, Aggregate {i} failed. Error: {docError}");
                     }
-                    await Task.Delay(500);
+                    await Task.Delay(50);
                 }
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -130,12 +130,21 @@ async Task LoadData()
 Console.WriteLine($"Do you want to run the script to load data? Answer Y or N: ");
 string? reply = Console.ReadLine();
 
-if (reply == "Y")
+if (reply == "Y" || reply == "y")
 {
     Console.WriteLine($"Your response was {reply}");
     await LoadData();
 }
-else Console.WriteLine($"Exiting console app.");
+//else
+//{
+//    Console.WriteLine($"Do you want to process unprocessed Message Records? Answer Y or N: ");
+//    reply = Console.ReadLine();
+//    if (reply == "Y" || reply == "y")
+//    {
+//        Console.WriteLine($"Your response was {reply}");
+        
+//    }
+//}
 
 Console.ReadLine();
 

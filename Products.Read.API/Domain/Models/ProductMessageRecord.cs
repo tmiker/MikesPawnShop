@@ -11,16 +11,15 @@ namespace Products.Read.API.Domain.Models
         public Guid AggregateId { get; init; }
         public string AggregateType { get; init; } = "Product";
         public int AggregateVersion { get; init; }
-        public int MessageId { get; init; }
         public string MessageType { get; init; } = default!;
         public string MessageJson { get; init; } = default!;
         public string? CorrelationId { get; init; }
+        public bool IsProcessed { get; set; } = false;
 
-        public ProductMessageRecord(Guid aggregateId, int aggregateVersion, int messageId, string messageType, string messageJson, string? correlationId)
+        public ProductMessageRecord(Guid aggregateId, int aggregateVersion, string messageType, string messageJson, string? correlationId)
         {
             AggregateId = aggregateId;
             AggregateVersion = aggregateVersion;
-            MessageId = messageId;
             MessageType = messageType;
             MessageJson = messageJson;
             CorrelationId = correlationId;

@@ -196,19 +196,13 @@ namespace Products.Read.API.Infrastructure.Repositories
             var images = await _db.ImageData.ToListAsync(); 
             var documents = await _db.DocumentData.ToListAsync();
             var products = await _db.Products.ToListAsync();
+            var messageRecords = await _db.ProductMessageRecords.ToListAsync();
             _db.ImageData.RemoveRange(images);
             _db.DocumentData.RemoveRange(documents);
             _db.Products.RemoveRange(products);
+            _db.ProductMessageRecords.RemoveRange(messageRecords);
             bool success = await _db.SaveChangesAsync() > 0;
             return success;
-
-
-            //var imageResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE ImageData");
-            //var documentResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE DocumentData");
-            //var productResult = await _db.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Products");
-            //bool success = imageResult > 0 && documentResult > 0 && productResult > 0;
-            //return success;
         }
-
     }
 }

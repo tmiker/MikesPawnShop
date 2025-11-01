@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Products.Read.API.Abstractions;
 using Products.Read.API.Configuration;
 using Products.Read.API.DTOs.DevTests;
 using Products.Read.API.Exceptions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Products.Shared.Abstractions;
+using System.Threading.Tasks;
 
 namespace Products.Read.API.Controllers
 {
@@ -13,11 +15,13 @@ namespace Products.Read.API.Controllers
     {
         private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
         private readonly ILogger<DevTestsController> _logger;
+        private readonly IProductMessageProcessor _productMessageProcessor;
 
-        public DevTestsController(IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger)
+        public DevTestsController(IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger, IProductMessageProcessor productMessageProcessor)
         {
             _cloudAmqpSettings = cloudAmqpSettings;
             _logger = logger;
+            _productMessageProcessor = productMessageProcessor;
         }
 
         [HttpPost("throwExceptionForTesting")]
@@ -50,6 +54,13 @@ namespace Products.Read.API.Controllers
             string? value = _cloudAmqpSettings.Value.TestingDummyValue;
             if (!string.IsNullOrWhiteSpace(value)) return Ok(value);
             return BadRequest("Unable to find the CloudAMQPSettings TestingDummyValue.");
+        }
+
+        [HttpPost("processMessageRecordQueue")]
+        public async Task<IActionResult> ProcessMessageRecordQueue(CancellationToken cancellationToken)
+        {
+            await _productMessageProcessor.ProcessMessageRecordsFromQueue();
+            return Ok();
         }
     }
 }

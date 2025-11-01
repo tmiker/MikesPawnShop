@@ -1,6 +1,8 @@
-﻿namespace Products.Shared.Messages
+﻿using Products.Shared.Abstractions;
+
+namespace Products.Shared.Messages
 {
-    public class ProductAddedMessage
+    public class ProductAddedMessage : IProductMessage
     {
         // for logging purposes on read side
         public Guid AggregateId { get; init; }

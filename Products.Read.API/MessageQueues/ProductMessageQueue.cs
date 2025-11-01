@@ -4,5 +4,6 @@ namespace Products.Read.API.MessageQueues
 {
     public class ProductMessageQueue : IMessageQueue
     {
+        // not used
     }
 }

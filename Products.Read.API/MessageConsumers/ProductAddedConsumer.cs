@@ -6,11 +6,13 @@ namespace Products.Read.API.MessageConsumers
 {
     public class ProductAddedConsumer : IConsumer<ProductAddedMessage>
     {
+        private readonly IProductMessageProcessor _messageProcessor;
         private readonly IProductRepository _productRepository;
         private readonly ILogger<ProductAddedConsumer> _logger;
 
-        public ProductAddedConsumer(IProductRepository productRepository, ILogger<ProductAddedConsumer> logger)
+        public ProductAddedConsumer(IProductMessageProcessor messageProcessor, IProductRepository productRepository, ILogger<ProductAddedConsumer> logger)
         {
+            _messageProcessor = messageProcessor;
             _productRepository = productRepository;
             _logger = logger;
         }
@@ -21,7 +23,13 @@ namespace Products.Read.API.MessageConsumers
             _logger.LogInformation("Product Added Message Received: VERSION = {version}, AggregateId = {message.AggregateId}," +
                 " Name = {message.Name}", message.AggregateVersion, message.AggregateId, message.Name);
 
-            await _productRepository.AddProductAsync(message);
+            // await _productRepository.AddProductAsync(message);
+
+            // note this will always return false for the Add Product Message
+            bool messagesInMessageRecordQueue = await _messageProcessor.ProcessProductMessageAsync(message);
+
+            // really want to batch process messages and call the below after processing a batch, or something equivalent
+            if (messagesInMessageRecordQueue) await _messageProcessor.ProcessMessageRecordsFromQueue();
         }
     }
 }

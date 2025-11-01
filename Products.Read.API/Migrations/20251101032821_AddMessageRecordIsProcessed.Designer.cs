@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Products.Read.API.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Products.Read.API.Infrastructure.Data;
 namespace Products.Read.API.Migrations
 {
     [DbContext(typeof(ProductsReadDbContext))]
-    partial class ProductsReadDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251101032821_AddMessageRecordIsProcessed")]
+    partial class AddMessageRecordIsProcessed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
