@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Products.Write.Domain.Aggregates;
 using Products.Write.Domain.Base;
+using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Infrastructure.Repositories
@@ -16,17 +17,7 @@ namespace Products.Write.Infrastructure.Repositories
             _logger = logger;
         }
 
-        // REFACTOR TRANSACTIONS
-
-        // Separating persistence of Domain Events into two method calls ???
-        //   - e.g. StageAggregateEventsAsync - EventStore.StageAggregateEventsAsync + SaveAsync - EventStore.SaveChangesAsync ???
-        //      - No, should do all in a single method (add event records and commit transaction) for user clarity
-        //      - This is for persisting the aggregate state in the form of event records, ...
-        //          ... i.e. a single aggregate only - doing Event SOURCING, not Event DRIVEN Architecture  
-        //      - Events are the persistence mechanism for the aggregate, not for inter-service communication
-        //      - For Event Driven architecture would need a service encapsulating the command handler, ...
-        //          ... publishing these events so can have side effects on other aggregates, ...
-        //          ... with a method to be called to integrate multiple transactions across different aggregates if needed.
+        // IDomainEvents are the persistence mechanism for the aggregate, not for inter-service communication
 
         public async Task<bool> SaveAsync(Product product)
         {
@@ -40,21 +31,6 @@ namespace Products.Write.Infrastructure.Repositories
                 _logger.LogInformation("Product Repository found no events to send to the Event Store for Product Id: {productId}", product.Id);
                 return true; // nothing to save, but not an error
             }
-
-            //bool success = true;
-            //if (product.DomainEvents != null && product.DomainEvents.Any())
-            //{
-            //    // THIS SHOULD ACTUALLY SEND ALL EVENTS TO THE EVENT STORE IN A TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
-            //    // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
-            //    foreach (var domainEvent in product.DomainEvents)
-            //    {
-            //        bool recordSaved = await _eventStore.SaveAsEventRecordAsync(domainEvent);
-            //        if (!recordSaved) success = false;
-            //    }
-            //}
-
-            //_logger.LogInformation("Product Repository sent {count} events to the Event Store", product.DomainEvents?.Count);
-            //return success;
         }
 
         public async Task<Product> GetProductByIdAsync(Guid aggregateId)
@@ -71,6 +47,64 @@ namespace Products.Write.Infrastructure.Repositories
             return product;
         }
 
+        // SNAPSHOTS
+
+        // SNAPSHOT RECORDS
+        public async Task<bool> SaveSnapshotRecordAsync(Product product)
+        {
+            ProductSnapshot snapshot = product.GetSnapshot();
+            var success = await _eventStore.SaveAsSnapshotRecordAsync(snapshot);
+            return success;
+        }
+
+        // TO GET A PROJECT IN ITS CURRENT (LATEST) STATE
+        public async Task<Product?> GetProductByIdUsingSnapshotsAsync(Guid aggregateId)
+        {
+            // if a snapshot is available use that
+            ProductSnapshot? snapshot = await _eventStore.GetProductSnapshotAsync(aggregateId);
+            if (snapshot is not null)
+            {
+                _logger.LogInformation("Product repository found ProductSnapshot with version {snapshot.Version}", snapshot.Version);
+                // if last event version that is contained in snapshot is equal to the snapshot version
+                IEnumerable<IDomainEvent> domainEvents = await _eventStore.GetDomainEventsByIdAsync(aggregateId, snapshot.Version + 1, int.MaxValue);
+                //// if last event version that is contained in the snapshot is one less than the snapshot version - so need to get events with versions = snapshot version and greater
+                //IEnumerable<IDomainEvent> domainEvents = await _eventStore.GetDomainEventsByIdAsync(aggregateId, snapshot.Version, int.MaxValue);
+
+                Product product = new Product(snapshot);
+                if (domainEvents.Any())
+                {
+                    domainEvents.OrderBy(d => d.AggregateVersion).ToList();
+                    _logger.LogInformation($"Product repository retrieved {domainEvents.Count()} domain events with versions from {domainEvents.First().AggregateVersion} to {domainEvents.Last().AggregateVersion}");
+
+                    foreach (var @event in domainEvents)
+                    {
+                        product.Apply(@event);
+                        _logger.LogInformation($"Project repository applied domain event of type {@event.GetType().Name}, version {@event.AggregateVersion}");
+                    }
+                }
+                return product;
+            }
+            else
+            {
+                // case no snapshot is found
+                IEnumerable<IDomainEvent> domainEvents = await _eventStore.GetDomainEventsByIdAsync(aggregateId, 0, int.MaxValue);
+
+                if (domainEvents.Any())
+                {
+                    Product product = new Product(domainEvents);
+                    return product;
+                }
+                return null;
+            }
+        }
+
+
+
+
+        // OUTBOX
+
+
+        // DEV / ADMIN ONLY
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
             IEnumerable<Guid> uniqueAggregateIds = await _eventStore.GetUniqueAggregateIdsAsync();
@@ -86,6 +120,12 @@ namespace Products.Write.Infrastructure.Repositories
                 }
             }
             return products;
+        }
+
+        public async Task<string?> GetSnapshotJsonAsync(Guid projectId)
+        {
+            string? snapshotJson = await _eventStore.GetSnapshotJsonAsync(projectId);
+            return snapshotJson;
         }
 
         public async Task<bool> PurgeAsync()

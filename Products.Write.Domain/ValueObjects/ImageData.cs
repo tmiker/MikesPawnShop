@@ -1,4 +1,5 @@
 ﻿using Products.Write.Domain.Base;
+using Products.Write.Domain.Snapshots;
 
 namespace Products.Write.Domain.ValueObjects
 {
@@ -29,6 +30,11 @@ namespace Products.Write.Domain.ValueObjects
             yield return SequenceNumber;
             yield return ImageUrl!;
             yield return ThumbnailUrl!;
+        }
+
+        public ImageDataSnapshot GetSnapshot()
+        {
+            return new ImageDataSnapshot(Name, Caption, SequenceNumber, ImageUrl, ThumbnailUrl);
         }
     }
 }

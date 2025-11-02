@@ -1,4 +1,5 @@
 ﻿using Products.Write.Domain.Base;
+using Products.Write.Domain.Snapshots;
 
 namespace Products.Write.Domain.ValueObjects
 {
@@ -26,6 +27,10 @@ namespace Products.Write.Domain.ValueObjects
             yield return Title!;
             yield return SequenceNumber;
             yield return DocumentUrl!;
+        }
+        public DocumentDataSnapshot GetSnapshot()
+        {
+            return new DocumentDataSnapshot(Name, Title, SequenceNumber, DocumentUrl);
         }
     }
 }

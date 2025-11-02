@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Products.Write.Domain.Base;
+using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Abstractions;
 using Products.Write.Infrastructure.Data;
 using Products.Write.Infrastructure.DataAccess;
@@ -59,38 +60,6 @@ namespace Products.Write.Infrastructure.EventStores
             return success;
         }
 
-        //public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
-        //{
-        //    // THIS SHOULD ACTUALLY PROCCESS ALL EVENTS AND COMMIT ALL IN A SINGLE TRANSACTION SO WILL ROLL BACK IF ANY FAIL
-        //    // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
-        //    EventRecord eventRecord = new EventRecord(
-        //        @event.AggregateId,
-        //        @event.AggregateType,
-        //        @event.AggregateVersion,
-        //        @event.GetType().AssemblyQualifiedName ?? throw new InvalidDataException("Invalid Event Type"),
-        //        JsonConvert.SerializeObject(@event, _jsonSettings),
-        //        @event.OccurredAt,
-        //        @event.CorrelationId); 
-
-        //    _eventStoreDbContext.EventRecords.Add(eventRecord);
-        //    // create outbox record from event record and add to outbox records - retain atomicity without using UOW - do individually for each event vs batch
-        //    _eventStoreDbContext.OutboxRecords.Add(new OutboxRecord(eventRecord));
-
-        //    bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
-
-        //    // consider what to do on error - how to maintain consistency 
-        //    if (success) _logger.LogInformation("Event saved as event record along with an outbox record. Aggregate Type: {agg_type}, " +
-        //        "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
-        //    else
-        //    {
-        //        _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, " +
-        //            "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
-        //        throw new ProductEventStoreException("Error saving event as event record. Contact support with CorrelationId.");
-        //    }
-
-        //    return success;
-        //}
-
         public async Task<IEnumerable<IDomainEvent>> GetDomainEventsByIdAsync(Guid aggregateId, int minVersion = 0, int maxVersion = Int32.MaxValue)
         {
             IEnumerable<EventRecord> records = await _eventStoreDbContext.EventRecords.Where(
@@ -119,6 +88,40 @@ namespace Products.Write.Infrastructure.EventStores
             return events;
         }
 
+        // SNAPSHOT RECORDS
+        public async Task<bool> SaveAsSnapshotRecordAsync(ProductSnapshot snapshot)
+        {
+            IEnumerable<SnapshotRecord> existingRecords = await _eventStoreDbContext.SnapshotRecords.Where(r => r.AggregateId == snapshot.Id).ToListAsync();
+            if (existingRecords.Any()) _eventStoreDbContext.SnapshotRecords.RemoveRange(existingRecords);
+
+            SnapshotRecord record = new SnapshotRecord(
+                snapshot.Id,
+                snapshot.GetType().AssemblyQualifiedName!,
+                snapshot.Version,
+                JsonConvert.SerializeObject(snapshot, _jsonSettings));
+
+            _eventStoreDbContext.SnapshotRecords.Add(record);
+            bool isSuccess = await _eventStoreDbContext.SaveChangesAsync() > 0;
+            if (!isSuccess) throw new ProductEventStoreException($"Error adding project snapshot record for project with Id = {snapshot.Id}");
+            return isSuccess;
+        }
+
+        public async Task<ProductSnapshot?> GetProductSnapshotAsync(Guid aggregateId)
+        {
+            SnapshotRecord? record = await _eventStoreDbContext.SnapshotRecords.FirstOrDefaultAsync(r => r.AggregateId == aggregateId);
+            if (record != null)
+            {
+                var productSnapshot = JsonConvert.DeserializeObject(record.SnapshotJson, Type.GetType(record.SnapshotType)!);
+                if (productSnapshot is ProductSnapshot snapshot)
+                {
+                    _logger.LogInformation("Product Snapshot successfully deserialized: Product Name = {productName}, Version = {productVersion}", snapshot.Name, snapshot.Version);
+                    return snapshot;
+                }
+            }
+            return null;
+        }
+
+        // OUTBOX RECORDS
         public async Task<IEnumerable<OutboxRecord>> GetOutboxRecordsAsync()
         {
             IEnumerable<OutboxRecord> outboxRecords = await _eventStoreDbContext.OutboxRecords.ToListAsync();
@@ -133,6 +136,13 @@ namespace Products.Write.Infrastructure.EventStores
                 .Distinct().ToListAsync();
 
             return uniqueIds;
+        }
+
+        public async Task<string?> GetSnapshotJsonAsync(Guid aggregateId)
+        {
+            SnapshotRecord? record = await _eventStoreDbContext.SnapshotRecords.FirstOrDefaultAsync(r => r.AggregateId == aggregateId);
+            if (record != null) return record.SnapshotJson;
+            return null;
         }
 
         public async Task<bool> RemoveAllProductEventRecordsByIdAsync(Guid aggregateId)
@@ -170,5 +180,37 @@ namespace Products.Write.Infrastructure.EventStores
             //bool success = eventResult > 0 && outboxResult > 0;
             //return success;
         }
+
+        //public async Task<bool> SaveAsEventRecordAsync(IDomainEvent @event)
+        //{
+        //    // THIS SHOULD ACTUALLY PROCCESS ALL EVENTS AND COMMIT ALL IN A SINGLE TRANSACTION SO WILL ROLL BACK IF ANY FAIL
+        //    // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
+        //    EventRecord eventRecord = new EventRecord(
+        //        @event.AggregateId,
+        //        @event.AggregateType,
+        //        @event.AggregateVersion,
+        //        @event.GetType().AssemblyQualifiedName ?? throw new InvalidDataException("Invalid Event Type"),
+        //        JsonConvert.SerializeObject(@event, _jsonSettings),
+        //        @event.OccurredAt,
+        //        @event.CorrelationId); 
+
+        //    _eventStoreDbContext.EventRecords.Add(eventRecord);
+        //    // create outbox record from event record and add to outbox records - retain atomicity without using UOW - do individually for each event vs batch
+        //    _eventStoreDbContext.OutboxRecords.Add(new OutboxRecord(eventRecord));
+
+        //    bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;
+
+        //    // consider what to do on error - how to maintain consistency 
+        //    if (success) _logger.LogInformation("Event saved as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+        //        "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+        //    else
+        //    {
+        //        _logger.LogError("Error saving event as event record along with an outbox record. Aggregate Type: {agg_type}, " +
+        //            "Aggregate Id: {agg_id}, Correlation Id {corr_id}", @event.AggregateType, @event.AggregateId, @event.CorrelationId);
+        //        throw new ProductEventStoreException("Error saving event as event record. Contact support with CorrelationId.");
+        //    }
+
+        //    return success;
+        //}
     }
 }

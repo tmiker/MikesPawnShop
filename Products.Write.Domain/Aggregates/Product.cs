@@ -22,6 +22,22 @@ namespace Products.Write.Domain.Aggregates
 
         private Product() { }
 
+        public Product(ProductSnapshot snapshot)
+        {
+            List<ImageData> images = new List<ImageData>();
+            snapshot.Images?.ForEach(i => images.Add(new ImageData(i.Name!, i.Caption!, i.SequenceNumber, i.ImageUrl!, i.ThumbnailUrl!)));
+            List<DocumentData> documents = new List<DocumentData>();
+            snapshot.Documents?.ForEach(d => documents.Add(new DocumentData(d.Name!, d.Title!, d.SequenceNumber, d.DocumentUrl!)));
+            Id = snapshot.Id;
+            _name = snapshot.Name;
+            _category = snapshot.Category;
+            _description = snapshot.Description;
+            _price = snapshot.Price;
+            _currency = snapshot.Currency;
+            _status = snapshot.Status;
+
+        }
+
         public Product(IEnumerable<IDomainEvent> domainEvents)
         {
             foreach (IDomainEvent domainEvent in domainEvents)
@@ -116,6 +132,11 @@ namespace Products.Write.Domain.Aggregates
 
         public ProductSnapshot GetSnapshot()
         {
+            List<ImageDataSnapshot> imageSnapshots = new List<ImageDataSnapshot>();
+            _images?.ForEach(i => imageSnapshots.Add(i.GetSnapshot()));
+            List<DocumentDataSnapshot> documentSnapshots = new List<DocumentDataSnapshot>();
+            _documents?.ForEach(d => documentSnapshots.Add(d.GetSnapshot()));
+
             return new ProductSnapshot()
             {
                 Id = Id,
@@ -125,8 +146,8 @@ namespace Products.Write.Domain.Aggregates
                 Price = _price,
                 Currency = _currency,
                 Status = _status,
-                Images = _images,
-                Documents = _documents,
+                Images = imageSnapshots,
+                Documents = documentSnapshots,
                 Version = _version,
                 DateCreated = _dateCreated,
                 DateUpdated = _dateUpdated
