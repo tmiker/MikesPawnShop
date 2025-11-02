@@ -47,8 +47,6 @@ namespace Products.Write.Infrastructure.Repositories
             return product;
         }
 
-        // SNAPSHOTS
-
         // SNAPSHOT RECORDS
         public async Task<bool> SaveSnapshotRecordAsync(Product product)
         {
@@ -97,9 +95,6 @@ namespace Products.Write.Infrastructure.Repositories
                 return null;
             }
         }
-
-
-
 
         // OUTBOX
 
