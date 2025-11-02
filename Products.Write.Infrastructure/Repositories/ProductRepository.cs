@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.Extensions.Logging;
 using Products.Write.Domain.Aggregates;
 using Products.Write.Domain.Base;
 using Products.Write.Domain.Snapshots;
@@ -21,9 +22,20 @@ namespace Products.Write.Infrastructure.Repositories
 
         public async Task<bool> SaveAsync(Product product)
         {
+            bool needsSnapshotUpdate = false;
+
             if (product.DomainEvents != null && product.DomainEvents.Any())
             {
+                // determine if need a snapshot if take every 10 versions
+                int maxEventVersion = product.DomainEvents.Max(e => e.AggregateVersion);
+                if (product.DomainEvents.Count() >= 10 || maxEventVersion % 10 > (maxEventVersion - product.DomainEvents.Count()) % 10) needsSnapshotUpdate = true;
+
+                // save as event records
                 bool success = await _eventStore.SaveEventRecordsAsync(product.DomainEvents);
+
+                // if needs snapshot save snapshot
+                if (needsSnapshotUpdate) await _eventStore.SaveAsSnapshotRecordAsync(product.GetSnapshot());
+
                 return success; // error handling occurs in event store
             }
             else
@@ -48,14 +60,13 @@ namespace Products.Write.Infrastructure.Repositories
         }
 
         // SNAPSHOT RECORDS
-        public async Task<bool> SaveSnapshotRecordAsync(Product product)
+        private async Task<bool> SaveSnapshotRecordAsync(Product product)
         {
             ProductSnapshot snapshot = product.GetSnapshot();
             var success = await _eventStore.SaveAsSnapshotRecordAsync(snapshot);
             return success;
         }
 
-        // TO GET A PROJECT IN ITS CURRENT (LATEST) STATE
         public async Task<Product?> GetProductByIdUsingSnapshotsAsync(Guid aggregateId)
         {
             // if a snapshot is available use that
