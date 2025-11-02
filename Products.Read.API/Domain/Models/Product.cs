@@ -44,6 +44,7 @@ namespace Products.Read.API.Domain.Models
 
         public void AddImage(ImageData image, int version)
         {
+            if (version <= Version) return;                                 // duplicate message - idempotency 3
             if (Images is null) Images = new List<ImageData>();
             Images.Add(image);
             Version = version;
@@ -52,6 +53,7 @@ namespace Products.Read.API.Domain.Models
 
         public void AddDocument(DocumentData document, int version)
         {
+            if (version <= Version) return;                                 // duplicate message - idempotency 3
             if (Documents is null) Documents = new List<DocumentData>();
             Documents.Add(document);
             Version = version;
@@ -60,6 +62,7 @@ namespace Products.Read.API.Domain.Models
 
         public void UpdateStatus(string status, int version)
         {
+            if (version <= Version) return;                                 // duplicate message - idempotency 3
             Status = status;
             Version = version;
             DateUpdated = DateTime.UtcNow;

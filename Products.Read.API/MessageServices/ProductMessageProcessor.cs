@@ -32,7 +32,7 @@ namespace Products.Read.API.MessageServices
                 else
                 {
                     Product? product = await _db.Products.FirstOrDefaultAsync(p => p.AggregateId == message.AggregateId);
-                    if (product is not null && product.Version >= message.AggregateVersion) return false;
+                    if (product is not null && product.Version >= message.AggregateVersion) return false;   // duplicate message - idempotency 1
                     if (product is not null && product.Version == message.AggregateVersion - 1) ProcessExistingProductMessage(product, (dynamic)message);
                     else
                     {
@@ -125,7 +125,7 @@ namespace Products.Read.API.MessageServices
                 // for each mesage record, if the version supercedes the current product version by 1, it is the correct record and should be processed if not already processed
                 foreach (var messageRecord in messageRecords)
                 {
-                    if (messageRecord.AggregateVersion == product?.Version + 1  && !messageRecord.IsProcessed)
+                    if (messageRecord.AggregateVersion == product?.Version + 1 && !messageRecord.IsProcessed)
                     {
                         // deserialize the record message payload to get the message
                         IProductMessage message = (IProductMessage)JsonConvert.DeserializeObject(messageRecord.MessageJson, Type.GetType(messageRecord.MessageType)!)!;
@@ -134,6 +134,7 @@ namespace Products.Read.API.MessageServices
                         // mark the record processed
                         messageRecord.IsProcessed = true;
                     }
+                    else if (messageRecord.AggregateVersion <= product?.Version) messageRecord.IsProcessed = true;      // duplicate message - idempotency 2
                 }
             }
 
