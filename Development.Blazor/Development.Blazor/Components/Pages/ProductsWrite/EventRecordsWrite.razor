@@ -32,6 +32,12 @@
                 <label for="pagesize">Page Size:</label>
                 <input id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
             </div>
+            <div class="col-1">
+                <a class="btn btn-primary form-control" @onclick="PageBackward">Back</a>
+            </div>
+            <div class="col-1">
+                <a class="btn btn-primary form-control" @onclick="PageForward">Fwd</a>
+            </div>
         </div>
     </div>
 
@@ -108,6 +114,20 @@
     private int _pageSize = 10;
     private PaginationMetadata? _pagingData;
 
+
+    private async Task PageForward()
+    {
+        if (_pagingData is null || _pageNumber >= _pagingData.TotalPageCount) return;
+        _pageNumber = _pageNumber + 1;
+        await RefreshData();
+    }
+
+    private async Task PageBackward()
+    {
+        if (_pageNumber <= 1) return;
+        _pageNumber = _pageNumber - 1;
+        await RefreshData();
+    }
 
     private async Task RefreshData()
     {
