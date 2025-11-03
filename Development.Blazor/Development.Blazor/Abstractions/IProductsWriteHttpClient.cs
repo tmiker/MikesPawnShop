@@ -7,14 +7,14 @@ namespace Development.Blazor.Abstractions
     public interface IProductsWriteHttpClient
     {
         Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10);
 
         Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
@@ -22,7 +22,7 @@ namespace Development.Blazor.Abstractions
             int pageSize = 10);
 
         Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
@@ -30,7 +30,7 @@ namespace Development.Blazor.Abstractions
             int pageSize = 10);
 
         Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,

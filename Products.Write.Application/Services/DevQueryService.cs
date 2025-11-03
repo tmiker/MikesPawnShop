@@ -33,7 +33,7 @@ namespace Products.Write.Application.Services
             List<ProductSnapshot>? snapshots = [];
 
             List<Guid> uniqueIds = new List<Guid>();
-            if (aggregateId is null) uniqueIds.AddRange(await GetUniqueAggregateIdsAsync());
+            if (aggregateId is null || aggregateId == default(Guid)) uniqueIds.AddRange(await GetUniqueAggregateIdsAsync());
             else uniqueIds.Add(aggregateId.Value);
 
             foreach (var id in uniqueIds)
@@ -78,16 +78,17 @@ namespace Products.Write.Application.Services
             int pageSize = 10)
         {
             IQueryable<EventRecord> query = _db.EventRecords.AsQueryable();
-            if (aggregateId is not null) query = query.Where(e => e.AggregateId == aggregateId);
+            if (aggregateId is not null && aggregateId != default(Guid)) query = query.Where(e => e.AggregateId == aggregateId);
             if (!string.IsNullOrWhiteSpace(correlationId)) query = query.Where(e => e.CorrelationId == correlationId);
             query = query.Where(e => e.AggregateVersion >= minVersion && e.AggregateVersion <= maxVersion);
-            query = query.OrderBy(e => e.OccurredAt);
 
-            List<EventRecord> records = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<EventRecord> records = await query.ToListAsync();
             int totalCount = records.Count();
+            var result = records.OrderBy(e => e.OccurredAt).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
-            return (true, records, pagingData, null);
+            return (true, result, pagingData, null);
         }
 
         public async Task<(bool IsSuccess, IEnumerable<OutboxRecord>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
@@ -99,7 +100,7 @@ namespace Products.Write.Application.Services
             int pageSize = 10)
         {
             IQueryable<OutboxRecord> query = _db.OutboxRecords.AsQueryable();
-            if (aggregateId is not null) query = query.Where(o => o.AggregateId == aggregateId);
+            if (aggregateId is not null && aggregateId != default(Guid)) query = query.Where(o => o.AggregateId == aggregateId);
             if (!string.IsNullOrWhiteSpace(correlationId)) query = query.Where(o => o.CorrelationId == correlationId);
             query = query.Where(o => o.AggregateVersion >= minVersion && o.AggregateVersion <= maxVersion);
             query = query.OrderBy(o => o.OccurredAt);
@@ -120,7 +121,7 @@ namespace Products.Write.Application.Services
             int pageSize = 10)
         {
             IQueryable<SnapshotRecord> query = _db.SnapshotRecords.AsQueryable();
-            if (aggregateId is not null) query = query.Where(r => r.AggregateId == aggregateId);
+            if (aggregateId is not null && aggregateId != default(Guid)) query = query.Where(r => r.AggregateId == aggregateId);
             query = query.Where(r => r.AggregateVersion >= minVersion && r.AggregateVersion <= maxVersion);
 
             List<SnapshotRecord> records = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

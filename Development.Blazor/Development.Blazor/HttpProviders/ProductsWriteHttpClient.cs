@@ -28,13 +28,13 @@ namespace Development.Blazor.HttpProviders
 
 
         public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/productSnapshots?aggregateId={aggregateId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/productSnapshots?aggregateId={aggregateId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -51,14 +51,15 @@ namespace Development.Blazor.HttpProviders
         }
 
         public async Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/eventRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/eventRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            _logger.LogInformation("GET EVENT RECORDS URI: {uri}", uri);
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -75,14 +76,14 @@ namespace Development.Blazor.HttpProviders
         }
 
         public async Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/outboxRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/outboxRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -99,14 +100,14 @@ namespace Development.Blazor.HttpProviders
         }
 
         public async Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
-            Guid? aggregateId,
+            string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/snapshotRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/snapshotRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
