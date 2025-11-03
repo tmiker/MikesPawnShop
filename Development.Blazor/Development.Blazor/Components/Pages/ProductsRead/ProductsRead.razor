@@ -1,71 +1,152 @@
 ﻿@page "/productsRead"
+@using Development.Blazor.Paging
 @rendermode InteractiveServer
 @inject IProductsReadHttpClient _readProductsClient
 
-<h3>Products - Read Side</h3>
+<div class="card border-primary">
 
-<h4>Products Count: @_productSummaryCount</h4>
+    <div class="card-header text-center bg-primary text-light">
+        <h4><b>READ SIDE PRODUCTS</b></h4>
+        <h6 class="mt-2"><i>Products Count: @_productSummaryCount</i></h6>
+    </div>
+    <div class="card-header">
+        <div class="row mt-2">
+            <div class="col-3">
+                <label for="namefilter">Name Filter:</label>
+                <input id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
+            </div>
+            <div class="col-3">
+                <label for="categoryfilter">Category Filter:</label>
+                <input id="categoryfilter" type="text" @bind="_categoryFilter" @bind:after="RefreshData" />
+            </div>
+            <div class="col-3">
+                <label for="sortcolumn">Sort Column:</label>
+                <input id="sortcolumn" type="text" @bind="_sortColumn" @bind:after="RefreshData" />
+            </div>
+            <div class="col-3">
+                <label for="pagesize">Page Size:</label>
+                <input id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
+            </div>
+        </div>
+    </div>
 
-@if (_productSummaries is not null)
-{
-    <table class="table table-sm table-bordered text-center">
-        <thead class="bg-primary text-light">
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Currency</th>
-                <th>Status</th>
-                <th>Images</th>
-                <th>Documents</th>
-                <th>Version</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var product in _productSummaries)
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+
+                @if (_productSummaries is not null)
+                {
+                    <table class="table table-sm table-bordered text-center">
+                        <thead class="bg-primary text-light">
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Currency</th>
+                                <th>Status</th>
+                                <th>Images</th>
+                                <th>Documents</th>
+                                <th>Version</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in _productSummaries)
+                            {
+                                <tr>
+                                    <td>@product.Id</td>
+                                    <td>@product.Name</td>
+                                    <td>@product.Category</td>
+                                    <td>@product.Price</td>
+                                    <td>@product.Currency</td>
+                                    <td>@product.Status</td>
+                                    <td>@product.ImageCount</td>
+                                    <td>@product.DocumentCount</td>
+                                    <td>@product.Version</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <div class="row m2">
+            @if (_pagingData is not null)
             {
-                <tr>
-                    <td>@product.Id</td>
-                    <td>@product.Name</td>
-                    <td>@product.Category</td>
-                    <td>@product.Price</td>
-                    <td>@product.Currency</td>
-                    <td>@product.Status</td>
-                    <td>@product.ImageCount</td>
-                    <td>@product.DocumentCount</td>
-                    <td>@product.Version</td>
-                </tr>
+                <div class="col-3 offset-2">
+                    <span class="text-primary">Page @_pagingData.CurrentPage of @_pagingData.TotalPageCount</span>
+                </div>
+                <div class="col-3">
+                    <span class="text-primary">Page Size: @_pagingData.PageSize</span>
+                </div>
+                <div class="col-2">
+                    <span class="text-primary">Total Items: @_pagingData.TotalItemCount</span>
+                </div>
             }
-        </tbody>
-        <tfooter class="text-center text-success">
-            Be good to your pets!
-        </tfooter>
-    </table>
-}
+        </div>
+
+        <div class="card-body text-center bg-primary text-light">
+            <h5><b><i>Be good to your pets!</i></b></h5>
+        </div>
+
+    </div>
+</div>
 
 @code {
     private List<ProductDTO>? _products;
     private List<ProductSummaryDTO>? _productSummaries;
 
+    private string? _nameFilter;
+    private string? _categoryFilter;
+    private string? _sortColumn;
+    private int _pageNumber;
+    private int _pageSize;
+    private PaginationMetadata? _pagingData;
+
     private int _productSummaryCount;
+
+    private async Task RefreshData()
+    {
+        var pagedProductSummariesResult = await _readProductsClient.GetPagedAndFilteredProductSummariesAsync(_nameFilter, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+        if (pagedProductSummariesResult.IsSuccess)
+        {
+            if (pagedProductSummariesResult.Products is not null && pagedProductSummariesResult.Products.Any())
+            {
+                _productSummaries = pagedProductSummariesResult.Products.ToList();
+                _pagingData = pagedProductSummariesResult.PagingData;
+                _productSummaryCount = _productSummaries.Count;
+            }
+        }
+        else Console.WriteLine(pagedProductSummariesResult.ErrorMessage);
+    }
 
 
     protected override async Task OnAfterRenderAsync(bool isFirstRender)
     {
         if (isFirstRender)
         {
-            var productSummariesResult = await _readProductsClient.GetProductSummariesAsync();
-            if (productSummariesResult.IsSuccess) 
+            var pagedProductSummariesResult = await _readProductsClient.GetPagedAndFilteredProductSummariesAsync(_nameFilter, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+            if (pagedProductSummariesResult.IsSuccess)
             {
-                if (productSummariesResult.ProductSummaries is not null && productSummariesResult.ProductSummaries.Any())
+                if (pagedProductSummariesResult.Products is not null && pagedProductSummariesResult.Products.Any())
                 {
-                    _productSummaries = productSummariesResult.ProductSummaries.ToList();
+                    _productSummaries = pagedProductSummariesResult.Products.ToList();
+                    _pagingData = pagedProductSummariesResult.PagingData;
                     _productSummaryCount = _productSummaries.Count;
                 }
             }
-            else Console.WriteLine(productSummariesResult.ErrorMessage);
+            else Console.WriteLine(pagedProductSummariesResult.ErrorMessage);
             this.StateHasChanged();
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        _nameFilter = null;
+        _categoryFilter = null;
+        _sortColumn = "Name";
+        _pageNumber = 1;
+        _pageSize = 6;
     }
 }

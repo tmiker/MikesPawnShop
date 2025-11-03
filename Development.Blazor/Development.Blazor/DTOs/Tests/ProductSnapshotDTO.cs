@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Development.Blazor.DTOs.Write
+namespace Development.Blazor.DTOs.Tests
 {
-    public class ProductAggregateDTO
+    public class ProductSnapshotDTO
     {
         public Guid Id { get; init; }
         public string? Name { get; init; }
@@ -11,8 +11,8 @@ namespace Development.Blazor.DTOs.Write
         public decimal Price { get; init; }
         public string? Currency { get; init; }
         public string? Status { get; init; }
-        public List<ImageDataValueObjectDTO>? Images { get; init; }
-        public List<DocumentDataValueObjectDTO>? Documents { get; init; }
+        public List<ImageDataSnapshotDTO>? Images { get; init; }
+        public List<DocumentDataSnapshotDTO>? Documents { get; init; }
         public int Version { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }

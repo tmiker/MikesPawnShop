@@ -1,6 +1,6 @@
-﻿namespace Development.Blazor.DTOs.Write
+﻿namespace Development.Blazor.DTOs.Tests
 {
-    public class ImageDataValueObjectDTO
+    public class ImageDataSnapshotDTO
     {
         public string? Name { get; init; }
         public string? Caption { get; init; }

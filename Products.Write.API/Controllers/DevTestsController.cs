@@ -39,7 +39,7 @@ namespace Products.Write.API.Controllers
             int pageSize = 10)
         {
             var result = await _devQueryService.GetProductSnapshotsAsync(aggregateId, minVersion, maxVersion, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(new PagedProductSnapshotResult() { Products = result.ProductSnapshots, PagingData = result.PagingData });
+            if (result.IsSuccess) return Ok(new PagedProductSnapshotResult() { ProductSnapshots = result.ProductSnapshots, PagingData = result.PagingData });
             return BadRequest(result.ErrorMessage);
         }
 

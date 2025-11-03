@@ -1,6 +1,7 @@
 ﻿using Development.Blazor.Abstractions;
 using Development.Blazor.DTOs.Tests;
 using Development.Blazor.DTOs.Write;
+using Development.Blazor.Paging;
 using Development.Blazor.Utility;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -19,6 +20,106 @@ namespace Development.Blazor.HttpProviders
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+        }
+
+
+
+
+
+
+        public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
+            Guid? aggregateId,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/productSnapshots?aggregateId={aggregateId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                PagedProductSnapshotResult? result = await response.Content.ReadFromJsonAsync<PagedProductSnapshotResult>();
+                return (true, result?.ProductSnapshots, result?.PagingData, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, null, error);
+        }
+
+        public async Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
+            Guid? aggregateId,
+            string? correlationId = null,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/eventRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                PagedEventRecordResult? result = await response.Content.ReadFromJsonAsync<PagedEventRecordResult>();
+                return (true, result?.EventRecords, result?.PagingData, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, null, error);
+        }
+
+        public async Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
+            Guid? aggregateId,
+            string? correlationId = null,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/outboxRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                PagedOutboxRecordResult? result = await response.Content.ReadFromJsonAsync<PagedOutboxRecordResult>();
+                return (true, result?.OutboxRecords, result?.PagingData, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, null, error);
+        }
+
+        public async Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
+            Guid? aggregateId,
+            string? correlationId = null,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_ProductsPath}/snapshotRecords?aggregateId={aggregateId}&correlationId={correlationId}&minVersion={minVersion}&maxVersion={maxVersion}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                PagedSnapshotRecordResult? result = await response.Content.ReadFromJsonAsync<PagedSnapshotRecordResult>();
+                return (true, result?.SnapshotRecords, result?.PagingData, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, null, error);
         }
 
         public async Task<(bool IsSuccess, Guid? AggregateId, string? ErrorMessage)> AddProductAsync(AddProductDTO addProductDTO, CancellationToken cancellationToken)

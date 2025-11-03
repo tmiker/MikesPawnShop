@@ -41,7 +41,7 @@ namespace Products.Read.API.QueryServices
         {
             var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower() == category.ToLower());
+            if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower().Contains(category.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
@@ -55,6 +55,9 @@ namespace Products.Read.API.QueryServices
                     break;
                 case "name":
                     query = query.OrderBy(p => p.Name);
+                    break;
+                case "category":
+                    query = query.OrderBy(p => p.Category);
                     break;
                 case "price ascending":
                     query = query.OrderBy(p => p.Price);
@@ -222,7 +225,7 @@ namespace Products.Read.API.QueryServices
         {
             var query = _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower() == category.ToLower());
+            if (!string.IsNullOrWhiteSpace(category)) query = query.Where(c => c.Category.ToLower().Contains(category.ToLower()));
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
@@ -236,6 +239,9 @@ namespace Products.Read.API.QueryServices
                     break;
                 case "name":
                     query = query.OrderBy(p => p.Name);
+                    break;
+                case "category":
+                    query = query.OrderBy(p => p.Category);
                     break;
                 case "price ascending":
                     query = query.OrderBy(p => p.Price);

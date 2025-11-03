@@ -5,7 +5,7 @@ namespace Products.Write.Application.CQRS.QueryResults
 {
     public class PagedProductSnapshotResult
     {
-        public IEnumerable<ProductSnapshot>? Products { get; set; }
+        public IEnumerable<ProductSnapshot>? ProductSnapshots { get; set; }
         public PaginationMetadata? PagingData { get; set; }
     }
 }

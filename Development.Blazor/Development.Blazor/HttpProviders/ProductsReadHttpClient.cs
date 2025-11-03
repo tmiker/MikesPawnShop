@@ -92,9 +92,10 @@ namespace Development.Blazor.HttpProviders
             }
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductsAsync(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
+        public async Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductsAsync(
+            string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsReadHttpClient_ProductsPath}/paged";
+            string uri = $"{StaticDetails.ProductsReadHttpClient_ProductsPath}/paged?filter={filter}&category={category}&sortColumn={sortColumn}&pageNumber={pageNumber}&pageSize={pageSize}";
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -113,9 +114,10 @@ namespace Development.Blazor.HttpProviders
             }
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSummariesAsync(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
+        public async Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSummariesAsync(
+            string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
-            string uri = $"{StaticDetails.ProductsReadHttpClient_ProductsPath}/paged/summaries";
+            string uri = $"{StaticDetails.ProductsReadHttpClient_ProductsPath}/paged/summaries?filter={filter}&category={category}&sortColumn={sortColumn}&pageNumber={pageNumber}&pageSize={pageSize}";
             var client = _httpClientFactory.CreateClient(StaticDetails.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
