@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Options;
 using Products.Write.API.Configuration;
 using Products.Write.Application.Abstractions;
-using Products.Write.Application.CQRS.CommandResults;
-using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.DTOs;
 

@@ -2,6 +2,7 @@
 using Products.Read.API.Abstractions;
 using Products.Read.API.Domain.Models;
 using Products.Read.API.DTOs;
+using Products.Read.API.Paging;
 using Products.Read.API.QueryResponses;
 
 namespace Products.Read.API.Controllers
@@ -45,18 +46,18 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("paged")]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetPagedAndFilteredProducts(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<PagedProductsDTO>> GetPagedAndFilteredProducts(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductsResult result = await _productQueryService.GetPagedAndFilteredProductsAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(new { result.Products, result.PaginationMetadata });
+            if (result.IsSuccess) return Ok(new PagedProductsDTO { Products = result.Products, PagingData = result.PaginationMetadata });
             return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("paged/summaries")]
-        public async Task<ActionResult<IEnumerable<ProductSummaryDTO>>> GetPagedAndFilteredProductSummaries(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<PagedProductSummariesDTO>> GetPagedAndFilteredProductSummaries(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductSummariesResult result = await _productQueryService.GetPagedAndFilteredProductSummariesAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(new { result.ProductSummaries, result.PaginationMetadata });
+            if (result.IsSuccess) return Ok(new PagedProductSummariesDTO { ProductSummaries = result.ProductSummaries, PagingData = result.PaginationMetadata });
             return BadRequest(result.ErrorMessage);
         }
 

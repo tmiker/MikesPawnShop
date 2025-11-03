@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Products.Write.Domain.Snapshots
+namespace Development.Blazor.DTOs.Write
 {
-    public class ProductSnapshot
+    public class ProductAggregateDTO
     {
         public Guid Id { get; init; }
         public string? Name { get; init; }
@@ -11,8 +11,8 @@ namespace Products.Write.Domain.Snapshots
         public decimal Price { get; init; }
         public string? Currency { get; init; }
         public string? Status { get; init; }
-        public List<ImageDataSnapshot>? Images { get; init; }
-        public List<DocumentDataSnapshot>? Documents { get; init; }
+        public List<ImageDataValueObjectDTO>? Images { get; init; }
+        public List<DocumentDataValueObjectDTO>? Documents { get; init; }
         public int Version { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }

@@ -1,0 +1,71 @@
+﻿@page "/productsRead"
+@rendermode InteractiveServer
+@inject IProductsReadHttpClient _readProductsClient
+
+<h3>Products - Read Side</h3>
+
+<h4>Products Count: @_productSummaryCount</h4>
+
+@if (_productSummaries is not null)
+{
+    <table class="table table-sm table-bordered text-center">
+        <thead class="bg-primary text-light">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Currency</th>
+                <th>Status</th>
+                <th>Images</th>
+                <th>Documents</th>
+                <th>Version</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in _productSummaries)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Category</td>
+                    <td>@product.Price</td>
+                    <td>@product.Currency</td>
+                    <td>@product.Status</td>
+                    <td>@product.ImageCount</td>
+                    <td>@product.DocumentCount</td>
+                    <td>@product.Version</td>
+                </tr>
+            }
+        </tbody>
+        <tfooter class="text-center text-success">
+            Be good to your pets!
+        </tfooter>
+    </table>
+}
+
+@code {
+    private List<ProductDTO>? _products;
+    private List<ProductSummaryDTO>? _productSummaries;
+
+    private int _productSummaryCount;
+
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            var productSummariesResult = await _readProductsClient.GetProductSummariesAsync();
+            if (productSummariesResult.IsSuccess) 
+            {
+                if (productSummariesResult.ProductSummaries is not null && productSummariesResult.ProductSummaries.Any())
+                {
+                    _productSummaries = productSummariesResult.ProductSummaries.ToList();
+                    _productSummaryCount = _productSummaries.Count;
+                }
+            }
+            else Console.WriteLine(productSummariesResult.ErrorMessage);
+            this.StateHasChanged();
+        }
+    }
+}

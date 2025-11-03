@@ -9,12 +9,12 @@ namespace Products.Read.API.Domain.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public Guid AggregateId { get; private set; }
-        public string Name { get; private set; }
-        public string Category { get; private set; }
-        public string Description { get; private set; }
+        public string Name { get; private set; } = default!;
+        public string Category { get; private set; } = default!;
+        public string Description { get; private set; } = default!;
         public decimal Price { get; private set; }
-        public string Currency { get; private set; }
-        public string Status { get; private set; }
+        public string Currency { get; private set; } = default!;
+        public string Status { get; private set; } = default!;
 
         [InverseProperty(nameof(ImageData.Product))]
         public List<ImageData>? Images { get; set; } 

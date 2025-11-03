@@ -4,8 +4,6 @@ using Products.Read.API.Abstractions;
 using Products.Read.API.Configuration;
 using Products.Read.API.DTOs.DevTests;
 using Products.Read.API.Exceptions;
-using Products.Shared.Abstractions;
-using System.Threading.Tasks;
 
 namespace Products.Read.API.Controllers
 {
@@ -56,11 +54,12 @@ namespace Products.Read.API.Controllers
             return BadRequest("Unable to find the CloudAMQPSettings TestingDummyValue.");
         }
 
-        [HttpPost("processMessageRecordQueue")]
-        public async Task<IActionResult> ProcessMessageRecordQueue(CancellationToken cancellationToken)
-        {
-            await _productMessageProcessor.ProcessMessageRecordsFromQueue();
-            return Ok();
-        }
+        // OBSOLETE
+        //[HttpPost("processMessageRecordQueue")]
+        //public async Task<IActionResult> ProcessMessageRecordQueue(CancellationToken cancellationToken)
+        //{
+        //    await _productMessageProcessor.ProcessMessageRecordsFromQueue();
+        //    return Ok();
+        //}
     }
 }
