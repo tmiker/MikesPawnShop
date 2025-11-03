@@ -8,6 +8,7 @@ using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.Dispatchers;
 using Products.Write.Application.EventManagement;
+using Products.Write.Application.Services;
 using System.Security.Authentication;
 
 namespace Products.Write.Application
@@ -66,8 +67,10 @@ namespace Products.Write.Application
 
             // Register Query Handlers
 
-            // Register Dev Test Handlers
+            // Register Dev Test Handlers and Services
             services.AddScoped<ICommandHandler<ThrowException, ThrowExceptionResult>, ThrowExceptionHandler>();
+
+            services.AddScoped<IDevQueryService, DevQueryService>();
 
             return services;
         }
