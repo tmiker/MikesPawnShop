@@ -1,5 +1,25 @@
-CQRS Handlers use of cancellation token ???
+Creating Blob Container - need to use method that doesn't throw if exists - but it needs to be public access ??? or can just make blob public access.
+	BlobContainerClient.CreateIfNotExistsAsync()
 
-Passing CorrelationId using headers to Exception Handlers ???
+Finish delete document from azure flow and test deleted
+
+Need Blazor Dev product detail page with image and docs list for adding and removing images - product list should have summaries, not full object
+	Detail page gets the full product to include images and docs, but still keep the list to minimize queries
+		Move product list to separate component as well from main page and detail in another and view based on conditions
+	Should be using paged ProductSummaryDTOs so create another page for testing image / document ops that gets a list of them instead of the write side snapshots test page
+		use the ProductsReadHttpClient as well as the write
+			is what actual client will be doing
+
+Add images and documents
+	Need a DisplayedFileName and an ActualFileName for security - actual is a Random File Name
+	Add Documents needs file type and size checks, and other security
+
+Change UpdateStatus action in Products Write controller to a PUT
+
+Cancellation token: button to cancel in UI
 
 Products.Write.API - use Fluent Validation for API Controller DTOs, or use Data Annotations 
+
+
+COMPLETED
+Exception Handling:  add Azure RequestFailedException

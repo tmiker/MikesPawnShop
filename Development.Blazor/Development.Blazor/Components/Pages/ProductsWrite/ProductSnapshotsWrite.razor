@@ -7,6 +7,11 @@
     <div class="card-header text-center bg-primary text-light">
         <h4><b>WRITE SIDE PRODUCT SNAPSHOTS</b></h4>
         <h6 class="mt-2"><i>Record Count: @_productSnapshotCount</i></h6>
+        @if (!string.IsNullOrWhiteSpace(_addResultString))
+        {
+            <h6><b><i>Add Result: @_addResultString</i></b></h6>
+            <a class="btn btn-success" @onclick="ClearAddResultString">Clear</a>
+        }
     </div>
 
     <div class="card-header bg-primary text-light">
@@ -39,6 +44,93 @@
         </div>
     </div>
 
+    @if (_addImageDTO is not null)
+    {
+        <div class="row mt-2">
+            <div class="col-6 offset-3 text-center">
+                <h5><b>Add Product Image</b></h5>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <EditForm Model="_addImageDTO" OnValidSubmit="SubmitAddImage" FormName="AddProductImageForm">
+                <DataAnnotationsValidator />
+                @* <ValidationSummary /> or <ValidationSummary Model="ImageToAdd" /> *@
+                @* EditForm (but not plain forms) automatically adds Antiforgery component and attribute unless manually disabled *@
+                <div class="col-12 text-center">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label for="productId">Product Id:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputText inert class="form-control" id="productId" @bind-Value="@_addImageDTO.ProductId" />
+                            <ValidationMessage For="@(() => _addImageDTO.ProductId)" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3 text-center">
+                            <label for="name">Name:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputText class="form-control" id="name" @bind-Value="@_addImageDTO.Name" />
+                            <ValidationMessage For="@(() => _addImageDTO.Name)" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3 text-center">
+                            <label for="caption">Caption:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputText class="form-control" id="caption" @bind-Value="@_addImageDTO.Caption" />
+                            <ValidationMessage For="@(() => _addImageDTO.Caption)" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3 text-center">
+                            <label for="seq">Sequence Number:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputNumber class="form-control" id="seq" @bind-Value="@_addImageDTO.SequenceNumber" />
+                            <ValidationMessage For="@(() => _addImageDTO.SequenceNumber)" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3 text-center">
+                            <label for="desiredfilename">Desired File Name:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputText class="form-control" id="desiredfilename" @bind-Value="@_addImageDTO.BlobFileName" />
+                            <ValidationMessage For="@(() => _addImageDTO.BlobFileName)" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3 text-center">
+                            <label for="file">Image to Add:</label>
+                        </div>
+                        <div class="col-9">
+                            <InputFile class="form-control" typeof="file" id="file" OnChange="@OnImageInputFileChange" />
+                            <ValidationMessage For="@(() => _addImageDTO.ImageBlob)" />
+                        </div>
+                    </div>
+
+                    <br />
+                    <div class="row">
+                        <div class="col-4 offset-3">
+                            <button class="btn btn-success form-control" type="submit">Submit</button>
+                        </div>
+                        <div class="col-4 offset-1">
+                            <a class="btn btn-primary form-control" @onclick="CancelAddImage">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+    }
+    @if (_addDocumentDTO is not null)
+    {
+        <AddDocumentModal ModalTitle="Add Document" AddButtonTitle="Add Doc" DocumentToAdd="@_addDocumentDTO" Submit="SubmitAddDocument" Cancel="CancelAddDocument" />
+    }
+
     <div class="card-body">
         <div class="row">
             <div class="col-12">
@@ -52,11 +144,13 @@
                                 <th>Name</th>
                                 <th>Category</th>
                                 <th>Price</th>
-                                <th>Currency</th>
-                                <th>Status</th>
+                                @* <th>Currency</th> *@
+                                @* <th>Status</th> *@
                                 <th>Images</th>
                                 <th>Documents</th>
                                 <th>Version</th>
+                                <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,11 +161,23 @@
                                     <td>@product.Name</td>
                                     <td>@product.Category</td>
                                     <td>@product.Price</td>
-                                    <td>@product.Currency</td>
-                                    <td>@product.Status</td>
+                                    @* <td>@product.Currency</td> *@
+                                    @* <td>@product.Status</td> *@
                                     <td>@product.Images?.Count</td>
                                     <td>@product.Documents?.Count</td>
                                     <td>@product.Version</td>
+                                    <td>
+                                        <a class="btn btn-success" @onclick="() => AddImage(product.Id.ToString())" >Add Image</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-danger" @onclick="() => DeleteImage(product.Id.ToString())">Delete Image </a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-success" @onclick="() => AddDocument(product.Id.ToString())">Add Doc</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-danger" @onclick="() => DeleteDocument(product.Id.ToString())">Delete Doc </a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -127,6 +233,87 @@
     private PaginationMetadata? _pagingData;
 
     private int _productSnapshotCount;
+
+    //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS START *******************
+
+    private AddImageDTO? _addImageDTO;
+    private AddDocumentDTO? _addDocumentDTO;
+    private CancellationTokenSource? _cancellationTokenSource;
+    private string? _addResultString;
+    private void ClearAddResultString() => _addResultString = null;
+
+    private void AddImage(string productId) => _addImageDTO = new AddImageDTO() { ProductId = productId };
+    private void CancelAddImage() => _addImageDTO = null;
+    private async Task SubmitAddImage()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        var addImageResult = await _writeSideHttpClient.AddProductImageAsync(_addImageDTO!, _cancellationTokenSource.Token);
+        _addResultString = addImageResult.IsSuccess ? "Success" : addImageResult.ErrorMessage;
+        _addImageDTO = null;
+        _cancellationTokenSource = null;
+    }
+    private string[] _allowedImageFileTypes = new string[] { "image/jpeg", "image/bmp", "image/png", "image/gif" };
+    private async Task OnImageInputFileChange(InputFileChangeEventArgs e)
+    {
+        if (!_allowedImageFileTypes.Contains(e.File.ContentType)) _addResultString = "Invalid file format. Files must be of type png, jpeg, bmp, or gif.";
+        var image = await e.File.RequestImageFileAsync(e.File.ContentType, 600, 600);  // should just return file as is if dims both < 600
+        _addImageDTO!.ImageBlob = image;
+    }
+
+    private void AddDocument(string productId) => _addDocumentDTO = new AddDocumentDTO() { ProductId = productId };
+    private void CancelAddDocument() => _addDocumentDTO = null;
+    private async Task SubmitAddDocument()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        if (_addDocumentDTO!.DocumentBlob is not null) Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS NOT null.");
+        else Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS null.");
+        var addDocumentResult = await _writeSideHttpClient.AddProductDocumentAsync(_addDocumentDTO!, _cancellationTokenSource.Token);
+        _addResultString = addDocumentResult.IsSuccess ? "Success" : addDocumentResult.ErrorMessage;
+        _addDocumentDTO = null;
+    }
+
+    private DeleteImageDTO? _deleteImageDTO;
+    private async Task DeleteImage(string productId) 
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _deleteImageDTO = new DeleteImageDTO(productId, "The first image will be deleted if any", null);
+        var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO);
+        _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
+        _deleteImageDTO = null;
+        _cancellationTokenSource = null;
+    }
+    private void CancelDeleteImage() => _deleteImageDTO = null;
+    private async Task SubmitDeleteImage()
+    {
+        var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO!);
+        _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
+        _deleteImageDTO = null;
+        _cancellationTokenSource = null;
+    }
+
+    private DeleteDocumentDTO? _deleteDocumentDTO;
+    private async Task DeleteDocument(string productId)
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        _deleteDocumentDTO = new DeleteDocumentDTO(productId, "The first document will be deleted if any", null);
+        var result = await _writeSideHttpClient.DeleteProductDocumentAsync(_deleteDocumentDTO);
+        _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
+        _deleteDocumentDTO = null;
+        _cancellationTokenSource = null;
+    }
+    private void CancelDeleteDocument() => _deleteDocumentDTO = null;
+    private async Task SubmitDeleteDocument()
+    {
+        var result = await _writeSideHttpClient.DeleteProductDocumentAsync(_deleteDocumentDTO!);
+        _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
+        _deleteDocumentDTO = null;
+        _cancellationTokenSource = null;
+    }
+
+
+
+    //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS END *******************
+
 
     private async Task ClearFilters()
     {

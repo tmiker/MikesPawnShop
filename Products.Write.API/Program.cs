@@ -21,7 +21,7 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 
 // Configure the HTTP request pipeline.
 
-app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
+// app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
 
 if (app.Environment.IsDevelopment())
 {

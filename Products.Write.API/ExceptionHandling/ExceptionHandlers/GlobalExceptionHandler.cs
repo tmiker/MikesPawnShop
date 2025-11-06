@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Azure;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Products.Write.Application.Exceptions;
 
@@ -83,6 +84,10 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
         {
             return exception switch
             {
+                RequestFailedException => (StatusCodes.Status409Conflict,
+                    "Azure Blob Storage Exception",
+                    "An error occurred using Azure Blob Storage",
+                    "https://tools.ietf.org/html/rfc7231#section-6.5.8"),
                 ValidationException => (StatusCodes.Status400BadRequest,
                     "Validation Error",
                     "One or more validation errors occurred.",

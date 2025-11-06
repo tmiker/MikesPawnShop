@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Products.Write.Application.Abstractions;
+using Products.Write.Application.Configuration;
 using Products.Write.Application.CQRS.CommandHandlers;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -17,12 +18,14 @@ namespace Products.Write.Application
     {
         public static IServiceCollection RegisterApplicationServices(this IServiceCollection services)
         {
-            // Register CloudAMQP related services
+            // Register configurations
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
             string amqpUrl = configuration.GetSection("CloudAMQPSettings:Url").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
             string amqpUsername = configuration.GetSection("CloudAMQPSettings:UserVhost").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
             string amqpPassword = configuration.GetSection("CloudAMQPSettings:Password").Value ?? throw new ArgumentNullException("Invalid Cloud AMQP configuration.");
 
+            // Register messaging services
             services.AddMassTransit(x =>
             {
                 x.UsingRabbitMq((context, cfg) =>
@@ -55,6 +58,10 @@ namespace Products.Write.Application
                 return aggregator;
             });
 
+            // Register Azure Blob Storage Services
+            services.AddScoped<IAzureStorageService, AzureStorageService>();
+            services.AddScoped<IImageResizeHelper, ImageResizeHelper>();
+
             // Register Dispatchers
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
@@ -64,6 +71,8 @@ namespace Products.Write.Application
             services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
             services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();
             services.AddScoped<ICommandHandler<PurgeData, PurgeDataResult>, PurgeDataHandler>();
+            services.AddScoped<ICommandHandler<DeleteImage, DeleteImageResult>, DeleteImageHandler>();
+            services.AddScoped<ICommandHandler<DeleteDocument, DeleteDocumentResult>, DeleteDocumentHandler>();
 
             // Register Query Handlers
 

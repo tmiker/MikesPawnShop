@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Products.Write.Application.DTOs;
 
 namespace Products.Write.Application.CQRS.Commands
@@ -9,17 +10,19 @@ namespace Products.Write.Application.CQRS.Commands
         public string Name { get; init; } = default!;          // for Azure blob storage, virtual directory plus filename
         public string Title { get; init; } = default!;
         public int SequenceNumber { get; init; }
-        public string DocumentUrl { get; init; } = default!;
-        public string? CorrelationId { get; set; } 
+        public string? CorrelationId { get; set; }
+        public IFormFile? DocumentBlob { get; set; }
+        public string? BlobFileName { get; set; }
 
         public AddDocument(AddDocumentDTO addDocumentDTO, StringValues correlationId)
         {
-            ProductId = addDocumentDTO.ProductId;
+            ProductId = Guid.Parse(addDocumentDTO.ProductId);
             Name = addDocumentDTO.Name;
             Title = addDocumentDTO.Title;
             SequenceNumber = addDocumentDTO.SequenceNumber;
-            DocumentUrl = addDocumentDTO.DocumentUrl;
             CorrelationId = correlationId;
+            DocumentBlob = addDocumentDTO.DocumentBlob;
+            BlobFileName = addDocumentDTO.BlobFileName;
         }
     }
 }

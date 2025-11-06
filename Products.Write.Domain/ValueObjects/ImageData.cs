@@ -13,7 +13,7 @@ namespace Products.Write.Domain.ValueObjects
 
         public ImageData() { }
 
-        public ImageData(string name, string caption, int sequenceNumber, string imageUrl, string thumbnailUrl)
+        public ImageData(string name, string caption, int sequenceNumber, string imageUrl, string? thumbnailUrl)
         {
             Name = name;
             Caption = caption;

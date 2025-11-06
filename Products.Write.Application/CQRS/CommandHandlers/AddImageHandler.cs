@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Azure;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Domain.Aggregates;
-using Products.Write.Domain.Enumerations;
 using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
@@ -11,12 +11,14 @@ namespace Products.Write.Application.CQRS.CommandHandlers
     public class AddImageHandler : ICommandHandler<AddImage, AddImageResult>
     {
         private readonly IProductRepository _productRepository;
+        private readonly IAzureStorageService _azureStorageService;
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<AddImageHandler> _logger;
 
-        public AddImageHandler(IProductRepository productRepository, IEventAggregator eventAggregator, ILogger<AddImageHandler> logger)
+        public AddImageHandler(IProductRepository productRepository, IAzureStorageService azureStorageService, IEventAggregator eventAggregator, ILogger<AddImageHandler> logger)
         {
             _productRepository = productRepository;
+            _azureStorageService = azureStorageService;
             _eventAggregator = eventAggregator;
             _logger = logger;
         }
@@ -25,32 +27,76 @@ namespace Products.Write.Application.CQRS.CommandHandlers
         {
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
 
-            Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
-            product.AddImage(command.Name, command.Caption, command.SequenceNumber, command.ImageUrl, command.ThumbnailUrl, command.CorrelationId);
+            //validate command properties
+            AddImageResult? validationResult = ValidateAddImageCommand(command);
+            if (validationResult is not null) return validationResult;
 
-            // Save the product - throws ProductEventStoreException if error occurs
-            // THE REPOSITORY SHOULD ACTUALLY PROCESS ALL EVENTS TO THE EVENT STORE IN A SINGLE TRANSACTION, AND COMMIT ALL IN ONE GO SO WILL ROLL BACK IF ANY FAIL
-            // THE BOOL SUCCESS SHOULD APPLY TO ALL EVENTS IN THE BATCH
-            // MAY NOT WANT TO THROW AN EXCEPTION HERE - THOUGH EXCEPTION SHOULD BE HANDLED AT A HIGHER LEVEL RETURNING A PROBLEM DETAILS RESPONSE
-            bool success = await _productRepository.SaveAsync(product);
+            // get file name without extension so can convert all file extensions to lower case
+            // set file name to user provided desired file name if provided
+            var fileNameShort = Path.GetFileNameWithoutExtension(command.ImageBlob?.FileName);
+            var extension = Path.GetExtension(command.ImageBlob!.FileName).ToLowerInvariant();
+            string filename = string.IsNullOrWhiteSpace(command.BlobFileName) ? $"{fileNameShort}{extension}" : $"{command.BlobFileName}{extension}";
 
-            // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
-            if (success)
+            // get product from id and upload image data for the product
+            Product? product = await _productRepository.GetProductByIdAsync(command.ProductId!);
+            if (product is null) return new AddImageResult(false, $"No product was found with ProductId {command.ProductId}");
+
+            //// THE SEQUENCE NUMBER SHOULD COME FROM THE DOMAIN - QUESTION IS SHOULD IT UPDATE ALL SEQUENCE NUMBERS? - YES ON DELETING AN IMAGE REINDEX THEM
+
+            string containerName = $"product-{command.ProductId}";
+
+            try
             {
-                _logger.LogInformation("AddProductHandler created product with Id: {productId}. Command CorrelationId: {correlationId}", product.Id, command.CorrelationId);
+                (string? ImageUrl, string? ThumbUrl) uploadResult = await _azureStorageService.UploadImageToAzureAsync(command.ImageBlob!, containerName, filename, cancellationToken);   // throws a RequestFailedException if fails
+                if (uploadResult.ImageUrl is null) return new AddImageResult(false, "An image url was not returned while trying to upload the image. Please contact support.");
 
-                if (product.DomainEvents is not null && product.DomainEvents.Any())
+                product.AddImage(command.Name, command.Caption, command.SequenceNumber, uploadResult.ImageUrl!, uploadResult.ThumbUrl!, command.CorrelationId);
+                bool success = await _productRepository.SaveAsync(product);
+                // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
+                if (success)
                 {
-                    foreach (var domainEvent in product.DomainEvents)
+                    if (product.DomainEvents is not null && product.DomainEvents.Any())
                     {
-                        // publish the event to the bus
-                        _eventAggregator.Raise(domainEvent);
+                        foreach (var domainEvent in product.DomainEvents)
+                        {
+                            // publish the event to the bus
+                            _eventAggregator.Raise(domainEvent);
+                        }
                     }
-                }
 
-                return new AddImageResult(true, null);
+                    return new AddImageResult(true, null);
+                }
+                else return new AddImageResult(false, "An error occurred in persisting changes.");
             }
-            else return new AddImageResult(false, "An error occurred in persisting changes.");
+            catch (RequestFailedException ex)
+            {
+                return new AddImageResult(false, ex.Message);
+            }
+        }
+
+        private AddImageResult? ValidateAddImageCommand(AddImage command)
+        {
+            // validate command args
+            if (command.ImageBlob is null)
+            {
+                _logger.LogInformation("Attempt to add Product Image failed due to not providing an image file. CorrelationId {corrId}.", command.CorrelationId);
+                return new AddImageResult(false, "An Image was not provided.");
+            }
+            // default file max size in bytes = 512000 bytes.
+            if (command.ImageBlob.Length > 512000)
+            {
+                _logger.LogInformation("Attempt to add Image failed due excessive file size of {fileSize}. CorrelationId {corrId}.", command.ImageBlob.Length, command.CorrelationId);
+                return new AddImageResult(false, $"The file size of {command.ImageBlob.Length} exceeds the maximum allowable size of 512,000 bytes");
+            }
+            // validate extension is allowed file type
+            string[] permittedExtensions = { ".png", ".jpg", ".jpeg", ".bmp" };
+            var extension = Path.GetExtension(command.ImageBlob.FileName).ToLowerInvariant();
+            if (string.IsNullOrEmpty(extension) || !permittedExtensions.Contains(extension))
+            {
+                _logger.LogInformation("Attempt to add Product Image failed due invalid image type of {imagetype}. CorrelationId {corrId}.", extension, command.CorrelationId);
+                return new AddImageResult(false, "Images must be in png, jpg, jpeg, or bmp format.");
+            }
+            return null;
         }
     }
 }
