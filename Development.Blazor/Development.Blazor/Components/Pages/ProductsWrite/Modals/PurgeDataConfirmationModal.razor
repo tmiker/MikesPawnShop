@@ -1,0 +1,92 @@
+﻿﻿<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="CancelPurgeData"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+
+        <div class="modal-content rounded-3 border">
+
+            <div class="modal-header bg-primary text-light">
+                <h5>@ModalTitle</h5>
+            </div>
+
+            <div class="modal-body">
+
+                <EditForm Model="PurgeDataDTO" OnValidSubmit="SubmitPurgeData" FormName="PurgeDataModalForm">
+                    <DataAnnotationsValidator />
+                    @* EditForm (but not plain forms) automatically adds Antiforgery component and attribute unless manually disabled *@
+                    @if (PurgeDataDTO != null)
+                    {
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="text-danger"><b><i>Confirm purge data?</i></b></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="pin">Pin Number:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputNumber class="form-control bg-dark text-light" id="pin" @bind-Value="PurgeDataDTO.PinNumber" />
+                                <ValidationMessage For="@(() => PurgeDataDTO.PinNumber)" />
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="row mt-2">
+                            <div class="col-4 offset-3">
+                                <button class="btn btn-primary form-control" @onclick="CancelPurgeData">Cancel</button>
+                            </div>
+                            <div class="col-4 offset-1">
+                                <button class="btn btn-success form-control" type="submit">@SubmitButtonTitle</button>
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-danger"><b><i>Error: A PurgeDataDTO was not provided.</i></b></h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 text-center">
+                                <button class="btn btn-primary form-control" @onclick="CancelPurgeData">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </EditForm>
+
+                <div class="modal-footer justify-content-around">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? ModalTitle { get; set; }
+
+    [Parameter]
+    public string? SubmitButtonTitle { get; set; }
+
+    [Parameter]
+    public PurgeDataDTO? PurgeDataDTO { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    [Parameter]
+    public EventCallback CancelPurgeData { get; set; }
+
+
+    public async Task SubmitPurgeData()
+    {
+        await Submit.InvokeAsync();
+    }
+}
+﻿

@@ -162,14 +162,17 @@ namespace Products.Write.Infrastructure.EventStores
         {
             // EF CORE
             int count = await _eventStoreDbContext.EventRecords.ExecuteDeleteAsync();
+            
             _logger.LogInformation("Product Event Store records were purged. Rows deleted: {count}", count);
             return count > 0;
         }
 
         public async Task<bool> PurgeAsync()
         {
+            var snapshots = await _eventStoreDbContext.SnapshotRecords.ToListAsync();
             var events = await _eventStoreDbContext.EventRecords.ToListAsync();
             var outbox = await _eventStoreDbContext.OutboxRecords.ToListAsync();
+            _eventStoreDbContext.SnapshotRecords.RemoveRange(snapshots);
             _eventStoreDbContext.EventRecords.RemoveRange(events);
             _eventStoreDbContext.OutboxRecords.RemoveRange(outbox);
             bool success = await _eventStoreDbContext.SaveChangesAsync() > 0;

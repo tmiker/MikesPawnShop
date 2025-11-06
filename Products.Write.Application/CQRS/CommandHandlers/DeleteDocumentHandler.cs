@@ -36,12 +36,15 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             if (snapshot.Documents is not null && snapshot.Documents.Any())
             {
                 // need to change to use the filename from the command
-                var doc = snapshot.Documents.First();
-                string containerName = $"product-{command.ProductId}";
-                string fileName = doc.Name!;
-                (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductDocumentFromAzureAsync(containerName, fileName, cancellationToken);
-                return new DeleteDocumentResult(result.IsSuccess, result.ErrorMessage);
-
+                var doc = snapshot.Documents.FirstOrDefault(d => d.Name == command.FileName);
+                if (doc is not null)
+                {
+                    string containerName = $"product-{command.ProductId}";
+                    string fileName = doc.Name!;
+                    (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductDocumentFromAzureAsync(containerName, fileName, cancellationToken);
+                    return new DeleteDocumentResult(result.IsSuccess, result.ErrorMessage);
+                }
+                return new DeleteDocumentResult(false, $"A document with filename {command.FileName}");
             }
             return new DeleteDocumentResult(false, "The product has no documents");
         }

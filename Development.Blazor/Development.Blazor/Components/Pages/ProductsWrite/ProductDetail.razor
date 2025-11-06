@@ -1,0 +1,489 @@
+﻿@page "/productDetail/{id}"
+@rendermode InteractiveServer
+@inject IProductsWriteHttpClient _writeSideHttpClient
+@inject IProductsReadHttpClient _readSideHttpClient
+
+<h3>Product Detail</h3>
+
+@if (Id > 0)
+{
+    <h4>Id: @Id</h4>
+}
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <h4>@_errorMessage</h4>
+}
+@if (!string.IsNullOrWhiteSpace(_successMessage))
+{
+    <h4>@_successMessage</h4>
+}
+
+@if (_product is not null)
+{
+    <h3>Product Name: @_product.Name</h3>
+    <h3>Product Category: @_product.Category</h3>
+    <h3>Product Aggregate Id: @_product.AggregateId</h3>
+    <h3>Image Count: @_product.Images?.Count</h3>
+    <h3>Document Count: @_product.Documents?.Count</h3>
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <h3><b>Product Detail</b></h3>
+    </div>
+</div>
+
+@if (_product is not null)
+{
+    <div class="row">
+        <div class="col-6 text-center">
+            <div class="row">
+                <div class="col offset-3 ">
+                    <h5><b>@_product.Name</b></h5>
+                </div>
+            </div>
+            <br />
+            <!-- COLUMN 1 START-->
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="id">Id:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber inert class="form-control" id="id" @bind-Value="@_product.Id" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="aggId">Aggreegate Id:</label>
+                </div>
+                <div class="col-9">
+                    <InputText inert class="form-control" id="aggId" @bind-Value="@_productAggregateId" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="category">Category:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="form-control " id="category" @bind-Value="@_product.Category" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="name">Name:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="form-control " id="name" @bind-Value="@_product.Name" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="version">Version:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="form-control" id="version" @bind-Value="@_product.Version" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="price">Price:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="form-control " id="price" @bind-Value="@_product.Price" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="currency">Currency:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="form-control " id="currency" @bind-Value="@_product.Currency" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="description">Description:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="form-control " id="description" @bind-Value="@_product.Description" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="status">Status:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="form-control" id="status" @bind-Value="@_product.Status" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="imageCount">Image Count:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="form-control" id="imageCount" @bind-Value="@_imageCount" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="docCount">Document Count:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="form-control" id="docCount" @bind-Value="@_documentCount" />
+                </div>
+            </div>
+            <br />
+            <!-- COLUMN 1 END -->
+            <div class="row">
+                <div class="col-9 offset-3 text-center">
+                    <span><i>@_product.Name</i></span>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-5 offset-5">
+                    <a class="btn btn-primary form-control" href="/productsList">Back</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 text-center">
+            <!-- COLUMN 2 START -->
+
+            <div class="row mt-4">
+                <div class="col-4 offset-1">
+                    <a class="btn btn-danger form-control" @onclick="AddImage">Add Image</a>
+                </div>
+                <div class="col-4 offset-2">
+                    <a class="btn btn-danger form-control" @onclick="AddDocument">Add Document</a>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-4 offset-1">
+                    <a class="btn btn-danger form-control" @onclick="DeleteImage">Delete Image</a>
+                </div>
+                @* <div class="col-4 offset-2">
+                    <a class="btn btn-danger form-control" @onclick="DeleteDocument">Delete Document</a>
+                </div> *@
+            </div>
+
+            <!-- COLUMN 2 END -->
+        </div>
+    </div>
+}
+
+@if (_addImageDTO is not null)
+{
+    <AddImageModal ModalTitle="Add Image" SubmitButtonTitle="Add Image" ImageToAdd="@_addImageDTO" Submit="SubmitAddImage" Cancel="CancelAddImage" />
+}
+@if (_addDocumentDTO is not null)
+{
+    <AddDocumentModal ModalTitle="Add Document" SubmitButtonTitle="Add Document" DocumentToAdd="@_addDocumentDTO" Submit="SubmitAddDocument" Cancel="CancelAddDocument" />
+}
+
+@code {
+
+    [Parameter]
+    public string? id { get; set; }
+
+    public int Id;
+
+    // [CascadingParameter(Name = "SelectedProduct")]
+    // public ProductSummaryDTO? SelectedProduct { get; set; }
+
+    private string? _errorMessage;
+    private string? _successMessage;
+
+    private ProductDTO? _product;
+    private string? _productAggregateId;
+    private int _imageCount;
+    private int _documentCount;
+
+    // [Parameter]
+    // public string? ProductId { get; set; }
+    // private ProductDTO? Product { get; set; }
+    private bool _showAddImageView { get; set; }
+    private ImageDataDTO? _primaryImage { get; set; }
+
+    // public AddProductImageDTO? AddImageDTO { get; set; }
+
+    //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS START *******************
+
+    private CancellationTokenSource? _cancellationTokenSource;
+    private string? _addResultString;
+    private void ClearAddResultString() => _addResultString = null;
+
+    private AddImageDTO? _addImageDTO;
+    private void AddImage() => _addImageDTO = new AddImageDTO() { ProductId = _product!.AggregateId.ToString() };
+    private void CancelAddImage() => _addImageDTO = null;
+    private async Task SubmitAddImage()
+    {
+        if (_addImageDTO is null) return;
+        _cancellationTokenSource = new CancellationTokenSource();
+        var addImageResult = await _writeSideHttpClient.AddProductImageAsync(_addImageDTO, _cancellationTokenSource.Token);
+        if (addImageResult.IsSuccess)
+        {
+            _imageCount++;
+            _successMessage = "Success Adding Image.";
+        }
+        else _errorMessage = addImageResult.ErrorMessage;
+        _addImageDTO = null;
+        _cancellationTokenSource = null;
+        // await ReloadAsync();  // nothing will have changed yet on read side - need write side data to fetch
+    }
+    // private string[] _allowedImageFileTypes = new string[] { "image/jpeg", "image/bmp", "image/png", "image/gif" };
+    // private async Task OnImageInputFileChange(InputFileChangeEventArgs e)
+    // {
+    //     if (!_allowedImageFileTypes.Contains(e.File.ContentType)) _addResultString = "Invalid file format. Files must be of type png, jpeg, bmp, or gif.";
+    //     var image = await e.File.RequestImageFileAsync(e.File.ContentType, 600, 600);  // should just return file as is if dims both < 600
+    //     _addImageDTO!.ImageBlob = image;
+    // }
+
+    private AddDocumentDTO? _addDocumentDTO;
+    private void AddDocument() => _addDocumentDTO = new AddDocumentDTO() { ProductId = _product!.AggregateId.ToString() };
+    private void CancelAddDocument() => _addDocumentDTO = null;
+    private async Task SubmitAddDocument()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        if (_addDocumentDTO!.DocumentBlob is not null) Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS NOT null.");
+        else Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS null.");
+        var addDocumentResult = await _writeSideHttpClient.AddProductDocumentAsync(_addDocumentDTO!, _cancellationTokenSource.Token);
+        if (addDocumentResult.IsSuccess)
+        {
+            _documentCount++;
+            _successMessage = "Success Adding Document.";
+        }
+        else _errorMessage = addDocumentResult.ErrorMessage;
+        _addDocumentDTO = null;
+        _cancellationTokenSource = null;
+        // await ReloadAsync(); // nothing will have changed yet on read side - need write side data to fetch
+    }
+
+    private DeleteImageDTO? _deleteImageDTO;
+    private async Task DeleteImage()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        if (_product!.Images is not null)
+        {
+            //var image = _product.Images[0];
+            string filename = "f15.jpg";    // image.Name!;
+            _deleteImageDTO = new DeleteImageDTO(_product!.AggregateId.ToString(), filename, null);
+            var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO);
+            if (result.IsSuccess)
+            {
+                _imageCount--;
+                // need to remove the image
+                _successMessage = "Success Deleting Image.";
+            }
+            else _errorMessage = result.ErrorMessage;
+        }
+        else _errorMessage = $"There are no product images";
+
+        _deleteImageDTO = null;
+        _cancellationTokenSource = null;
+    }
+    private void CancelDeleteImage() => _deleteImageDTO = null;
+    private async Task SubmitDeleteImage()
+    {
+        var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO!);
+        _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
+        _deleteImageDTO = null;
+        _cancellationTokenSource = null;
+    }
+
+    //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS END *******************
+
+    //// ****************** ALTERNATE ADD AND REMOVE IMAGES AND DOCUMENTS START *******************
+    ///
+    // private CancellationTokenSource? _cancellationTokenSource = null;
+    // private AddImageDTO? _addImageDTO = null;
+    // private void AddImageAsync()
+    // {
+    //     _addImageDTO = new AddImageDTO { ProductId = _product?.AggregateId.ToString()! };
+    //     _showAddImageView = true;
+    // }
+    // private void CancelAddImage()
+    // {
+    //     _showAddImageView = false;
+    //     _addImageDTO = null;
+    // }
+    // private async Task SubmitNewImage()
+    // {
+    //     _cancellationTokenSource = new CancellationTokenSource();
+    //     var result = await _writeSideHttpClient.AddProductImageAsync(_addImageDTO!, _cancellationTokenSource.Token);
+    //     if (result.IsSuccess) _successMessage = "Image successfully added";
+    //     else _errorMessage = result.ErrorMessage!;
+    //     _showAddImageView = false;
+    //     _addImageDTO = null;
+    //     _cancellationTokenSource = null;
+    //     await ReloadAsync();
+    // }
+
+    // private void SetPrimaryImage(int sequenceNumber)
+    // {
+    //     await _toastrService.ShowToastrError($"NOT YET IMPLEMENTED FOR PRODUCTS!");
+    //     var primaryImage = _product!.Images?.FirstOrDefault(i => i.SequenceNumber == sequenceNumber);
+    //     if (primaryImage != null)
+    //     {
+    //         _primaryImage = primaryImage;
+    //     }
+    // }
+
+    // private DeleteImageDTO? _deleteImageDTO = null;
+    // private async Task DeleteImageAsync(string filename)
+    // {
+    //     _deleteImageDTO = new DeleteImageDTO(_product!.AggregateId.ToString(), filename, null);
+    //     var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO);
+    //     if (result.IsSuccess)
+    //     {
+    //         _successMessage = "Image successfully removed";
+    //         await ReloadAsync();
+    //     }
+    //     else
+    //     {
+    //         _errorMessage = result.ErrorMessage!;
+    //         await ReloadAsync();
+    //     }
+    // }
+    //// ****************** ALTERNATE ADD AND REMOVE IMAGES AND DOCUMENTS END *******************
+
+    private async Task ReloadAsync()
+    {
+        var result = await _readSideHttpClient.GetProductByIdAsync(Id);
+        if (result.IsSuccess)
+        {
+            _product = result.Product;
+            if (_product is not null)
+            {
+                _productAggregateId = _product.AggregateId.ToString();
+                if (_product.Images is not null)
+                {
+                    _primaryImage = _product.Images[0];
+                    _imageCount = _product.Images.Count;
+                }
+                if (_product.Documents is not null)
+                {
+                    _documentCount = _product.Documents.Count;
+                }
+            }
+        }
+        else _errorMessage = result.ErrorMessage;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            var result = await _readSideHttpClient.GetProductByIdAsync(Id);
+            if (result.IsSuccess)
+            {
+                _product = result.Product;
+                if (_product is not null)
+                {
+                    _productAggregateId = _product.AggregateId.ToString();
+                    if (_product.Images is not null && _product.Images.Any())
+                    {
+                        _primaryImage = _product.Images[0];
+                        _imageCount = _product.Images.Count;
+                    }
+                    if (_product.Documents is not null)
+                    {
+                        _documentCount = _product.Documents.Count;
+                    }
+                }
+            }
+            else _errorMessage = result.ErrorMessage;
+            this.StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Int32.TryParse(id, out int number)) Id = number;
+        else _errorMessage = $"Unable to parse Product Id";
+        // if (SelectedProduct is not null) Id = SelectedProduct.Id;
+    }
+}
+
+
+@*
+                    //// ****************** ALTERNATE ADD AND REMOVE IMAGES AND DOCUMENTS  *******************
+
+                    <!-- COLUMN 2 START-->
+            @if (!_showAddImageView)
+            {
+                <div class="row">
+                    <div class="col-4 offset-4 text-center ">
+                        <h5><b>Images</b></h5>
+                    </div>
+                        <div class="col-3 offset-1 text-end">
+                            <a class="btn btn-toolbar-custom" role="button" @onclick="AddImageAsync">
+                                <i class="bi-plus-lg m-1"></i>  Add Image
+                            </a>
+                        </div>
+                </div>
+                @if (_primaryImage != null)
+                {
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <img src="@_primaryImage.ImageUrl" width="400" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="text-primary"><i>@_primaryImage.Caption</i></p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <br />
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h6 class="text-primary"><b><i>No images available</i></b></h6>
+                        </div>
+                    </div>
+                    <br />
+                }
+                <div class="row">
+                    @if (_primaryImage != null)
+                    {
+                        <div class="col-1 text-center ">
+                            <span><i>@_primaryImage.SequenceNumber</i></span>
+                        </div>
+                        <div class="col-6 offset-2 text-center">
+                            <span><i>@_primaryImage.Name</i></span>
+                        </div>
+                            <div class="col-1 offset-2 text-center">
+                                <a class="btn btn-sm btn-danger " @onclick="(() => DeleteImageAsync(_primaryImage.Name!))">&#128465;</a>
+                            </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <AddImageModal />
+            }
+            <br />
+            <div class="row">
+                @if (_product.Images is not null && _product.Images.Any())
+                {
+                    @foreach (var image in _product.Images)
+                    {
+                        <div class="col-2">
+                            @if (image.SequenceNumber == 1)
+                            {
+                                <img src="@image.ThumbnailUrl" width="100" style="border:2px solid blue;" />
+                            }
+                            else
+                            {
+                                <img src="@image.ThumbnailUrl" width="100" style="cursor:pointer;" @onclick="(() => SetPrimaryImage(image.SequenceNumber))" />
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            <!-- COLUMN 2 END-->
+                *@

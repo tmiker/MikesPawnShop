@@ -1,5 +1,146 @@
-﻿<h3>AddImageModal</h3>
+﻿
+<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="Cancel"></div>
+    <div class="modal-dialog modal-lg" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content rounded-3 border">
+
+            <div class="modal-header bg-primary text-light">
+                <h5>@ModalTitle</h5>
+            </div>
+
+            <div class="modal-body">
+
+                @if (!string.IsNullOrEmpty(_allowedFileTypeError))
+                {
+                    <h4 class="text-danger">ERROR: @_allowedFileTypeError</h4>
+                    <a class="btn btn-success" @onclick="ClearFileTypeError">Clear</a>
+                }
+
+                <EditForm Model="@ImageToAdd" OnValidSubmit="Submit" FormName="AddImageModalForm">
+                    <DataAnnotationsValidator />
+                    @if (ImageToAdd != null)
+                    {
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label for="productId">Product Id:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText inert class="form-control" id="productId" @bind-Value="@ImageToAdd.ProductId" />
+                                <ValidationMessage For="@(() => ImageToAdd.ProductId)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="name">Name:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control" id="name" @bind-Value="@ImageToAdd.Name" />
+                                <ValidationMessage For="@(() => ImageToAdd.Name)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="label" for="caption">Caption:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control " id="caption" @bind-Value="@ImageToAdd.Caption" />
+                            </div>
+                        </div>
+                        <ValidationMessage For="@(() => ImageToAdd.Caption)" />
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="seq">Sequence Number:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputNumber class="form-control" id="seq" @bind-Value="@ImageToAdd.SequenceNumber" />
+                                <ValidationMessage For="@(() => ImageToAdd.SequenceNumber)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="desiredfilename">Desired File Name:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control" id="desiredfilename" @bind-Value="@ImageToAdd.BlobFileName" />
+                                <ValidationMessage For="@(() => ImageToAdd.BlobFileName)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label for="file">Document:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputFile class="form-control" typeof="file" id="files" OnChange="@OnImageInputFileChange" />
+                                <ValidationMessage For="@(() => ImageToAdd.ImageBlob)" />
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="row mt-2">
+                            <div class="col-4 offset-3">
+                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                            </div>
+                            @if (ImageToAdd.ImageBlob is not null)
+                            {
+                                <div class="col-4 offset-1">
+                                    <button class="btn btn-success form-control" type="submit">Submit</button>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-danger"><b><i>Error: No Task object provided.</i></b></h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 text-center">
+                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </EditForm>
+            </div>
+            <div class="modal-footer bg-primary text-light">
+                <p>Footer</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
+    private string? _allowedFileTypeError;
 
+    private void ClearFileTypeError()
+    {
+        // ImageToAdd!.DocumentBlob = null;
+        _allowedFileTypeError = null;
+    }
+
+    [Parameter]
+    public AddImageDTO? ImageToAdd { get; set; }
+
+    [Parameter]
+    public string? ModalTitle { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    [Parameter]
+    public string SubmitButtonTitle { get; set; } = "Add";
+
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+
+    private string[] _allowedImageFileTypes = new string[] { "image/jpeg", "image/bmp", "image/png", "image/gif" };
+    private async Task OnImageInputFileChange(InputFileChangeEventArgs e)
+    {
+        if (!_allowedImageFileTypes.Contains(e.File.ContentType)) _allowedFileTypeError = "Invalid file format. Files must be of type png, jpeg, bmp, or gif.";
+        var image = await e.File.RequestImageFileAsync(e.File.ContentType, 600, 600);  // should just return file as is if dims both < 600
+        ImageToAdd!.ImageBlob = image;
+    }
 }

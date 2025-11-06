@@ -36,9 +36,18 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             if (snapshot.Images is not null && snapshot.Images.Any())
             {
                 // need to change to use the filename from the command
-                var image = snapshot.Images.First();
+                //var image = snapshot.Images.FirstOrDefault(i => i.Name == command.FileName);
+                //if (image is not null)
+                //{
+                //    string containerName = $"product-{command.ProductId}";
+                //    string fileName = "f15.jpg";    // image.Name!;
+                //    (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductImageFromAzureAsync(containerName, fileName, cancellationToken);
+                //    return new DeleteImageResult(result.IsSuccess, result.ErrorMessage);
+                //}
+                //return new DeleteImageResult(false, $"An image with filename {command.FileName} was not found.");
+
                 string containerName = $"product-{command.ProductId}";
-                string fileName = image.Name!;
+                string fileName = "f15.jpg"; // this works so need to include extension in filename   // image.Name!;
                 (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductImageFromAzureAsync(containerName, fileName, cancellationToken);
                 return new DeleteImageResult(result.IsSuccess, result.ErrorMessage);
 

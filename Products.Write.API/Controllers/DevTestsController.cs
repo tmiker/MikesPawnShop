@@ -125,7 +125,7 @@ namespace Products.Write.API.Controllers
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             PurgeData command = new PurgeData(purgeDataDTO.PinNumber, correlationId);
             PurgeDataResult result = await _commandDispatcher.DispatchAsync<PurgeData, PurgeDataResult>(command, cancellationToken);
-            if (result.IsSuccess) return Ok(result);
+            if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
     }

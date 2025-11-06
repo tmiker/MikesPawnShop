@@ -38,8 +38,9 @@ namespace Development.Blazor.HttpProviders
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                string aggregateId = await response.Content.ReadAsStringAsync();
-                return (true, Guid.Parse(aggregateId), null);
+                AddProductResult? result = await response.Content.ReadFromJsonAsync<AddProductResult>();
+                
+                return (true, result?.ProductId, null);
             }
             string error = await response.Content.ReadAsStringAsync();
             return (false, null, error);

@@ -80,12 +80,12 @@
 
                         <div class="row mt-2">
                             <div class="col-4 offset-3">
-                                <button class="btn button-primary form-control" @onclick="Cancel">Cancel</button>
+                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
                             </div>
                             @if (DocumentToAdd.DocumentBlob is not null)
                             {
                                 <div class="col-4 offset-1">
-                                    <button class="btn button-success form-control" type="submit">Submit</button>
+                                    <button class="btn btn-success form-control" type="submit">Submit</button>
                                 </div>
                             }
                         </div>
@@ -131,7 +131,7 @@
     public EventCallback Submit { get; set; }
 
     [Parameter]
-    public string AddButtonTitle { get; set; } = "Add";
+    public string SubmitButtonTitle { get; set; } = "Add";
 
     [Parameter]
     public EventCallback Cancel { get; set; }

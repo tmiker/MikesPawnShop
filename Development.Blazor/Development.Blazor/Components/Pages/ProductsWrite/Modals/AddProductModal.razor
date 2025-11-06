@@ -1,0 +1,139 @@
+﻿﻿<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content rounded-3 border">
+
+            <div class="modal-header bg-primary text-light">
+                <h5>@ModalTitle</h5>
+            </div>
+
+            <div class="modal-body">
+
+                <EditForm Model="AddNewProductDTO" OnValidSubmit="Submit" FormName="AddProductModalForm">
+                    <DataAnnotationsValidator />
+                    @* EditForm (but not plain forms) automatically adds Antiforgery component and attribute unless manually disabled *@
+
+                    @if (AddNewProductDTO != null)
+                    {
+
+
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="name">Name:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText class="form-control " id="name" @bind-Value="AddNewProductDTO.Name" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.Name)" />
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="cat">Category:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputSelect class="form-select" id="categorySelect" @bind-Value="@AddNewProductDTO.Category">
+                                    <option value="">...select category...</option>
+                                    @foreach (var cat in _categoriesList!)
+                                    {
+                                        <option value="@cat">@cat</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => AddNewProductDTO.Category)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="desc">Description:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText class="form-control " id="desc" @bind-Value="AddNewProductDTO.Description" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.Description)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="price">Price:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputNumber class="form-control " id="price" @bind-Value="AddNewProductDTO.Price" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.Price)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="curr">Currency:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText class="form-control " id="curr" @bind-Value="AddNewProductDTO.Currency" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.Currency)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="status">Status:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText class="form-control " id="status" @bind-Value="AddNewProductDTO.Status" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.Status)" />
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="row mt-2">
+                            <div class="col-4 offset-3">
+                                <button class="btn btn-primary form-control" @onclick="CancelAddProduct">Cancel</button>
+                            </div>
+                            <div class="col-4 offset-1">
+                                <button class="btn btn-success form-control" type="submit">@SubmitButtonTitle</button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-danger"><b><i>Error: An AddProductDTO was not provided.</i></b></h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 text-center">
+                                <button class="btn btn-primary form-control" @onclick="CancelAddProduct">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </EditForm>
+
+                <div class="modal-footer justify-content-around">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? ModalTitle { get; set; }
+
+    [Parameter]
+    public string? SubmitButtonTitle { get; set; }
+
+    [Parameter]
+    public AddProductDTO? AddNewProductDTO { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    [Parameter]
+    public EventCallback CancelAddProduct { get; set; }
+
+    private List<string> _categoriesList = new List<string>() { "Astronomy", "Computers", "Electronics", "Photography", "Music" };
+
+}
+﻿

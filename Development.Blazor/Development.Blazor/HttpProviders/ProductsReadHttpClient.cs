@@ -147,9 +147,10 @@ namespace Development.Blazor.HttpProviders
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    string result = await response.Content.ReadAsStringAsync();
-                    ProductDTO? product = JsonSerializer.Deserialize<ProductDTO>(result, _jsonOptions);
-                    Console.WriteLine(product);
+                    ProductDTO? product = await response.Content.ReadFromJsonAsync<ProductDTO>();
+                    //string result = await response.Content.ReadAsStringAsync();
+                    //ProductDTO? product = JsonSerializer.Deserialize<ProductDTO>(result, _jsonOptions);
+                    //Console.WriteLine(product);
                     return (true, product, null);
                 }
                 string error = await response.Content.ReadAsStringAsync();
