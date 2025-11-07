@@ -147,7 +147,7 @@
 
     private async Task RefreshData()
     {
-        var result = await _writeSideHttpClient.GetOutboxRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
+        var result = await _writeSideHttpClient.GetPagedOutboxRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
         if (result.IsSuccess)
         {
             if (result.OutboxRecords is not null)
@@ -164,7 +164,7 @@
     {
         if (isFirstRender)
         {
-            var result = await _writeSideHttpClient.GetOutboxRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
+            var result = await _writeSideHttpClient.GetPagedOutboxRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
             if (result.IsSuccess)
             {
                 if (result.OutboxRecords is not null)

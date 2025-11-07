@@ -9,7 +9,7 @@
 
     <div class="card-header text-center bg-primary text-light">
         <h4><b>WRITE SIDE PRODUCTS</b></h4>
-        <h6 class="mt-2"><i>Record Count: @_productSummariesCount</i></h6>
+        <h6 class="mt-2"><i>Record Count: @_productsCount</i></h6>
 
     </div>
 
@@ -71,10 +71,10 @@
                 <a class="btn btn-success form-control" @onclick="AddProduct">Add Product</a>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-12">
 
-                @if (_productSummaries is not null)
+                @if (_products is not null)
                 {
                     <table class="table table-sm table-bordered text-center">
                         <thead class="bg-primary text-light">
@@ -93,7 +93,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var product in _productSummaries)
+                            @foreach (var product in _products)
                             {
                                 <tr>
                                     <td>@product.Id</td>
@@ -102,11 +102,11 @@
                                     <td>@product.Price</td>
                                     <td>@product.Currency</td>
                                     <td>@product.Status</td>
-                                    <td>@product.ImageCount</td>
-                                    <td>@product.DocumentCount</td>
+                                    <td>@product.Images?.Count</td>
+                                    <td>@product.Documents?.Count</td>
                                     <td>@product.Version</td>
                                     <td>
-                                        <a class="btn btn-primary" @onclick="() => Detail(product.Id)">Detail</a>
+                                        <a class="btn btn-primary" @onclick="() => Detail(product.Id.ToString())">Detail</a>
                                     </td>
 
                                 </tr>
@@ -166,17 +166,19 @@
     // [CascadingParameter(Name = "SelectedProduct")]
     // public ProductSummaryDTO? SelectedProduct { get; set; }
 
-    private List<ProductSummaryDTO>? _productSummaries;
+    private List<ProductSnapshotDTO>? _products;
 
     private string? _aggregateIdString = null;
     private string? _categoryFilter = null;
     private string? _sortColumn = null;
+    private int _minVersion = 0;
+    private int _maxVersion = Int32.MaxValue;
 
     private int _pageNumber = 1;
     private int _pageSize = 10;
     private PaginationMetadata? _pagingData;
 
-    private int _productSummariesCount;
+    private int _productsCount;
 
     private string? _errorMessage;
     private string? _successMessage;
@@ -186,67 +188,12 @@
         _successMessage = null;
     }
 
-    private void Detail(int productId) => Nav.NavigateTo($"productDetail/{productId}");
+    private void Detail(string aggregateId) => Nav.NavigateTo($"productDetail/{aggregateId}");
 
     //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS START *******************
 
     private CancellationTokenSource? _cancellationTokenSource;
-    // private string? _addResultString;
-    // private void ClearAddResultString() => _addResultString = null;
-
-    // private AddImageDTO? _addImageDTO;
-    // private void AddImage(string productId) => _addImageDTO = new AddImageDTO() { ProductId = productId };
-    // private void CancelAddImage() => _addImageDTO = null;
-    // private async Task SubmitAddImage()
-    // {
-    //     if (_addImageDTO is null) return;
-    //     _cancellationTokenSource = new CancellationTokenSource();
-    //     var addImageResult = await _writeSideHttpClient.AddProductImageAsync(_addImageDTO, _cancellationTokenSource.Token);
-    //     _addResultString = addImageResult.IsSuccess ? "Success" : addImageResult.ErrorMessage;
-    //     _addImageDTO = null;
-    //     _cancellationTokenSource = null;
-    // }
-    // private string[] _allowedImageFileTypes = new string[] { "image/jpeg", "image/bmp", "image/png", "image/gif" };
-    // private async Task OnImageInputFileChange(InputFileChangeEventArgs e)
-    // {
-    //     if (!_allowedImageFileTypes.Contains(e.File.ContentType)) _addResultString = "Invalid file format. Files must be of type png, jpeg, bmp, or gif.";
-    //     var image = await e.File.RequestImageFileAsync(e.File.ContentType, 600, 600);  // should just return file as is if dims both < 600
-    //     _addImageDTO!.ImageBlob = image;
-    // }
-
-    // private AddDocumentDTO? _addDocumentDTO;
-    // private void AddDocument(string productId) => _addDocumentDTO = new AddDocumentDTO() { ProductId = productId };
-    // private void CancelAddDocument() => _addDocumentDTO = null;
-    // private async Task SubmitAddDocument()
-    // {
-    //     _cancellationTokenSource = new CancellationTokenSource();
-    //     if (_addDocumentDTO!.DocumentBlob is not null) Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS NOT null.");
-    //     else Console.WriteLine($"The RAZOR PAGE SUBMIT Document Blob IS null.");
-    //     var addDocumentResult = await _writeSideHttpClient.AddProductDocumentAsync(_addDocumentDTO!, _cancellationTokenSource.Token);
-    //     _addResultString = addDocumentResult.IsSuccess ? "Success" : addDocumentResult.ErrorMessage;
-    //     _addDocumentDTO = null;
-    // }
-
-    // private DeleteImageDTO? _deleteImageDTO;
-    // private async Task DeleteImage(string productId)
-    // {
-    //     _cancellationTokenSource = new CancellationTokenSource();
-    //     _deleteImageDTO = new DeleteImageDTO(productId, "The first image will be deleted if any", null);
-    //     var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO);
-    //     _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
-    //     _deleteImageDTO = null;
-    //     _cancellationTokenSource = null;
-    // }
-    // private void CancelDeleteImage() => _deleteImageDTO = null;
-    // private async Task SubmitDeleteImage()
-    // {
-    //     var result = await _writeSideHttpClient.DeleteProductImageAsync(_deleteImageDTO!);
-    //     _addResultString = result.IsSuccess ? "Success" : result.ErrorMessage;
-    //     _deleteImageDTO = null;
-    //     _cancellationTokenSource = null;
-    // }
-
-    //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS END *******************
+ 
 
     //// ****************** ADD PRODUCT *****************
     private AddProductDTO? _addProductDTO = null;
@@ -306,14 +253,15 @@
 
     private async Task RefreshData()
     {
-        var result = await _readSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_aggregateIdString, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+        var result = await _writeSideHttpClient.GetPagedProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
+        // var result = await _readSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_aggregateIdString, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
         if (result.IsSuccess)
         {
-            if (result.Products is not null && result.Products.Any())
+            if (result.ProductSnapshots is not null && result.ProductSnapshots.Any())
             {
-                _productSummaries = result.Products.ToList();
+                _products = result.ProductSnapshots.ToList();
                 _pagingData = result.PagingData;
-                _productSummariesCount = _productSummaries.Count;
+                _productsCount = _products.Count;
             }
         }
         else Console.WriteLine(result.ErrorMessage);
@@ -323,14 +271,15 @@
     {
         if (isFirstRender)
         {
-            var result = await _readSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_aggregateIdString, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+            var result = await _writeSideHttpClient.GetPagedProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
+            // var result = await _readSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_aggregateIdString, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
             if (result.IsSuccess)
             {
-                if (result.Products is not null && result.Products.Any())
+                if (result.ProductSnapshots is not null && result.ProductSnapshots.Any())
                 {
-                    _productSummaries = result.Products.ToList();
+                    _products = result.ProductSnapshots.ToList();
                     _pagingData = result.PagingData;
-                    _productSummariesCount = _productSummaries.Count;
+                    _productsCount = _products.Count;
                 }
             }
             else Console.WriteLine(result.ErrorMessage);

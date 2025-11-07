@@ -210,7 +210,7 @@ namespace Development.Blazor.HttpProviders
 
         // Dev Tests
         // Dev Tests methods
-        public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
+        public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedProductSnapshotsAsync(
             string? aggregateId,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
@@ -232,8 +232,29 @@ namespace Development.Blazor.HttpProviders
             string error = await response.Content.ReadAsStringAsync();
             return (false, null, null, error);
         }
+        
+        public async Task<(bool IsSuccess, ProductSnapshotDTO? ProductSnapshot, string? ErrorMessage)> GetProductSnapshotByIdAsync(
+            string? aggregateId,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/productSnapshot/{aggregateId}?minVersion={minVersion}&maxVersion={maxVersion}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
 
-        public async Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                ProductSnapshotDTO? snapshotDTO = await response.Content.ReadFromJsonAsync<ProductSnapshotDTO>();
+                return (true, snapshotDTO, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, error);
+        }
+
+        public async Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedEventRecordsAsync(
             string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
@@ -258,7 +279,7 @@ namespace Development.Blazor.HttpProviders
             return (false, null, null, error);
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
+        public async Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedOutboxRecordsAsync(
             string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
@@ -282,7 +303,7 @@ namespace Development.Blazor.HttpProviders
             return (false, null, null, error);
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
+        public async Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedSnapshotRecordsAsync(
             string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,

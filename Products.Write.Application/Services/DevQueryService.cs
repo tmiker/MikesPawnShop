@@ -49,6 +49,17 @@ namespace Products.Write.Application.Services
             return (true, result, pagingData, null);
         }
 
+        public async Task<(bool IsSuccess, ProductSnapshot? ProductSnapshot, string? ErrorMessage)> GetProductSnapshotByIdAsync(
+            Guid aggregateId,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue)
+        {
+            IEnumerable<IDomainEvent> aggregateEvents = await GetDomainEventsByAggregateIdAndVersionAsync(aggregateId, minVersion, maxVersion);
+            Product product = new Product(aggregateEvents);
+            ProductSnapshot snapshot = product.GetSnapshot();
+            return (true, snapshot, null);
+        }
+
         private async Task<IEnumerable<Guid>> GetUniqueAggregateIdsAsync()
         {
             IEnumerable<Guid> uniqueIds = await _db.EventRecords.Select(p => p.AggregateId).Distinct().ToListAsync();        

@@ -13,6 +13,11 @@ namespace Products.Write.Application.Abstractions
             int pageNumber = 1,
             int pageSize = 10);
 
+        Task<(bool IsSuccess, ProductSnapshot? ProductSnapshot, string? ErrorMessage)> GetProductSnapshotByIdAsync(
+            Guid aggregateId,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue);
+
         Task<(bool IsSuccess, IEnumerable<EventRecord>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
             Guid? aggregateId,
             string? correlationId = null,

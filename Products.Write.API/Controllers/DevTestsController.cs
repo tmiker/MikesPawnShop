@@ -5,6 +5,7 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.QueryResults;
 using Products.Write.Application.DTOs;
+using Products.Write.Domain.Snapshots;
 
 namespace Products.Write.API.Controllers
 {
@@ -39,6 +40,19 @@ namespace Products.Write.API.Controllers
             if (!string.IsNullOrWhiteSpace(aggregateId)) guid = Guid.Parse(aggregateId);
             var result = await _devQueryService.GetProductSnapshotsAsync(guid, minVersion, maxVersion, pageNumber, pageSize);
             if (result.IsSuccess) return Ok(new PagedProductSnapshotResult() { ProductSnapshots = result.ProductSnapshots, PagingData = result.PagingData });
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("productSnapshot/{aggregateId}")]
+        public async Task<ActionResult<ProductSnapshot>> GetProductSnapshot(
+            string? aggregateId,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue)
+        {
+            Guid guid = Guid.Empty;
+            if (!string.IsNullOrWhiteSpace(aggregateId)) guid = Guid.Parse(aggregateId);
+            var result = await _devQueryService.GetProductSnapshotByIdAsync(guid, minVersion, maxVersion);
+            if (result.IsSuccess) return Ok(result.ProductSnapshot);
             return BadRequest(result.ErrorMessage);
         }
 

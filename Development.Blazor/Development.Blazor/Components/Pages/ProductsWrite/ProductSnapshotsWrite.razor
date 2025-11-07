@@ -341,7 +341,7 @@
 
     private async Task RefreshData()
     {
-        var snapshotsResult = await _writeSideHttpClient.GetProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
+        var snapshotsResult = await _writeSideHttpClient.GetPagedProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
         if (snapshotsResult.IsSuccess)
         {
             if (snapshotsResult.ProductSnapshots is not null && snapshotsResult.ProductSnapshots.Any())
@@ -359,7 +359,7 @@
     {
         if (isFirstRender)
         {
-            var snapshotsResult = await _writeSideHttpClient.GetProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
+            var snapshotsResult = await _writeSideHttpClient.GetPagedProductSnapshotsAsync(_aggregateIdString, _minVersion, _maxVersion, _pageNumber, _pageSize);
             if (snapshotsResult.IsSuccess)
             {
                 if (snapshotsResult.ProductSnapshots is not null && snapshotsResult.ProductSnapshots.Any())

@@ -8,8 +8,9 @@ namespace Development.Blazor.Abstractions
     {
         Task<(bool IsSuccess, Guid? AggregateId, string? ErrorMessage)> AddProductAsync(AddProductDTO addProductDTO, CancellationToken cancellationToken);
         Task<(bool IsSuccess, string? ErrorMessage)> UpdateStatusAsync(UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken);
-        Task<(bool IsSuccess, string? ErrorMessage)> AddImageAsync(AddImageDTO addImageDTO, CancellationToken cancellationToken);
-        Task<(bool IsSuccess, string? ErrorMessage)> AddDocumentAsync(AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken);
+
+        //Task<(bool IsSuccess, string? ErrorMessage)> AddImageAsync(AddImageDTO addImageDTO, CancellationToken cancellationToken);
+        //Task<(bool IsSuccess, string? ErrorMessage)> AddDocumentAsync(AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken);
 
         // UPDATED METHODS FOR IMAGES AND DOCUMENTS
         Task<(bool IsSuccess, string? ErrorMessage)> AddProductImageAsync(AddImageDTO addImageDTO, CancellationToken cancellationToken);
@@ -18,22 +19,19 @@ namespace Development.Blazor.Abstractions
         Task<(bool IsSuccess, string? ErrorMessage)> DeleteProductDocumentAsync(DeleteDocumentDTO deleteDocumentDTO);
 
         // Dev Tests
-        Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
+        Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedProductSnapshotsAsync(
             string? aggregateId,
             int minVersion = 0,
             int maxVersion = Int32.MaxValue,
             int pageNumber = 1,
             int pageSize = 10);
 
-        Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetEventRecordsAsync(
+        Task<(bool IsSuccess, ProductSnapshotDTO? ProductSnapshot, string? ErrorMessage)> GetProductSnapshotByIdAsync(
             string? aggregateId,
-            string? correlationId = null,
             int minVersion = 0,
-            int maxVersion = Int32.MaxValue,
-            int pageNumber = 1,
-            int pageSize = 10);
+            int maxVersion = Int32.MaxValue);
 
-        Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetOutboxRecordsAsync(
+        Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedEventRecordsAsync(
             string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,
@@ -41,7 +39,15 @@ namespace Development.Blazor.Abstractions
             int pageNumber = 1,
             int pageSize = 10);
 
-        Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
+        Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedOutboxRecordsAsync(
+            string? aggregateId,
+            string? correlationId = null,
+            int minVersion = 0,
+            int maxVersion = Int32.MaxValue,
+            int pageNumber = 1,
+            int pageSize = 10);
+
+        Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedSnapshotRecordsAsync(
             string? aggregateId,
             string? correlationId = null,
             int minVersion = 0,

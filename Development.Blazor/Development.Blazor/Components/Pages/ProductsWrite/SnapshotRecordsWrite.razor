@@ -147,7 +147,7 @@
 
     private async Task RefreshData()
     {
-        var result = await _writeSideHttpClient.GetSnapshotRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
+        var result = await _writeSideHttpClient.GetPagedSnapshotRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
         if (result.IsSuccess)
         {
             if (result.SnapshotRecords is not null)
@@ -164,7 +164,7 @@
     {
         if (isFirstRender)
         {
-            var result = await _writeSideHttpClient.GetSnapshotRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
+            var result = await _writeSideHttpClient.GetPagedSnapshotRecordsAsync(_aggregateIdString, _correlationId, _minVersion, _maxVersion, _pageNumber, _pageSize);
             if (result.IsSuccess)
             {
                 if (result.SnapshotRecords is not null)
