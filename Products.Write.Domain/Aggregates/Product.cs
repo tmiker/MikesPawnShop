@@ -103,7 +103,7 @@ namespace Products.Write.Domain.Aggregates
                 throw new ArgumentNullException("Missing Image Metadata; Caption, Image URL, and Thumbnail URL are required.");
             }
             int maxSequenceNumber = MaxImageSequenceNumber;
-            Causes(new ImageAdded(Id, this.GetType().Name, _version + 1, correlationId, name, caption, maxSequenceNumber, imageUrl, thumbnailUrl));
+            Causes(new ImageAdded(Id, this.GetType().Name, _version + 1, correlationId, name, caption, maxSequenceNumber + 1, imageUrl, thumbnailUrl));
         }
 
         private void When(ImageAdded @event)
@@ -124,7 +124,7 @@ namespace Products.Write.Domain.Aggregates
                 throw new ArgumentNullException("Missing Document Metadata; Title and Document URL are required.");
             }
             int maxSequenceNumber = MaxDocumentSequenceNumber;
-            Causes(new DocumentAdded(Id, this.GetType().Name, _version + 1, correlationId, name, title, maxSequenceNumber, documentUrl));
+            Causes(new DocumentAdded(Id, this.GetType().Name, _version + 1, correlationId, name, title, maxSequenceNumber + 1, documentUrl));
         }
 
         private void When(DocumentAdded @event)
