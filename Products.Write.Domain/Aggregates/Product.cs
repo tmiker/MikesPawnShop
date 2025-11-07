@@ -94,7 +94,7 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = @event.OccurredAt;
         }
 
-        public void AddImage(string name, string caption, int sequenceNumber, string imageUrl, string thumbnailUrl, string correlationId)
+        public void AddImage(string name, string caption, string imageUrl, string thumbnailUrl, string correlationId)
         {
             // CONSIDER REINDEXING SEQUENCE NUMBERS IN CASE DELETION LEFT GAPS
 
@@ -102,7 +102,8 @@ namespace Products.Write.Domain.Aggregates
             {
                 throw new ArgumentNullException("Missing Image Metadata; Caption, Image URL, and Thumbnail URL are required.");
             }
-            Causes(new ImageAdded(Id, this.GetType().Name, _version + 1, correlationId, name, caption, sequenceNumber, imageUrl, thumbnailUrl));
+            int maxSequenceNumber = MaxImageSequenceNumber;
+            Causes(new ImageAdded(Id, this.GetType().Name, _version + 1, correlationId, name, caption, maxSequenceNumber, imageUrl, thumbnailUrl));
         }
 
         private void When(ImageAdded @event)
@@ -114,7 +115,7 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = @event.OccurredAt;
         }
 
-        public void AddDocument(string name, string title, int sequenceNumber, string documentUrl, string correlationId)
+        public void AddDocument(string name, string title, string documentUrl, string correlationId)
         {
             // CONSIDER REINDEXING SEQUENCE NUMBERS IN CASE DELETION LEFT GAPS
 
@@ -122,7 +123,8 @@ namespace Products.Write.Domain.Aggregates
             {
                 throw new ArgumentNullException("Missing Document Metadata; Title and Document URL are required.");
             }
-            Causes(new DocumentAdded(Id, this.GetType().Name, _version + 1, correlationId, name, title, sequenceNumber, documentUrl));
+            int maxSequenceNumber = MaxDocumentSequenceNumber;
+            Causes(new DocumentAdded(Id, this.GetType().Name, _version + 1, correlationId, name, title, maxSequenceNumber, documentUrl));
         }
 
         private void When(DocumentAdded @event)
@@ -134,7 +136,7 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = @event.OccurredAt;
         }
 
-        public int MaxImageSequenceNumber
+        private int MaxImageSequenceNumber
         {
             get
             {
@@ -143,7 +145,7 @@ namespace Products.Write.Domain.Aggregates
             }
         }
 
-        public int MaxDocumentSequenceNumber
+        private int MaxDocumentSequenceNumber
         {
             get
             {

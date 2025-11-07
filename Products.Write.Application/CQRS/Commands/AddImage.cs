@@ -10,7 +10,7 @@ namespace Products.Write.Application.CQRS.Commands
         public Guid ProductId { get; init; }
         public string Name { get; private set; } = default!;       // virtual directory plus filename
         public string Caption { get; init; } = default!;
-        public int SequenceNumber { get; init; }
+        // public int SequenceNumber { get; init; }
         public string? CorrelationId { get; set; }
         public IFormFile? ImageBlob { get; set; }
         public string? BlobFileName { get; set; }
@@ -20,7 +20,7 @@ namespace Products.Write.Application.CQRS.Commands
             ProductId = Guid.Parse(addImageDTO.ProductId);
             Name = addImageDTO.Name;
             Caption = addImageDTO.Caption;
-            SequenceNumber = addImageDTO.SequenceNumber;
+            // SequenceNumber = addImageDTO.SequenceNumber;
             CorrelationId = correlationId;
             ImageBlob = addImageDTO.ImageBlob;
             BlobFileName = addImageDTO.BlobFileName;

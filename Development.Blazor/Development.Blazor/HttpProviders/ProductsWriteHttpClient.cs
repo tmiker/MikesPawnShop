@@ -111,7 +111,7 @@ namespace Development.Blazor.HttpProviders
                 if (!string.IsNullOrWhiteSpace(addImageDTO.ProductId)) content.Add(new StringContent(addImageDTO.ProductId!), nameof(addImageDTO.ProductId));
                 if (!string.IsNullOrWhiteSpace(addImageDTO.Name)) content.Add(new StringContent(addImageDTO.Name!), nameof(addImageDTO.Name));
                 if (!string.IsNullOrWhiteSpace(addImageDTO.Caption)) content.Add(new StringContent(addImageDTO.Caption!), nameof(addImageDTO.Caption));
-                content.Add(new StringContent(addImageDTO.SequenceNumber.ToString()), nameof(addImageDTO.SequenceNumber));
+                // content.Add(new StringContent(addImageDTO.SequenceNumber.ToString()), nameof(addImageDTO.SequenceNumber));
                 if (!string.IsNullOrWhiteSpace(addImageDTO.BlobFileName)) content.Add(new StringContent(addImageDTO.BlobFileName!), nameof(addImageDTO.BlobFileName));
                 if (addImageDTO.ImageBlob is not null)
                 {
@@ -151,7 +151,7 @@ namespace Development.Blazor.HttpProviders
                 if (!string.IsNullOrWhiteSpace(addDocumentDTO.ProductId)) content.Add(new StringContent(addDocumentDTO.ProductId!), nameof(addDocumentDTO.ProductId));
                 if (!string.IsNullOrWhiteSpace(addDocumentDTO.Name)) content.Add(new StringContent(addDocumentDTO.Name!), nameof(addDocumentDTO.Name));
                 if (!string.IsNullOrWhiteSpace(addDocumentDTO.Title)) content.Add(new StringContent(addDocumentDTO.Title!), nameof(addDocumentDTO.Title));
-                content.Add(new StringContent(addDocumentDTO.SequenceNumber.ToString()), nameof(addDocumentDTO.SequenceNumber));
+                // content.Add(new StringContent(addDocumentDTO.SequenceNumber.ToString()), nameof(addDocumentDTO.SequenceNumber));
                 if (!string.IsNullOrWhiteSpace(addDocumentDTO.BlobFileName)) content.Add(new StringContent(addDocumentDTO.BlobFileName!), nameof(addDocumentDTO.BlobFileName));
                 if (addDocumentDTO.DocumentBlob is not null)
                 {

@@ -42,7 +42,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             Product? product = await _productRepository.GetProductByIdAsync(command.ProductId!);
             if (product is null) return new AddImageResult(false, $"No product was found with ProductId {command.ProductId}");
             if (product.ImageFileNameExists(filename)) return new AddImageResult(false, "The selected file name already exists.");
-            int maxSequenceNumber = product.MaxImageSequenceNumber;
+            // int maxSequenceNumber = product.MaxImageSequenceNumber;  // moved to domain
 
             string containerName = $"product-{command.ProductId}";
 
@@ -51,7 +51,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 (string? ImageUrl, string? ThumbUrl) uploadResult = await _azureStorageService.UploadImageToAzureAsync(command.ImageBlob!, containerName, filename, cancellationToken);   // throws a RequestFailedException if fails
                 if (uploadResult.ImageUrl is null) return new AddImageResult(false, "An image url was not returned while trying to upload the image. Please contact support.");
 
-                product.AddImage(filename, command.Caption, maxSequenceNumber + 1, uploadResult.ImageUrl!, uploadResult.ThumbUrl!, command.CorrelationId);
+                product.AddImage(filename, command.Caption, uploadResult.ImageUrl!, uploadResult.ThumbUrl!, command.CorrelationId);
                 bool success = await _productRepository.SaveAsync(product);
                 // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
                 if (success)

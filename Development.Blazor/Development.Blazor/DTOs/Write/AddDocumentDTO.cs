@@ -8,7 +8,8 @@ namespace Development.Blazor.DTOs.Write
         public string ProductId { get; set; } = default!;
         public string Name { get; set; } = default!;
         public string Title { get; set; } = default!;
-        public int SequenceNumber { get; set; }
+
+        // public int SequenceNumber { get; set; }
         public IBrowserFile? DocumentBlob { get; set; } 
         public string? BlobFileName { get; set; }
 

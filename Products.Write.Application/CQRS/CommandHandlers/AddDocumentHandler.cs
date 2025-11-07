@@ -42,7 +42,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             Product? product = await _productRepository.GetProductByIdAsync(command.ProductId!);
             if (product is null) return new AddDocumentResult(false, $"No product was found with ProductId {command.ProductId}");
             if (product.DocumentFileNameExists(filename)) return new AddDocumentResult(false, "The selected file name already exists.");
-            int maxSequenceNumber = product.MaxDocumentSequenceNumber;
+            // int maxSequenceNumber = product.MaxDocumentSequenceNumber;   // moved to domain
 
             string containerName = $"product-{command.ProductId}";
 
@@ -51,7 +51,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 string? docUrl = await _azureStorageService.UploadDocumentToAzureAsync(command.DocumentBlob!, containerName, filename, cancellationToken);   // throws a RequestFailedException if fails
                 if (docUrl is null) return new AddDocumentResult(false, "A document url was not returned while trying to upload the document. Please contact support.");
 
-                product.AddDocument(filename, command.Title, maxSequenceNumber + 1, docUrl, command.CorrelationId);
+                product.AddDocument(filename, command.Title, docUrl, command.CorrelationId);
                 bool success = await _productRepository.SaveAsync(product);
                 // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
                 if (success)

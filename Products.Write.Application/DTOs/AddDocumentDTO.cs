@@ -11,8 +11,9 @@ namespace Products.Write.Application.DTOs
         public string Name { get; init; } = default!;
         [Required]
         public string Title { get; init; } = default!;
-        [Required]
-        public int SequenceNumber { get; init; }
+
+        //[Required]
+        //public int SequenceNumber { get; init; }  // moved to domain
 
         // public string? DocumentUrl { get; init; } = default!;
 
