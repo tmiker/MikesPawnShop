@@ -1,3 +1,32 @@
+Read Side Products API
+	Messaging
+		Messages are processed immediately by the ProductMessageProcessor if the version allows (message version = current product version + 1)
+		If not the correct version, they are persisted to a message queue
+		The queue is processed every time a new event occurs and messages are removed from the queue when processed
+		For performance, message processing needs to be converted to batch processing
+
+
+Adding a Use Case
+	Write Side
+		Domain
+			Add behaviour to Product domain aggregate
+				Requires adding corresponding IDomainEvent
+			Register the event and add EventHandler in SingleThreadedEventAggregator
+		Application
+			Add Command, CommandResult, and CommandHandler and any required DTOs
+		API
+			Add Controller action 
+	Shared
+		Add corresponding Message
+	Read Side
+		API
+			Add Message Consumer
+			Register message consumer in CompositionRoot messaging configuration
+			Add Message processing method for the message type in the ProductMessageProcessor 
+
+
+---------------- DEV NOTES ---------------
+
 Products.Read.API
 	HTTP Rest Controller:	GET
 	if GRPC Server:			POST, PUT, DELETE

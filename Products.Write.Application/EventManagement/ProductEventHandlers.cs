@@ -22,6 +22,8 @@ namespace Products.Write.Application.EventManagement
             eventAggregator.Register<StatusUpdated>(OnStatusUpdated);
             eventAggregator.Register<ImageAdded>(OnImageAdded);
             eventAggregator.Register<DocumentAdded>(OnDocumentAdded);
+            eventAggregator.Register<ImageDeleted>(OnImageDeleted);
+            eventAggregator.Register<DocumentDeleted>(OnDocumentDeleted);
         }
 
         private void OnProductAdded(ProductAdded @event)
@@ -81,6 +83,35 @@ namespace Products.Write.Application.EventManagement
                 @event.Title,
                 @event.SequenceNumber,
                 @event.DocumentUrl
+            );
+            _publishEndpoint.Publish(message);
+        }
+
+
+
+
+
+        private void OnImageDeleted(ImageDeleted @event)
+        {
+            Console.WriteLine($"Image Deleted for Product: {@event.AggregateId}, FileName: {@event.FileName}");
+            ImageDeletedMessage message = new ImageDeletedMessage(
+                @event.AggregateId,
+                @event.AggregateType,
+                @event.AggregateVersion,
+                @event.CorrelationId,
+                @event.FileName
+            );
+            _publishEndpoint.Publish(message);
+        }
+        private void OnDocumentDeleted(DocumentDeleted @event)
+        {
+            Console.WriteLine($"Document Deleted for Product: {@event.AggregateId}, FileName: {@event.FileName}");
+            DocumentDeletedMessage message = new DocumentDeletedMessage(
+                @event.AggregateId,
+                @event.AggregateType,
+                @event.AggregateVersion,
+                @event.CorrelationId,
+                @event.FileName
             );
             _publishEndpoint.Publish(message);
         }

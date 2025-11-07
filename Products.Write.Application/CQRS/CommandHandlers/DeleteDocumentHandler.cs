@@ -3,7 +3,6 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Domain.Aggregates;
-using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
@@ -25,28 +24,22 @@ namespace Products.Write.Application.CQRS.CommandHandlers
 
         public async Task<DeleteDocumentResult> HandleAsync(DeleteDocument command, CancellationToken cancellationToken)
         {
-            // This needs to be called from a client page with images, get the filename as image.Name, use the product id, and delete
-            // Currently deletes the first image.
             Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
 
-            //product.DeleteDocument(command.FileName);
-            //await _productRepository.SaveAsync(product);
+            // delete image in domain
+            product.DeleteDocument(command.FileName, command.CorrelationId);
+            bool success = await _productRepository.SaveAsync(product);
 
-            ProductSnapshot snapshot = product.GetSnapshot();
-            if (snapshot.Documents is not null && snapshot.Documents.Any())
+            if (success)
             {
-                // need to change to use the filename from the command
-                var doc = snapshot.Documents.FirstOrDefault(d => d.Name == command.FileName);
-                if (doc is not null)
-                {
-                    string containerName = $"product-{command.ProductId}";
-                    string fileName = doc.Name!;
-                    (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductDocumentFromAzureAsync(containerName, fileName, cancellationToken);
-                    return new DeleteDocumentResult(result.IsSuccess, result.ErrorMessage);
-                }
-                return new DeleteDocumentResult(false, $"A document with filename {command.FileName}");
+                // delete image from azure blob storage
+                string containerName = $"product-{command.ProductId}";
+                string fileName = command.FileName;
+                (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductDocumentFromAzureAsync(containerName, fileName, cancellationToken);
+                return new DeleteDocumentResult(result.IsSuccess, result.ErrorMessage);
             }
-            return new DeleteDocumentResult(false, "The product has no documents");
+
+            return new DeleteDocumentResult(success, "Error removing document from write side data store");
         }
     }
 }

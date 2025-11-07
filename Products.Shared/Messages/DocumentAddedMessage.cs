@@ -17,7 +17,7 @@ namespace Products.Shared.Messages
         public string? DocumentUrl { get; init; } // = default!;
 
         public DocumentAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
-            string correlationId, string name, string title, int sequenceNumber,
+            string? correlationId, string name, string title, int sequenceNumber,
             string documentUrl)
         {
             AggregateId = aggregateId;

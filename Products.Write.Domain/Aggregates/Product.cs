@@ -136,6 +136,30 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = @event.OccurredAt;
         }
 
+        public void DeleteImage(string filename, string? correlationId)
+        {
+            Causes(new ImageDeleted(Id, this.GetType().Name, _version + 1, correlationId, filename));
+        }
+
+        public void When(ImageDeleted @event)
+        {
+            if (_images is null) return;
+            ImageData? image = _images.FirstOrDefault(d => d.Name == @event.FileName);
+            if (image is not null) _images.Remove(image);
+        }
+
+        public void DeleteDocument(string filename, string? correlationId)
+        {
+            Causes(new DocumentDeleted(Id, this.GetType().Name, _version + 1, correlationId, filename));
+        }
+
+        public void When(DocumentDeleted @event)
+        {
+            if (_documents is null) return;
+            DocumentData? doc = _documents.FirstOrDefault(d => d.Name == @event.FileName);
+            if (doc is not null) _documents.Remove(doc);
+        }
+
         private int MaxImageSequenceNumber
         {
             get

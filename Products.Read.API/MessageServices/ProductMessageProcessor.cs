@@ -64,25 +64,6 @@ namespace Products.Read.API.MessageServices
             _db.ProductMessageRecords.Add(record);
         }
 
-        private void ProcessExistingProductMessage(Product product, StatusUpdatedMessage message)
-        {
-            product!.UpdateStatus(message.Status, message.AggregateVersion);
-        }
-
-        // 3
-        private void ProcessExistingProductMessage(Product product, ImageAddedMessage message)
-        {
-            ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
-            product!.AddImage(image, message.AggregateVersion);
-        }
-
-        // 3
-        private void ProcessExistingProductMessage(Product product, DocumentAddedMessage message)
-        {
-            DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
-            product!.AddDocument(document, message.AggregateVersion);
-        }
-
         private void ProcessNewProductMessage(ProductAddedMessage message)
         {
             Product product = new Product
@@ -100,6 +81,34 @@ namespace Products.Read.API.MessageServices
             _db.Products.Add(product);
         }
 
+        private void ProcessExistingProductMessage(Product product, StatusUpdatedMessage message)
+        {
+            product!.UpdateStatus(message.Status, message.AggregateVersion);
+        }
+
+        private void ProcessExistingProductMessage(Product product, ImageAddedMessage message)
+        {
+            ImageData image = new ImageData(message.Name!, message.Caption!, message.SequenceNumber, message.ImageUrl!, message.ThumbnailUrl!);
+            product!.AddImage(image, message.AggregateVersion);
+        }
+
+        private void ProcessExistingProductMessage(Product product, DocumentAddedMessage message)
+        {
+            DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
+            product!.AddDocument(document, message.AggregateVersion);
+        }
+
+        private void ProcessExistingProductMessage(Product product, ImageDeletedMessage message)
+        {
+            product!.DeleteImage(message.FileName, message.AggregateVersion);
+        }
+
+        private void ProcessExistingProductMessage(Product product, DocumentDeletedMessage message)
+        {
+            product!.DeleteDocument(message.FileName, message.AggregateVersion);
+        }
+
+        
         private void HandleProductStateSynchronizationError(string messageType, Guid aggregateId, string correlationId, Exception? ex)
         {
             _logger.LogError("Error synchronizing product state from Write Side synchronization message. " +

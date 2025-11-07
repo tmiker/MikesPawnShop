@@ -8,7 +8,7 @@ namespace Products.Write.Domain.Events
         public string AggregateType { get; init; } = default!;
         public int AggregateVersion { get; init; }
         public DateTime OccurredAt { get; init; }
-        public string CorrelationId { get; init; } = default!;
+        public string? CorrelationId { get; init; } 
         public string Name { get; init; } = default!;
         public string Caption { get; init; } = default!;
         public int SequenceNumber { get; init; }
@@ -16,7 +16,7 @@ namespace Products.Write.Domain.Events
         public string ThumbnailUrl { get; init; } = default!;
 
         public ImageAdded(Guid aggregateId, string aggregateType, int aggregateVersion,
-            string correlationId, string name, string caption, int sequenceNumber,
+            string? correlationId, string name, string caption, int sequenceNumber,
             string imageUrl, string thumbnailUrl)
         {
             AggregateId = aggregateId;

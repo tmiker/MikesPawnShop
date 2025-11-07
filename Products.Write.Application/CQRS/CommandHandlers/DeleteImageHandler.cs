@@ -3,8 +3,8 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Domain.Aggregates;
-using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Abstractions;
+using static MassTransit.ValidationResultExtensions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
@@ -25,34 +25,22 @@ namespace Products.Write.Application.CQRS.CommandHandlers
 
         public async Task<DeleteImageResult> HandleAsync(DeleteImage command, CancellationToken cancellationToken)
         {
-            // This needs to be called from a client page with images, get the filename as image.Name, use the product id, and delete
-            // Currently deletes the first image.
             Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
 
-            //product.DeleteImage(command.FileName);
-            //await _productRepository.SaveAsync(product);
+            // delete image in domain
+            product.DeleteImage(command.FileName, command.CorrelationId);
+            bool success = await _productRepository.SaveAsync(product);
 
-            ProductSnapshot snapshot = product.GetSnapshot();
-            if (snapshot.Images is not null && snapshot.Images.Any())
+            if (success)
             {
-                // need to change to use the filename from the command
-                //var image = snapshot.Images.FirstOrDefault(i => i.Name == command.FileName);
-                //if (image is not null)
-                //{
-                //    string containerName = $"product-{command.ProductId}";
-                //    string fileName = "f15.jpg";    // image.Name!;
-                //    (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductImageFromAzureAsync(containerName, fileName, cancellationToken);
-                //    return new DeleteImageResult(result.IsSuccess, result.ErrorMessage);
-                //}
-                //return new DeleteImageResult(false, $"An image with filename {command.FileName} was not found.");
-
+                // delete image from azure blob storage
                 string containerName = $"product-{command.ProductId}";
-                string fileName = "f15.jpg"; // this works so need to include extension in filename   // image.Name!;
+                string fileName = command.FileName;
                 (bool IsSuccess, string? ErrorMessage) result = await _azureStorageService.DeleteProductImageFromAzureAsync(containerName, fileName, cancellationToken);
                 return new DeleteImageResult(result.IsSuccess, result.ErrorMessage);
-
             }
-            return new DeleteImageResult(false, "The product has no images");
+
+            return new DeleteImageResult(success, "Error removing image from write side data store");
         }
     }
 }

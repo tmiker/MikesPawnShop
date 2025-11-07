@@ -44,7 +44,7 @@ namespace Products.Read.API.Domain.Models
 
         public void AddImage(ImageData image, int version)
         {
-            if (version <= Version) return;                                 // duplicate message - idempotency 3
+            if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Images is null) Images = new List<ImageData>();
             Images.Add(image);
             Version = version;
@@ -53,11 +53,37 @@ namespace Products.Read.API.Domain.Models
 
         public void AddDocument(DocumentData document, int version)
         {
-            if (version <= Version) return;                                 // duplicate message - idempotency 3
+            if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Documents is null) Documents = new List<DocumentData>();
             Documents.Add(document);
             Version = version;
             DateUpdated = DateTime.UtcNow;
+        }
+
+        public void DeleteDocument(string fileName, int version)
+        {
+            if (version <= Version) return;                                 // duplicate message - idempotency 
+            if (Documents is null || !Documents.Any()) return;
+            DocumentData? document = Documents.FirstOrDefault(d => d.Name == fileName);
+            if (document is not null)
+            {
+                Documents.Remove(document);
+                Version = version;
+                DateUpdated = DateTime.UtcNow;
+            }
+        }
+
+        public void DeleteImage(string fileName, int version)
+        {
+            if (version <= Version) return;                                 // duplicate message - idempotency 
+            if (Images is null || !Images.Any()) return;
+            ImageData? image = Images.FirstOrDefault(d => d.Name == fileName);
+            if (image is not null)
+            {
+                Images.Remove(image);
+                Version = version;
+                DateUpdated = DateTime.UtcNow;
+            }
         }
 
         public void UpdateStatus(string status, int version)

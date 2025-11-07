@@ -18,7 +18,7 @@ namespace Products.Shared.Messages
         public string? ThumbnailUrl { get; init; } // = default!;
 
         public ImageAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
-            string correlationId, string name, string caption, int sequenceNumber,
+            string? correlationId, string name, string caption, int sequenceNumber,
             string imageUrl, string thumbnailUrl)
         {
             AggregateId = aggregateId;

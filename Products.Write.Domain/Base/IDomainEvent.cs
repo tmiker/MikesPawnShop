@@ -6,6 +6,6 @@
         string AggregateType { get; }
         int AggregateVersion { get; }
         DateTime OccurredAt { get; }
-        string CorrelationId { get; }
+        string? CorrelationId { get; }
     }
 }

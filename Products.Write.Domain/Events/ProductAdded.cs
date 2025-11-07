@@ -9,7 +9,7 @@ namespace Products.Write.Domain.Events
         public string AggregateType { get; init; } = default!;
         public int AggregateVersion { get; init; }
         public DateTime OccurredAt { get; init; }
-        public string CorrelationId { get; init; } = default!;
+        public string? CorrelationId { get; init; } 
 
         public string Name { get; init; } = default!;
         public string Category { get; init; } = default!;
@@ -19,7 +19,7 @@ namespace Products.Write.Domain.Events
         public string Status { get; init; } = default!;
 
         public ProductAdded(Guid aggregateId, string aggregateType, int aggregateVersion, 
-            string correlationId, string name, CategoryEnum category, 
+            string? correlationId, string name, CategoryEnum category, 
             string description, decimal price, string currency, string status)
         {
             AggregateId = aggregateId;

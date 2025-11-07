@@ -19,7 +19,7 @@ namespace Products.Shared.Messages
         public string Status { get; init; } // = default!;
 
         public ProductAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
-            string correlationId, string name, string category,
+            string? correlationId, string name, string category,
             string description, decimal price, string currency, string status)
         {
             AggregateId = aggregateId;

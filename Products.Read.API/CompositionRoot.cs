@@ -46,6 +46,8 @@ namespace Products.Read.API
                 x.AddConsumer<StatusUpdateConsumer>();
                 x.AddConsumer<DocumentAddedConsumer>();
                 x.AddConsumer<ImageAddedConsumer>();
+                x.AddConsumer<DocumentDeletedConsumer>();
+                x.AddConsumer<ImageDeletedConsumer>();
                 x.AddConsumer<DataPurgedConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
@@ -68,6 +70,8 @@ namespace Products.Read.API
                         e.ConfigureConsumer<StatusUpdateConsumer>(context);
                         e.ConfigureConsumer<DocumentAddedConsumer>(context);
                         e.ConfigureConsumer<ImageAddedConsumer>(context);
+                        e.ConfigureConsumer<DocumentDeletedConsumer>(context);
+                        e.ConfigureConsumer<ImageDeletedConsumer>(context);
                         e.ConfigureConsumer<DataPurgedConsumer>(context);
 
                         // Robustness: retry with jitter + immediate faults to _error queue if exhausted
