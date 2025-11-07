@@ -225,7 +225,7 @@
         else _errorMessage = result.ErrorMessage;
         _cancellationTokenSource = new CancellationTokenSource();
         _purgeDataDTO = null;
-        // await RefreshData();
+        await RefreshData();
     }
 
     private async Task ClearFilters()
