@@ -23,6 +23,60 @@ namespace Products.Write.Application.Services
             _logger = logger;
         }
 
+        public async Task<(bool IsSuccess, IEnumerable<ProductSnapshot>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
+            Guid? aggregateId,
+            string? category,
+            string? sortColumn,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            List<ProductSnapshot>? snapshots = [];
+
+            List<Guid> uniqueIds = new List<Guid>();
+            if (aggregateId is null || aggregateId == default(Guid)) uniqueIds.AddRange(await GetUniqueAggregateIdsAsync());
+            else uniqueIds.Add(aggregateId.Value);
+
+            foreach (var id in uniqueIds)
+            {
+                IEnumerable<IDomainEvent> aggregateEvents = await GetDomainEventsByAggregateIdAndVersionAsync(id, 0, int.MaxValue);
+                Product product = new Product(aggregateEvents);
+                snapshots.Add(product.GetSnapshot());
+            }
+
+            var query = snapshots.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(category)) query = query.Where(s => s.Category != null && s.Category.ToLower().Contains(category.ToLower()));
+
+            switch (sortColumn?.ToLower())
+            {
+                case "id":
+                    query = query.OrderBy(p => p.Id);
+                    break;
+                case "name":
+                    query = query.OrderBy(p => p.Name);
+                    break;
+                case "category":
+                    query = query.OrderBy(p => p.Category);
+                    break;
+                case "price ascending":
+                    query = query.OrderBy(p => p.Price);
+                    break;
+                case "price descending":
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    query = query.OrderBy(p => p.Name);
+                    break;
+            }
+
+
+            IEnumerable<ProductSnapshot> result = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            int totalCount = result.Count();
+            PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
+
+            return (true, result, pagingData, null);
+        }
+
         public async Task<(bool IsSuccess, IEnumerable<ProductSnapshot>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
             Guid? aggregateId,
             int minVersion = 0,

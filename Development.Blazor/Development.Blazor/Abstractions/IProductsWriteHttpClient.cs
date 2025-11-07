@@ -19,6 +19,13 @@ namespace Development.Blazor.Abstractions
         Task<(bool IsSuccess, string? ErrorMessage)> DeleteProductDocumentAsync(DeleteDocumentDTO deleteDocumentDTO);
 
         // Dev Tests
+        Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
+            string? aggregateId,
+            string? category,
+            string? sortColumn,
+            int pageNumber = 1,
+            int pageSize = 10);
+
         Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedProductSnapshotsAsync(
             string? aggregateId,
             int minVersion = 0,

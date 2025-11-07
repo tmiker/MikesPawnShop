@@ -6,6 +6,13 @@ namespace Products.Write.Application.Abstractions
 {
     public interface IDevQueryService
     {
+        Task<(bool IsSuccess, IEnumerable<ProductSnapshot>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
+            Guid? aggregateId,
+            string? category,
+            string? sortColumn,
+            int pageNumber = 1,
+            int pageSize = 10);
+
         Task<(bool IsSuccess, IEnumerable<ProductSnapshot>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetProductSnapshotsAsync(
             Guid? aggregateId,
             int minVersion = 0,

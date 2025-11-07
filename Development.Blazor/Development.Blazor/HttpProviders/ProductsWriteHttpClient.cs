@@ -209,7 +209,32 @@ namespace Development.Blazor.HttpProviders
         }
 
         // Dev Tests
-        // Dev Tests methods
+        public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
+            string? aggregateId,
+            string? category,
+            string? sortColumn,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            string uri = $"{StaticDetails.ProductsWriteHttpClient_DevTestsPath}/pagedAndFilteredProductSnapshots?aggregateId={aggregateId}&category={category}&sortColumn={sortColumn}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var client = _httpClientFactory.CreateClient(StaticDetails.ProductsWriteHttpClient_ClientName);
+
+            Console.WriteLine($"BLAZOR DEV CLIENT HTTP CLIENT CALL URI: {uri}");
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                PagedProductSnapshotResult? result = await response.Content.ReadFromJsonAsync<PagedProductSnapshotResult>();
+                return (true, result?.ProductSnapshots, result?.PagingData, null);
+
+            }
+            string error = await response.Content.ReadAsStringAsync();
+            return (false, null, null, error);
+        }
+
+
         public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedProductSnapshotsAsync(
             string? aggregateId,
             int minVersion = 0,

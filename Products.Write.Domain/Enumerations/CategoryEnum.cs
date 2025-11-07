@@ -6,6 +6,7 @@
         Books,
         Computers,
         Electronics,
+        Music,
         Photography,
         Sports
     }

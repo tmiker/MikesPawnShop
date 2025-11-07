@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Products.Write.API.Configuration;
 using Products.Write.Application.Abstractions;
@@ -6,6 +7,7 @@ using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.QueryResults;
 using Products.Write.Application.DTOs;
 using Products.Write.Domain.Snapshots;
+using System;
 
 namespace Products.Write.API.Controllers
 {
@@ -27,6 +29,22 @@ namespace Products.Write.API.Controllers
         }
 
         // Query service propagated endpoints
+
+        [HttpGet("pagedAndFilteredProductSnapshots")]
+        public async Task<ActionResult<PagedProductSnapshotResult>> GetFilteredProductSnapshots(
+            string? aggregateId,
+            string? category,
+            string? sortColumn,
+            int pageNumber = 1,
+            int pageSize = 10)
+        {
+            Console.WriteLine($"WRITE API CONTROLLER URI: {Request.GetDisplayUrl()}");
+            Guid? guid = Guid.Empty;
+            if (!string.IsNullOrWhiteSpace(aggregateId)) guid = Guid.Parse(aggregateId);
+            var result = await _devQueryService.GetPagedAndFilteredProductSnapshotsAsync(guid, category, sortColumn, pageNumber, pageSize);
+            if (result.IsSuccess) return Ok(new PagedProductSnapshotResult() { ProductSnapshots = result.ProductSnapshots, PagingData = result.PagingData });
+            return BadRequest(result.ErrorMessage);
+        }
 
         [HttpGet("productSnapshots")]
         public async Task<ActionResult<PagedProductSnapshotResult>> GetProductSnapshots(
