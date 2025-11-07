@@ -134,6 +134,27 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = @event.OccurredAt;
         }
 
+        public int MaxImageSequenceNumber
+        {
+            get
+            {
+                if (_images is not null && _images.Any()) return _images.Max(i => i.SequenceNumber);
+                return 0;
+            }
+        }
+
+        public int MaxDocumentSequenceNumber
+        {
+            get
+            {
+                if (_documents is not null && _documents.Any()) return _documents.Max(i => i.SequenceNumber);
+                return 0;
+            }
+        }
+
+        public bool ImageFileNameExists(string filename) => _images is null ? false : _images.Where(d => d.Name == filename).Count() > 0;
+        public bool DocumentFileNameExists(string filename) => _documents is null ? false : _documents.Where(d => d.Name == filename).Count() > 0;
+
         public ProductSnapshot GetSnapshot()
         {
             List<ImageDataSnapshot> imageSnapshots = new List<ImageDataSnapshot>();

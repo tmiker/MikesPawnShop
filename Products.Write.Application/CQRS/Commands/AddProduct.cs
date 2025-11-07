@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Products.Write.Application.DTOs;
+using System.Text;
 
 namespace Products.Write.Application.CQRS.Commands
 {
@@ -34,6 +35,6 @@ namespace Products.Write.Application.CQRS.Commands
             Currency = dto.Currency;
             Status = dto.Status;            
             CorrelationId = correlationId!;
-        }   
+        }
     }
 }

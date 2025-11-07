@@ -5,6 +5,7 @@ using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Domain.Aggregates;
 using Products.Write.Infrastructure.Abstractions;
+using System.Text;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
@@ -40,6 +41,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             // get product from id and upload image data for the product
             Product? product = await _productRepository.GetProductByIdAsync(command.ProductId!);
             if (product is null) return new AddDocumentResult(false, $"No product was found with ProductId {command.ProductId}");
+            if (product.DocumentFileNameExists(filename)) return new AddDocumentResult(false, "The selected file name already exists.");
+            int maxSequenceNumber = product.MaxDocumentSequenceNumber;
 
             string containerName = $"product-{command.ProductId}";
 
@@ -48,7 +51,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 string? docUrl = await _azureStorageService.UploadDocumentToAzureAsync(command.DocumentBlob!, containerName, filename, cancellationToken);   // throws a RequestFailedException if fails
                 if (docUrl is null) return new AddDocumentResult(false, "A document url was not returned while trying to upload the document. Please contact support.");
 
-                product.AddDocument(command.Name, command.Title, command.SequenceNumber, docUrl, command.CorrelationId);
+                product.AddDocument(filename, command.Title, maxSequenceNumber + 1, docUrl, command.CorrelationId);
                 bool success = await _productRepository.SaveAsync(product);
                 // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
                 if (success)
@@ -75,6 +78,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
         private AddDocumentResult? ValidateAddDocumentCommand(AddDocument command)
         {
             // validate command args
+            command.CleanFileName();
+
             if (command.DocumentBlob is null)
             {
                 _logger.LogInformation("Attempt to add Product Document failed due to not providing a document file. CorrelationId {corrId}.", command.CorrelationId);

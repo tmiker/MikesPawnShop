@@ -5,6 +5,7 @@ using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
 using Products.Write.Domain.Aggregates;
 using Products.Write.Infrastructure.Abstractions;
+using System.Text;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
@@ -40,8 +41,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             // get product from id and upload image data for the product
             Product? product = await _productRepository.GetProductByIdAsync(command.ProductId!);
             if (product is null) return new AddImageResult(false, $"No product was found with ProductId {command.ProductId}");
-
-            //// THE SEQUENCE NUMBER SHOULD COME FROM THE DOMAIN - QUESTION IS SHOULD IT UPDATE ALL SEQUENCE NUMBERS? - YES ON DELETING AN IMAGE REINDEX THEM
+            if (product.ImageFileNameExists(filename)) return new AddImageResult(false, "The selected file name already exists.");
+            int maxSequenceNumber = product.MaxImageSequenceNumber;
 
             string containerName = $"product-{command.ProductId}";
 
@@ -50,7 +51,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
                 (string? ImageUrl, string? ThumbUrl) uploadResult = await _azureStorageService.UploadImageToAzureAsync(command.ImageBlob!, containerName, filename, cancellationToken);   // throws a RequestFailedException if fails
                 if (uploadResult.ImageUrl is null) return new AddImageResult(false, "An image url was not returned while trying to upload the image. Please contact support.");
 
-                product.AddImage(command.Name, command.Caption, command.SequenceNumber, uploadResult.ImageUrl!, uploadResult.ThumbUrl!, command.CorrelationId);
+                product.AddImage(filename, command.Caption, maxSequenceNumber + 1, uploadResult.ImageUrl!, uploadResult.ThumbUrl!, command.CorrelationId);
                 bool success = await _productRepository.SaveAsync(product);
                 // Note, if have success, plus fact that event store will throw if error occurs, we can confidently assume success and publish product domain events
                 if (success)
@@ -77,6 +78,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
         private AddImageResult? ValidateAddImageCommand(AddImage command)
         {
             // validate command args
+            command.CleanFileName();
+
             if (command.ImageBlob is null)
             {
                 _logger.LogInformation("Attempt to add Product Image failed due to not providing an image file. CorrelationId {corrId}.", command.CorrelationId);
