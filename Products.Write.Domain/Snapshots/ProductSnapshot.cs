@@ -14,6 +14,9 @@ namespace Products.Write.Domain.Snapshots
         public List<ImageDataSnapshot>? Images { get; init; }
         public List<DocumentDataSnapshot>? Documents { get; init; }
         public int Version { get; init; }
+        public int QuantityOnHand { get; init; }
+        public int QuantityAvailable { get; init; }
+        public string? UOM { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }
 

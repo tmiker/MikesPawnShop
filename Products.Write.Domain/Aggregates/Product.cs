@@ -16,6 +16,10 @@ namespace Products.Write.Domain.Aggregates
         private string? _status;
         private List<ImageData>? _images;
         private List<DocumentData>? _documents;
+        // inventory awareness
+        private int _quantityOnHand;
+        private int _quantityAvailable;
+        private string? _uom;
         private int _version;
         private DateTime _dateCreated;
         private DateTime _dateUpdated;
@@ -35,7 +39,12 @@ namespace Products.Write.Domain.Aggregates
             _price = snapshot.Price;
             _currency = snapshot.Currency;
             _status = snapshot.Status;
-
+            _version = snapshot.Version;
+            _dateCreated = snapshot.DateCreated;
+            _dateUpdated = snapshot.DateUpdated;
+            _quantityOnHand = snapshot.QuantityOnHand;
+            _quantityAvailable = snapshot.QuantityAvailable;
+            _uom = snapshot.UOM;            
         }
 
         public Product(IEnumerable<IDomainEvent> domainEvents)
@@ -76,6 +85,9 @@ namespace Products.Write.Domain.Aggregates
             _currency = @event.Currency;
             _status = @event.Status;
             _version = @event.AggregateVersion;
+            _quantityOnHand = 0;
+            _quantityAvailable = 0;
+            _uom = "each";
             _dateCreated = @event.OccurredAt;
             _dateUpdated = @event.OccurredAt;
         }
@@ -201,7 +213,10 @@ namespace Products.Write.Domain.Aggregates
                 Documents = documentSnapshots,
                 Version = _version,
                 DateCreated = _dateCreated,
-                DateUpdated = _dateUpdated
+                DateUpdated = _dateUpdated,
+                QuantityOnHand = _quantityOnHand,
+                QuantityAvailable = _quantityAvailable,
+                UOM = _uom
             };
         }
     }
