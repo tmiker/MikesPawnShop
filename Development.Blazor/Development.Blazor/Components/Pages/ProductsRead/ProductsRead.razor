@@ -55,8 +55,11 @@
                                 <th>Currency</th>
                                 <th>Status</th>
                                 <th>Images</th>
-                                <th>Documents</th>
-                                <th>Version</th>
+                                <th>Docs</th>
+                                <th>Ver</th>
+                                <th>On Hand</th>
+                                <th>Allocated</th>
+                                <th>Available</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,7 +67,7 @@
                             {
                                 <tr>
                                     <td>@product.Id</td>
-                                    <td>@product.AggregateId</td>
+                                    <td>@product.AggregateId.ToString()[0..8]-...</td>
                                     <td>@product.Name</td>
                                     <td>@product.Category</td>
                                     <td>@product.Price</td>
@@ -73,6 +76,9 @@
                                     <td>@product.ImageCount</td>
                                     <td>@product.DocumentCount</td>
                                     <td>@product.Version</td>
+                                    <td>@product.QuantityOnHand</td>
+                                    <td>@product.QuantityAllocated</td>
+                                    <td>@product.QuantityAvailable</td>
                                 </tr>
                             }
                         </tbody>

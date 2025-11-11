@@ -15,7 +15,7 @@ namespace Products.Write.Domain.Snapshots
         public List<DocumentDataSnapshot>? Documents { get; init; }
         public int Version { get; init; }
         public int QuantityOnHand { get; init; }
-        public int QuantityAvailable { get; init; }
+        public int QuantityAllocated { get; init; }
         public string? UOM { get; init; }
         public int LowStockThreshold { get; init; }
         public DateTime DateCreated { get; init; }

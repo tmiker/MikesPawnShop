@@ -27,7 +27,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);
 
             Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, 
-                command.QuantityOnHand, command.QuantityAvailable, command.UOM, command.LowStockThreshold, command.CorrelationId);
+                command.QuantityOnHand, command.UOM, command.LowStockThreshold, command.CorrelationId);
             // Guid productId = product.Id;
 
             // Save the product - throws ProductEventStoreException if error occurs

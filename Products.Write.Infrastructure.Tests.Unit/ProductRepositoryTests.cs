@@ -30,7 +30,7 @@ namespace Products.Write.Infrastructure
 
             // Create the IEnumerable<IDomainEvent> returned by the Mock EventStore using Setup/Returns
             IDomainEvent productAdded = new ProductAdded(aggregateId, "Product", 0, "Correlation Id 1", productName,
-                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 1, "each", 1);
+                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 0, "each", 1);
             IDomainEvent statusUpdated = new StatusUpdated(aggregateId, "Product", 1, "Correlation Id 2", Status.InActive.Name);
             IDomainEvent imageAdded = new ImageAdded(aggregateId, "Product", 2, "Correlation Id 3", imageName, "Caption",
                 4, "Image URL", "Thumb URL");
@@ -71,7 +71,7 @@ namespace Products.Write.Infrastructure
             // ARRANGE
             // create a product with multiple domain events to save and a SUT ProjectRepository
             Product product = new Product("Product 1", CategoryEnum.Books, "A book on things.", 25.99m,
-                "USD", "Active", 1, 1, "each", 1, Guid.NewGuid().ToString());
+                "USD", "Active", 1, "each", 1, Guid.NewGuid().ToString());
             product.UpdateStatus("InActive", Guid.NewGuid().ToString());
             product.AddImage("Image 1", "A dog", "Image URL", "Thumb URL", Guid.NewGuid().ToString());
             product.AddDocument("Doc 1", "Instructions", "Document URL", Guid.NewGuid().ToString());

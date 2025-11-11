@@ -18,13 +18,13 @@ namespace Products.Shared.Messages
         public string Currency { get; init; } // = default!;
         public string Status { get; init; } // = default!;
         public int QuantityOnHand { get; init; }
-        public int QuantityAvailable { get; init; }
+        public int QuantityAllocated { get; init; }
         public string UOM { get; init; }
         public int LowStockThreshold { get; init; }
 
         public ProductAddedMessage(Guid aggregateId, string aggregateType, int aggregateVersion,
             string? correlationId, string name, string category, string description, decimal price, 
-            string currency, string status, int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold)
+            string currency, string status, int quantityOnHand, int quantityAllocated, string uom, int lowStockThreshold)
         {
             AggregateId = aggregateId;
             AggregateType = aggregateType;
@@ -38,7 +38,7 @@ namespace Products.Shared.Messages
             Currency = currency;
             Status = status;
             QuantityOnHand = quantityOnHand;
-            QuantityAvailable = quantityAvailable;
+            QuantityAllocated = quantityAllocated;
             UOM = uom;
             LowStockThreshold = lowStockThreshold;
         }

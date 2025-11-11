@@ -15,6 +15,25 @@ namespace Products.Read.API.Migrations
                 name: "dbo");
 
             migrationBuilder.CreateTable(
+                name: "MessageRecords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AggregateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AggregateType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AggregateVersion = table.Column<int>(type: "int", nullable: false),
+                    MessageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MessageJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CorrelationId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsProcessed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageRecords", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 schema: "dbo",
                 columns: table => new
@@ -24,10 +43,14 @@ namespace Products.Read.API.Migrations
                     AggregateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Category = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    QuantityOnHand = table.Column<int>(type: "int", nullable: false),
+                    QuantityAllocated = table.Column<int>(type: "int", nullable: false),
+                    UOM = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LowStockThreshold = table.Column<int>(type: "int", nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -111,6 +134,9 @@ namespace Products.Read.API.Migrations
             migrationBuilder.DropTable(
                 name: "ImageData",
                 schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "MessageRecords");
 
             migrationBuilder.DropTable(
                 name: "Products",

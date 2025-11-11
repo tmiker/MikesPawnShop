@@ -41,7 +41,7 @@ namespace Products.Write.Application.EventManagement
                 @event.Currency,
                 @event.Status,
                 @event.QuantityOnHand,
-                @event.QuantityAvailable,
+                @event.QuantityAllocated,
                 @event.UOM,
                 @event.LowStockThreshold
             );

@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Products.Write.Domain.Base;
@@ -26,7 +24,7 @@ namespace Products.Write.Infrastructure
             Guid aggregateId = Guid.NewGuid();
 
             IDomainEvent productAdded = new ProductAdded(aggregateId, "Product", 1, "Correlation Id", "Book Name", 
-                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 1, "each", 1);
+                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 0, "each", 1);
             string? expectedEventType = productAdded.GetType().AssemblyQualifiedName;
             string expectedEventJson = JsonConvert.SerializeObject(productAdded, _settings);
 
@@ -69,7 +67,7 @@ namespace Products.Write.Infrastructure
             bool saveResult = false;
             Guid aggregateId = Guid.NewGuid();
             IDomainEvent productAdded = new ProductAdded(aggregateId, "Product", 0, "Correlation Id 1", "Book Name",
-                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 1, "each", 1);
+                CategoryEnum.Books, "Book Description", 25.99m, "USD", Status.Active.Name, 1, 0, "each", 1);
             IDomainEvent statusUpdated = new StatusUpdated(aggregateId, "Product", 1, "Correlation Id 2", Status.InActive.Name);
             IDomainEvent imageAdded = new ImageAdded(aggregateId, "Product", 2, "Correlation Id 3", "Image Name", "Caption", 
                 4, "Image URL", "Thumb URL");

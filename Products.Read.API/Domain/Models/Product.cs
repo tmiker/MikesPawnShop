@@ -23,7 +23,7 @@ namespace Products.Read.API.Domain.Models
         public List<DocumentData>? Documents { get; set; }
 
         public int QuantityOnHand { get; private set; }
-        public int QuantityAvailable { get; private set; }
+        public int QuantityAllocated { get; private set; }
         public string UOM { get; private set; } = default!;
         public int LowStockThreshold { get; private set; }
 
@@ -34,7 +34,7 @@ namespace Products.Read.API.Domain.Models
         private Product() { }
 
         public Product(Guid aggregateId, string name, string category, string description, decimal price, string currency, string status, 
-            int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold, int version)
+            int quantityOnHand, int quantityAllocated, string uom, int lowStockThreshold, int version)
         {
             AggregateId = aggregateId;
             Name = name;
@@ -44,7 +44,7 @@ namespace Products.Read.API.Domain.Models
             Currency = currency;
             Status = status;
             QuantityOnHand = quantityOnHand;
-            QuantityAvailable = quantityAvailable;
+            QuantityAllocated = quantityAllocated;
             UOM = uom;
             LowStockThreshold = lowStockThreshold;
             Version = version;

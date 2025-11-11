@@ -1,23 +1,11 @@
 ﻿using Products.Write.Application.DTOs;
-using Products.Write.Domain.Aggregates;
 using Products.Write.Domain.Enumerations;
-using Products.Write.Domain.Snapshots;
 using System.Text.Json;
 using System.Text;
 using Products.Write.Application.CQRS.CommandResults;
 using System.Net.Http.Json;
 
 JsonSerializerOptions jsonOptions = new JsonSerializerOptions() { WriteIndented = true };
-
-//// Products.Domain Tests
-//Product product = new Product("Product 1", CategoryEnum.Books, "A book on things.", 25.99m,
-//    "USD", "Active", Guid.NewGuid().ToString());
-//product.UpdateStatus("InActive", Guid.NewGuid().ToString());
-//product.AddImage("Image 1", "A dog", 3, "Image URL", "Thumb URL", Guid.NewGuid().ToString());
-//product.AddDocument("Doc 1", "Instructions", 1, "Document URL", Guid.NewGuid().ToString());
-//ProductSnapshot snapshot = product.GetSnapshot();
-//string json = JsonSerializer.Serialize(snapshot, jsonOptions);
-//Console.WriteLine(json);
 
 async Task LoadData()
 {
@@ -32,7 +20,7 @@ async Task LoadData()
         // add a new product
         string category = GetRandomCategory();
         decimal price = (decimal)(new Random().Next(999, 499999)) / 100;
-        AddProductDTO addProductDTO = new AddProductDTO($"Product {counter}", category, $"Description {counter}", price, "USD", "Active", 1, 1, "each", 1);
+        AddProductDTO addProductDTO = new AddProductDTO($"Product {counter}", category, $"Description {counter}", price, "USD", "Active", 1, "each", 1);
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, baseUrl);
         request.Content = new StringContent(JsonSerializer.Serialize(addProductDTO), Encoding.UTF8, "application/json");
         HttpResponseMessage response = await client.SendAsync(request);

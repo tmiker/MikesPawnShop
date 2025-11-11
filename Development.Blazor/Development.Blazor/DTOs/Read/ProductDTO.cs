@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace Development.Blazor.DTOs.Read
 {
     public class ProductDTO
@@ -12,7 +14,7 @@ namespace Development.Blazor.DTOs.Read
         public string? Currency { get; set; }
         public string? Status { get; set; }
         public int QuantityOnHand { get; set; }
-        public int QuantityAvailable { get; set; }
+        public int QuantityAllocated { get; set; }
         public string? UOM { get; set; }
         public int LowStockThreshold { get; set; }
         public int Version { get; set; }
@@ -20,5 +22,8 @@ namespace Development.Blazor.DTOs.Read
         public DateTime DateUpdated { get; set; }
         public List<ImageDataDTO>? Images { get; set; }
         public List<DocumentDataDTO>? Documents { get; set; }
+
+        [JsonIgnore]
+        public int QuantityAvailable { get => QuantityOnHand - QuantityAllocated; }
     }
 }

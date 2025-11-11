@@ -18,7 +18,7 @@ namespace Products.Write.Domain.Aggregates
         private List<DocumentData>? _documents;
         // inventory awareness
         private int _quantityOnHand;
-        private int _quantityAvailable;
+        private int _quantityAllocated;
         private string? _uom;
         private int _lowStockThreshold;
         private int _version;
@@ -44,7 +44,7 @@ namespace Products.Write.Domain.Aggregates
             _dateCreated = snapshot.DateCreated;
             _dateUpdated = snapshot.DateUpdated;
             _quantityOnHand = snapshot.QuantityOnHand;
-            _quantityAvailable = snapshot.QuantityAvailable;
+            _quantityAllocated = snapshot.QuantityAllocated;
             _lowStockThreshold = snapshot.LowStockThreshold;
             _uom = snapshot.UOM;            
         }
@@ -70,13 +70,13 @@ namespace Products.Write.Domain.Aggregates
         }
 
         public Product(string name, CategoryEnum category, string description, decimal price, string currency, string status, 
-            int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold, string correlationId)
+            int quantityOnHand, string uom, int lowStockThreshold, string correlationId)
         {
             // validate status - below statement will throw InvalidEnumArgumentException if not valid
             Status validStatus = Status.FromName(status);
             // event constructor takes category enum and converts to string value for the property
             Causes(new ProductAdded(Guid.NewGuid(), this.GetType().Name, _version, correlationId, name, category, description, price, currency, validStatus.Name,
-                quantityOnHand, quantityAvailable, uom, lowStockThreshold));
+                quantityOnHand, 0, uom, lowStockThreshold));
         }
 
         private void When(ProductAdded @event)
@@ -89,7 +89,7 @@ namespace Products.Write.Domain.Aggregates
             _currency = @event.Currency;
             _status = @event.Status;
             _quantityOnHand = @event.QuantityOnHand;
-            _quantityAvailable = @event.QuantityAvailable;
+            _quantityAllocated = 0;
             _uom = @event.UOM;
             _lowStockThreshold = @event.LowStockThreshold;
             _version = @event.AggregateVersion;
@@ -217,7 +217,7 @@ namespace Products.Write.Domain.Aggregates
                 Images = imageSnapshots,
                 Documents = documentSnapshots,
                 QuantityOnHand = _quantityOnHand,
-                QuantityAvailable = _quantityAvailable,
+                QuantityAllocated = _quantityAllocated,
                 UOM = _uom,
                 LowStockThreshold = _lowStockThreshold,
                 Version = _version,

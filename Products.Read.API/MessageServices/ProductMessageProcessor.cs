@@ -76,7 +76,7 @@ namespace Products.Read.API.MessageServices
                     currency: message.Currency,
                     status: message.Status,
                     quantityOnHand: message.QuantityOnHand,
-                    quantityAvailable: message.QuantityAvailable,
+                    quantityAllocated: message.QuantityAllocated,
                     uom: message.UOM,
                     lowStockThreshold: message.LowStockThreshold,
                     version: message.AggregateVersion

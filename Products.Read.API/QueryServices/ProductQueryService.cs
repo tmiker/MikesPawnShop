@@ -93,7 +93,7 @@ namespace Products.Read.API.QueryServices
                 Price = product.Price,
                 Status = product.Status,
                 QuantityOnHand = product.QuantityOnHand,
-                QuantityAvailable = product.QuantityAvailable,
+                QuantityAllocated = product.QuantityAllocated,
                 UOM = product.UOM,
                 LowStockThreshold = product.LowStockThreshold,
                 Version = product.Version,
@@ -121,6 +121,10 @@ namespace Products.Read.API.QueryServices
                     Description = product.Description,
                     Price = product.Price,
                     Status = product.Status,
+                    QuantityOnHand = product.QuantityOnHand,
+                    QuantityAllocated = product.QuantityAllocated,
+                    UOM = product.UOM,
+                    LowStockThreshold = product.LowStockThreshold,
                     Version = product.Version,
                     DateCreated = product.DateCreated,
                     DateUpdated = product.DateUpdated,
@@ -191,7 +195,7 @@ namespace Products.Read.API.QueryServices
                     Currency = product.Currency,
                     Status = product.Status,
                     QuantityOnHand = product.QuantityOnHand,
-                    QuantityAvailable = product.QuantityAvailable,
+                    QuantityAllocated = product.QuantityAllocated,
                     UOM = product.UOM,
                     LowStockThreshold = product.LowStockThreshold,
                     Version = product.Version,
@@ -204,29 +208,6 @@ namespace Products.Read.API.QueryServices
                 summaryDTOs.Add(dto);
             }
             return new GetProductSummariesResult(true, summaryDTOs, null);
-
-            //var result = await (
-            //            from product in _db.Products
-            //            join image in _db.ImageData on product.Id equals image.ProductId into images
-            //            join document in _db.DocumentData on product.Id equals document.ProductId into documents
-            //             select new  ProductSummaryDTO
-            //                 {
-            //                     Id = product.Id,
-            //                     AggregateId = product.AggregateId,
-            //                     Name = product.Name,
-            //                     Category = product.Category,
-            //                     Description = product.Description,
-            //                     Price = product.Price,
-            //                     Status = product.Status,
-            //                     Version = product.Version,
-            //                     DateCreated = product.DateCreated,
-            //                     DateUpdated = product.DateUpdated,
-            //                     ImageCount = images == null ? 0 : images.ToList().Count(), // 0,  // (from i in _db.ImageData where i.ProductId == product.Id select i).ToList().Count(),
-            //                     DocumentCount = documents == null ? 0 : documents.ToList().Count() // 0,  // (from d in _db.DocumentData where d.ProductId == product.Id select d).ToList().Count()
-
-            //                 }).ToListAsync();
-
-            //return result;
         }
 
         public async Task<GetPagedAndFilteredProductSummariesResult> GetPagedAndFilteredProductSummariesAsync(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
@@ -278,7 +259,7 @@ namespace Products.Read.API.QueryServices
                     Currency = product.Currency,
                     Status = product.Status,
                     QuantityOnHand = product.QuantityOnHand,
-                    QuantityAvailable = product.QuantityAvailable,
+                    QuantityAllocated = product.QuantityAllocated,
                     UOM = product.UOM,
                     LowStockThreshold = product.LowStockThreshold,
                     Version = product.Version,
@@ -311,7 +292,7 @@ namespace Products.Read.API.QueryServices
                 Currency = product.Currency,
                 Status = product.Status,
                 QuantityOnHand = product.QuantityOnHand,
-                QuantityAvailable = product.QuantityAvailable,
+                QuantityAllocated = product.QuantityAllocated,
                 UOM = product.UOM,
                 LowStockThreshold = product.LowStockThreshold,
                 Version = product.Version,

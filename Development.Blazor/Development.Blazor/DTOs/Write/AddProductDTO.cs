@@ -9,7 +9,9 @@
         public string Currency { get; set; } = default!;
         public string Status { get; set; } = default!;
         public int QuantityOnHand { get; set; }
-        public int QuantityAvailable { get; set; }
+
+        // public int QuantityAllocated { get; set; }
+
         public string? UOM { get; set; } = default!;
         public int LowStockThreshold { get; set; }
     }
