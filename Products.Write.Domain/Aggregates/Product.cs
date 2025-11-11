@@ -20,6 +20,7 @@ namespace Products.Write.Domain.Aggregates
         private int _quantityOnHand;
         private int _quantityAvailable;
         private string? _uom;
+        private int _lowStockThreshold;
         private int _version;
         private DateTime _dateCreated;
         private DateTime _dateUpdated;
@@ -44,6 +45,7 @@ namespace Products.Write.Domain.Aggregates
             _dateUpdated = snapshot.DateUpdated;
             _quantityOnHand = snapshot.QuantityOnHand;
             _quantityAvailable = snapshot.QuantityAvailable;
+            _lowStockThreshold = snapshot.LowStockThreshold;
             _uom = snapshot.UOM;            
         }
 
@@ -84,10 +86,11 @@ namespace Products.Write.Domain.Aggregates
             _price = @event.Price;
             _currency = @event.Currency;
             _status = @event.Status;
-            _version = @event.AggregateVersion;
             _quantityOnHand = 0;
             _quantityAvailable = 0;
             _uom = "each";
+            _lowStockThreshold = 3;
+            _version = @event.AggregateVersion;
             _dateCreated = @event.OccurredAt;
             _dateUpdated = @event.OccurredAt;
         }
@@ -211,12 +214,13 @@ namespace Products.Write.Domain.Aggregates
                 Status = _status,
                 Images = imageSnapshots,
                 Documents = documentSnapshots,
+                QuantityOnHand = _quantityOnHand,
+                QuantityAvailable = _quantityAvailable,
+                UOM = _uom,
+                LowStockThreshold = _lowStockThreshold,
                 Version = _version,
                 DateCreated = _dateCreated,
                 DateUpdated = _dateUpdated,
-                QuantityOnHand = _quantityOnHand,
-                QuantityAvailable = _quantityAvailable,
-                UOM = _uom
             };
         }
     }
