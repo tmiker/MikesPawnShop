@@ -10,17 +10,20 @@ namespace Products.Write.Domain.Events
         public int AggregateVersion { get; init; }
         public DateTime OccurredAt { get; init; }
         public string? CorrelationId { get; init; } 
-
         public string Name { get; init; } = default!;
         public string Category { get; init; } = default!;
         public string Description { get; init; } = default!;
         public decimal Price { get; init; }
         public string Currency { get; init; } = default!;
         public string Status { get; init; } = default!;
+        public int QuantityOnHand { get; init; }
+        public int QuantityAvailable { get; init; }
+        public string UOM { get; init; } = default!;
+        public int LowStockThreshold { get; init; }
 
-        public ProductAdded(Guid aggregateId, string aggregateType, int aggregateVersion, 
-            string? correlationId, string name, CategoryEnum category, 
-            string description, decimal price, string currency, string status)
+        public ProductAdded(Guid aggregateId, string aggregateType, int aggregateVersion, string? correlationId, 
+            string name, CategoryEnum category, string description, decimal price, string currency, string status,
+            int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold)
         {
             AggregateId = aggregateId;
             AggregateType = aggregateType;
@@ -33,6 +36,10 @@ namespace Products.Write.Domain.Events
             Price = price;
             Currency = currency;
             Status = status;
+            QuantityOnHand = quantityOnHand;
+            QuantityAvailable = quantityAvailable;
+            UOM = uom;
+            LowStockThreshold = lowStockThreshold;
         }
     }
 }

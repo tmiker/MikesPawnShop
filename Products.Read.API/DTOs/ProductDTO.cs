@@ -12,6 +12,10 @@ namespace Products.Read.API.DTOs
         public decimal Price { get; init; }
         public string? Currency { get; init; }
         public string? Status { get; init; }
+        public int QuantityOnHand { get; init; }
+        public int QuantityAvailable { get; init; }
+        public string? UOM { get; init; }
+        public int LowStockThreshold { get; init; }
         public int Version { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }

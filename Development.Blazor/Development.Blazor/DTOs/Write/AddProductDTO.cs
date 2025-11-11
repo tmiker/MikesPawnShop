@@ -8,5 +8,9 @@
         public decimal Price { get; set; }
         public string Currency { get; set; } = default!;
         public string Status { get; set; } = default!;
+        public int QuantityOnHand { get; set; }
+        public int QuantityAvailable { get; set; }
+        public string? UOM { get; set; } = default!;
+        public int LowStockThreshold { get; set; }
     }
 }

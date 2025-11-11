@@ -5,7 +5,6 @@ using Products.Read.API.DTOs;
 using Products.Read.API.Infrastructure.Data;
 using Products.Read.API.QueryResponses;
 using Products.Read.API.QueryServices;
-using Products.Shared.Messages;
 
 namespace Products.Read.API
 {
@@ -36,6 +35,10 @@ namespace Products.Read.API
             int documentSequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
             int documentVersion = 1;
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             NullLogger<ProductQueryService> logger = NullLogger<ProductQueryService>.Instance;
             var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
@@ -49,7 +52,7 @@ namespace Products.Read.API
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                Product product = new Product(aggregateId, productName, category, description, price, currency, status, aggregateVersion);
+                Product product = new Product(aggregateId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold, aggregateVersion);
                 ImageData image = new ImageData(imageName, caption, imageSequenceNumber, imageUrl, thumbUrl);
                 DocumentData document = new DocumentData(documentName, title, documentSequenceNumber, documentUrl);
                 context.Products.Add(product);
@@ -101,6 +104,10 @@ namespace Products.Read.API
             int documentSequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
             int documentVersion = 1;
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             NullLogger<ProductQueryService> logger = NullLogger<ProductQueryService>.Instance;
             var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
@@ -114,7 +121,7 @@ namespace Products.Read.API
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                Product product = new Product(aggregateId, productName, category, description, price, currency, status, aggregateVersion);
+                Product product = new Product(aggregateId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold, aggregateVersion);
                 ImageData image = new ImageData(imageName, caption, imageSequenceNumber, imageUrl, thumbUrl);
                 DocumentData document = new DocumentData(documentName, title, documentSequenceNumber, documentUrl);
                 context.Products.Add(product);

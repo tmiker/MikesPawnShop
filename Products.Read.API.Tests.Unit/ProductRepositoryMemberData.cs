@@ -17,9 +17,13 @@ namespace Products.Read.API
             decimal price = 1299.99m;
             string currency = "USD";
             string status = "Active";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
-            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+            ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion, correlationId, 
+                productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
 
             return new List<object[]> { new object[] { productAddedMessage } };
         }
@@ -35,11 +39,15 @@ namespace Products.Read.API
             string description = "Catadioptric Telescope";
             decimal price = 1299.99m;
             string currency = "USD";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
             string initialStatus = "Active";
             string updatedStatus = "InActive";
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, initialStatus);
+                correlationId, productName, category, description, price, currency, initialStatus, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, aggregateVersion,
                 correlationId, updatedStatus);
 
@@ -58,6 +66,10 @@ namespace Products.Read.API
             decimal price = 1299.99m;
             string currency = "USD";
             string status = "Active";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
             string imageName = "Telescope";
             string caption = "Meade LX8";
             int sequenceNumber = 1;
@@ -65,7 +77,7 @@ namespace Products.Read.API
             string thumbUrl = "https://www.docs.thumbUrl";
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             ImageAddedMessage imageAddedMessage = new ImageAddedMessage(aggregateId, aggregateType, aggregateVersion,
                 correlationId, imageName, caption, sequenceNumber, imageUrl, thumbUrl);
 
@@ -84,13 +96,17 @@ namespace Products.Read.API
             decimal price = 1299.99m;
             string currency = "USD";
             string status = "Active";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
             string documentName = "Instructions";
             string title = "Meade LX8 Instructions";
             int sequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             DocumentAddedMessage documentAddedMessage = new DocumentAddedMessage(aggregateId, aggregateType, aggregateVersion,
                 correlationId, documentName, title, sequenceNumber, documentUrl);
 

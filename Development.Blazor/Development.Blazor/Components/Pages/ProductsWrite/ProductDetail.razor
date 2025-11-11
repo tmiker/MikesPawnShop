@@ -83,6 +83,38 @@
                     <InputText class="form-control" id="status" @bind-Value="@_product.Status" />
                 </div>
             </div>
+            <div class="row">
+                <div class="col-3 offset-1">
+                    <label for="qoh">Quantity On Hand:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="form-control " id="qoh" @bind-Value="_product.QuantityOnHand" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 offset-1">
+                    <label for="qavail">Quantity Available:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="form-control " id="qavail" @bind-Value="_product.QuantityAvailable" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 offset-1">
+                    <label for="uom">UOM:</label>
+                </div>
+                <div class="col-7">
+                    <InputText class="form-control " id="uom" @bind-Value="_product.UOM" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 offset-1">
+                    <label for="lowstock">Low Stock Threshold:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="form-control " id="lowstock" @bind-Value="_product.LowStockThreshold" />
+                </div>
+            </div>
             <div class="form-group row">
                 <div class="col-3 text-center">
                     <label for="imageCount">Image Count:</label>

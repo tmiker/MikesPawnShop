@@ -69,12 +69,14 @@ namespace Products.Write.Domain.Aggregates
             // _version++;
         }
 
-        public Product(string name, CategoryEnum category, string description, decimal price, string currency, string status, string correlationId)
+        public Product(string name, CategoryEnum category, string description, decimal price, string currency, string status, 
+            int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold, string correlationId)
         {
             // validate status - below statement will throw InvalidEnumArgumentException if not valid
             Status validStatus = Status.FromName(status);
             // event constructor takes category enum and converts to string value for the property
-            Causes(new ProductAdded(Guid.NewGuid(), this.GetType().Name, _version, correlationId, name, category, description, price, currency, validStatus.Name));
+            Causes(new ProductAdded(Guid.NewGuid(), this.GetType().Name, _version, correlationId, name, category, description, price, currency, validStatus.Name,
+                quantityOnHand, quantityAvailable, uom, lowStockThreshold));
         }
 
         private void When(ProductAdded @event)
@@ -86,10 +88,10 @@ namespace Products.Write.Domain.Aggregates
             _price = @event.Price;
             _currency = @event.Currency;
             _status = @event.Status;
-            _quantityOnHand = 0;
-            _quantityAvailable = 0;
-            _uom = "each";
-            _lowStockThreshold = 3;
+            _quantityOnHand = @event.QuantityOnHand;
+            _quantityAvailable = @event.QuantityAvailable;
+            _uom = @event.UOM;
+            _lowStockThreshold = @event.LowStockThreshold;
             _version = @event.AggregateVersion;
             _dateCreated = @event.OccurredAt;
             _dateUpdated = @event.OccurredAt;

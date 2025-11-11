@@ -131,7 +131,7 @@ namespace Products.Write.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SnapshotRecords");
+                    b.ToTable("SnapshotRecords", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -31,6 +31,10 @@ namespace Products.Read.API.Infrastructure.Repositories
                     price: message.Price,
                     currency: message.Currency,
                     status: message.Status,
+                    quantityOnHand: message.QuantityOnHand,
+                    quantityAvailable: message.QuantityAvailable,
+                    uom: message.UOM,
+                    lowStockThreshold: message.LowStockThreshold,
                     version: message.AggregateVersion
                 );
 

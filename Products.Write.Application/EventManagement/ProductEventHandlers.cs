@@ -39,7 +39,11 @@ namespace Products.Write.Application.EventManagement
                 @event.Description,
                 @event.Price,
                 @event.Currency,
-                @event.Status
+                @event.Status,
+                @event.QuantityOnHand,
+                @event.QuantityAvailable,
+                @event.UOM,
+                @event.LowStockThreshold
             );
             _publishEndpoint.Publish(message);
         }
@@ -86,10 +90,6 @@ namespace Products.Write.Application.EventManagement
             );
             _publishEndpoint.Publish(message);
         }
-
-
-
-
 
         private void OnImageDeleted(ImageDeleted @event)
         {

@@ -1,6 +1,4 @@
-﻿using MassTransit;
-using Microsoft.Extensions.Logging;
-using Products.Shared.Messages;
+﻿using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -28,7 +26,8 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
             CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);
 
-            Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, command.CorrelationId);
+            Product product = new Product(command.Name, categoryEnum, command.Description, command.Price, command.Currency, command.Status, 
+                command.QuantityOnHand, command.QuantityAvailable, command.UOM, command.LowStockThreshold, command.CorrelationId);
             // Guid productId = product.Id;
 
             // Save the product - throws ProductEventStoreException if error occurs

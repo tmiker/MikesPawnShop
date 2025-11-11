@@ -20,7 +20,12 @@ namespace Products.Read.API.Domain.Models
         public List<ImageData>? Images { get; set; } 
 
         [InverseProperty(nameof(DocumentData.Product))]
-        public List<DocumentData>? Documents { get; set; } 
+        public List<DocumentData>? Documents { get; set; }
+
+        public int QuantityOnHand { get; private set; }
+        public int QuantityAvailable { get; private set; }
+        public string UOM { get; private set; } = default!;
+        public int LowStockThreshold { get; private set; }
 
         public int Version { get; set; }
         public DateTime DateCreated { get; private set; }
@@ -28,7 +33,8 @@ namespace Products.Read.API.Domain.Models
 
         private Product() { }
 
-        public Product(Guid aggregateId, string name, string category, string description, decimal price, string currency, string status, int version)
+        public Product(Guid aggregateId, string name, string category, string description, decimal price, string currency, string status, 
+            int quantityOnHand, int quantityAvailable, string uom, int lowStockThreshold, int version)
         {
             AggregateId = aggregateId;
             Name = name;
@@ -37,6 +43,10 @@ namespace Products.Read.API.Domain.Models
             Price = price;
             Currency = currency;
             Status = status;
+            QuantityOnHand = quantityOnHand;
+            QuantityAvailable = quantityAvailable;
+            UOM = uom;
+            LowStockThreshold = lowStockThreshold;
             Version = version;
             DateCreated = DateTime.UtcNow;
             DateUpdated = default;

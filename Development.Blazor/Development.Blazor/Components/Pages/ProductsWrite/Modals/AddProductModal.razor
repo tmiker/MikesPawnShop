@@ -49,7 +49,7 @@
                                 <label for="desc">Description:</label>
                             </div>
                             <div class="col-7">
-                                <InputText class="form-control " id="desc" @bind-Value="AddNewProductDTO.Description" />
+                                <InputTextArea rows="4" class="form-control " id="desc" @bind-Value="AddNewProductDTO.Description" />
                                 <ValidationMessage For="@(() => AddNewProductDTO.Description)" />
                             </div>
                         </div>
@@ -80,6 +80,44 @@
                                 <ValidationMessage For="@(() => AddNewProductDTO.Status)" />
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="qoh">Quantity On Hand:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputNumber class="form-control " id="qoh" @bind-Value="AddNewProductDTO.QuantityOnHand" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.QuantityOnHand)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="qavail">Quantity Available:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputNumber class="form-control " id="qavail" @bind-Value="AddNewProductDTO.QuantityAvailable" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.QuantityAvailable)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="uom">UOM:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText class="form-control " id="uom" @bind-Value="AddNewProductDTO.UOM" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.UOM)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-1">
+                                <label for="lowstock">Low Stock Threshold:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputNumber class="form-control " id="lowstock" @bind-Value="AddNewProductDTO.LowStockThreshold" />
+                                <ValidationMessage For="@(() => AddNewProductDTO.LowStockThreshold)" />
+                            </div>
+                        </div>
+
 
                         <br />
 

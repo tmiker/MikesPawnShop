@@ -24,9 +24,13 @@ namespace Products.Read.API
             decimal price = 1299.99m;
             string currency = "USD";
             string status = "Active";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
 
             NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
             var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
@@ -69,9 +73,13 @@ namespace Products.Read.API
             decimal price = 1299.99m;
             string currency = "USD";
             string status = "Active";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
 
             NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
 
@@ -107,9 +115,13 @@ namespace Products.Read.API
             string initialStatus = "Active";
             int updatedVersion = 1;
             string updatedStatus = "InActive";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
-                correlationId, productName, category, description, price, currency, initialStatus);
+                correlationId, productName, category, description, price, currency, initialStatus, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, updatedVersion,
                 correlationId, updatedStatus);
 
@@ -156,9 +168,13 @@ namespace Products.Read.API
             int updatedVersion = 1;
             string updatedStatus = "InActive";
             Guid incorrectAggregateId = Guid.NewGuid();
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
-                correlationId, productName, category, description, price, currency, initialStatus);
+                correlationId, productName, category, description, price, currency, initialStatus, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(incorrectAggregateId, aggregateType, updatedVersion,
                 correlationId, updatedStatus);
 
@@ -199,9 +215,13 @@ namespace Products.Read.API
             int updatedVersion = 2;                 // version 1 will be missing, should throw MissingProductVersionException
             string updatedStatus = "InActive";
             Guid incorrectAggregateId = Guid.NewGuid();
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
-                correlationId, productName, category, description, price, currency, initialStatus);
+                correlationId, productName, category, description, price, currency, initialStatus, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             StatusUpdatedMessage statusUpdatedMessage = new StatusUpdatedMessage(incorrectAggregateId, aggregateType, updatedVersion,
                 correlationId, updatedStatus);
 
@@ -243,9 +263,13 @@ namespace Products.Read.API
             string firstUpdatedStatus = "InActive";
             int secondUpdatedVersion = 2;
             string secondUpdatedStatus = "Obsolete";
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, initialVersion,
-                correlationId, productName, category, description, price, currency, initialStatus);
+                correlationId, productName, category, description, price, currency, initialStatus, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             StatusUpdatedMessage firstStatusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, firstUpdatedVersion,
                 correlationId, firstUpdatedStatus);
             StatusUpdatedMessage secondStatusUpdatedMessage = new StatusUpdatedMessage(aggregateId, aggregateType, secondUpdatedVersion,
@@ -293,9 +317,13 @@ namespace Products.Read.API
             string imageUrl = "https://www.docs.imageUrl";
             string thumbUrl = "https://www.docs.thumbUrl";
             int imageVersion = 1;
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             ImageAddedMessage imageAddedMessage = new ImageAddedMessage(aggregateId, aggregateType, imageVersion,
                 correlationId, imageName, caption, sequenceNumber, imageUrl, thumbUrl);
 
@@ -348,9 +376,13 @@ namespace Products.Read.API
             int sequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
             int documentVersion = 1;
+            int quantityOnHand = 1;
+            int quantityAvailable = 1;
+            string uom = "each";
+            int lowStockThreshold = 1;
 
             ProductAddedMessage productAddedMessage = new ProductAddedMessage(aggregateId, aggregateType, aggregateVersion,
-                correlationId, productName, category, description, price, currency, status);
+                correlationId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold);
             DocumentAddedMessage documentAddedMessage = new DocumentAddedMessage(aggregateId, aggregateType, documentVersion,
                 correlationId, documentName, title, sequenceNumber, documentUrl);
 
@@ -382,14 +414,5 @@ namespace Products.Read.API
                 Assert.Equal(document.Title, title);
             }
         }
-
-
-        //[Theory]
-        //[MemberData(nameof(ProductRepositoryMemberData.AddProductAndAddImageCommandsTestData), typeof(ProductRepositoryTests))]
-        //public async Task AddProductImageAsync_ValidInputArgument_AddsImageToProduct_MemberData(ProductAddedMessage productAdded, ImageAddedMessage imageAdded)
-        //{
-
-        //}
-
     }
 }
