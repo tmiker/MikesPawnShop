@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Development.Blazor", "Devel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Development.Blazor.Client", "Development.Blazor\Development.Blazor.Client\Development.Blazor.Client.csproj", "{87623208-A787-45B0-AE1E-4B02FD840794}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carts.API", "Carts.API\Carts.API.csproj", "{D5BA0373-A7B5-45EE-9971-A0D9BB8A986E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,10 @@ Global
 		{87623208-A787-45B0-AE1E-4B02FD840794}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87623208-A787-45B0-AE1E-4B02FD840794}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87623208-A787-45B0-AE1E-4B02FD840794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5BA0373-A7B5-45EE-9971-A0D9BB8A986E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5BA0373-A7B5-45EE-9971-A0D9BB8A986E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5BA0373-A7B5-45EE-9971-A0D9BB8A986E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BA0373-A7B5-45EE-9971-A0D9BB8A986E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
