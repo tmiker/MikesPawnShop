@@ -11,24 +11,13 @@ namespace Development.Blazor.HttpProxyServices
     [ApiController]
     public class CartsProxyController : ControllerBase
     {
-        private readonly ICartHttpService _cartHttpService;
+        private readonly ICartsHttpService _cartHttpService;
         private readonly ILogger<CartsProxyController> _logger;
 
-        public CartsProxyController(ICartHttpService cartHttpService, ILogger<CartsProxyController> logger)
+        public CartsProxyController(ICartsHttpService cartHttpService, ILogger<CartsProxyController> logger)
         {
             _cartHttpService = cartHttpService;
             _logger = logger;
-        }
-
-        [Authorize]
-        [HttpGet("oidcTestEndpoint")]
-        public async Task<IActionResult> CheckCartsOidcTestEndpoint()
-        {
-            string uri = Request.GetDisplayUrl();
-            _logger.LogInformation("Blazor Dev Server Proxy Services: CheckCartsOidcTestEndpointt was called: {uri}", uri);
-            var result = await _cartHttpService.CheckCartsOidcTestEndpointAsync();
-            if (result.IsSuccess) return Ok(result.ApiUserInfo);
-            else return BadRequest(result.ErrorMessage);
         }
 
         [Authorize]

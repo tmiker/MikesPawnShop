@@ -4,7 +4,6 @@ using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.Utility;
 using Development.Blazor.Components;
 using Development.Blazor.HttpProviders;
-using Development.Blazor.Utility;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,7 +12,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
@@ -50,6 +48,9 @@ builder.Services.AddAuthentication(options =>
     // oidcOptions.Scope.Add(OpenIdConnectScope.OfflineAccess);
     oidcOptions.Scope.Add("roles");
     oidcOptions.Scope.Add("cartsapi.fullaccess");
+    oidcOptions.Scope.Add("productswriteapi.fullaccess");
+    oidcOptions.Scope.Add("accountsapi.fullaccess");
+    oidcOptions.Scope.Add("ordersapi.fullaccess");
     oidcOptions.CallbackPath = new PathString("/signin-oidc");
     oidcOptions.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
     oidcOptions.GetClaimsFromUserInfoEndpoint = true;
@@ -78,29 +79,44 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Http Clients
-builder.Services.AddHttpClient(name: StaticDetails.ProductsReadHttpClient_ClientName, configureClient: config =>
+builder.Services.AddHttpClient(name: StaticData.ProductsReadHttpClient_ClientName, configureClient: config =>
 {
-    config.BaseAddress = new Uri(StaticDetails.ProductsReadHttpClient_BaseURL);
+    config.BaseAddress = new Uri(StaticData.ProductsReadHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-builder.Services.AddSingleton<IProductsReadHttpClient, ProductsReadHttpClient>();
+builder.Services.AddSingleton<IProductsReadHttpService, ProductsReadHttpService>();
 
-builder.Services.AddHttpClient(name: StaticDetails.ProductsWriteHttpClient_ClientName, configureClient: config =>
+builder.Services.AddHttpClient(name: StaticData.ProductsWriteHttpClient_ClientName, configureClient: config =>
 {
-    config.BaseAddress = new Uri(StaticDetails.ProductsWriteHttpClient_BaseURL);
+    config.BaseAddress = new Uri(StaticData.ProductsWriteHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-builder.Services.AddSingleton<IProductsWriteHttpClient, ProductsWriteHttpClient>();
+builder.Services.AddSingleton<IProductsWriteHttpService, ProductsWriteHttpService>();
 builder.Services.AddHttpClient(name: StaticData.CartsHttpClient_ClientName, configureClient: config =>
 {
     config.BaseAddress = new Uri(StaticData.CartsHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-builder.Services.AddSingleton<ICartHttpService, CartHttpService>();
+builder.Services.AddSingleton<ICartsHttpService, CartsHttpService>();
+builder.Services.AddHttpClient(name: StaticData.AccountsHttpClient_ClientName, configureClient: config =>
+{
+    config.BaseAddress = new Uri(StaticData.AccountsHttpClient_BaseURL);
+    config.DefaultRequestHeaders.Clear();
+    config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+}).AddUserAccessTokenHandler();
+builder.Services.AddSingleton<IAccountsHttpService, AccountsHttpService>();
+builder.Services.AddHttpClient(name: StaticData.OrdersHttpClient_ClientName, configureClient: config =>
+{
+    config.BaseAddress = new Uri(StaticData.OrdersHttpClient_BaseURL);
+    config.DefaultRequestHeaders.Clear();
+    config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+}).AddUserAccessTokenHandler();
+builder.Services.AddSingleton<IOrdersHttpService, OrdersHttpService>();
 
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

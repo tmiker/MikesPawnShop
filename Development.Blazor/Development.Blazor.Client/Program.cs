@@ -15,7 +15,7 @@ builder.Services.AddKeyedScoped<HttpClient>("LocalAPIClientFromWASM",
        });
 
 
-builder.Services.AddScoped<ICartHttpService, ClientCartHttpService>();
+builder.Services.AddScoped<ICartsHttpService, ClientCartHttpService>();
 
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();

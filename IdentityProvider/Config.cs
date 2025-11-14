@@ -16,7 +16,10 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
             {
-                new ApiScope("cartsapi.fullaccess")
+                new ApiScope("cartsapi.fullaccess"),
+                new ApiScope("productswriteapi.fullaccess"),
+                new ApiScope("accountsapi.fullaccess"),
+                new ApiScope("ordersapi.fullaccess")
             };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -25,7 +28,20 @@ public static class Config
             new ApiResource("cartsapi", "Shopping Carts API", new [] { "role" })
                 {
                     Scopes = { "cartsapi.fullaccess" }
+                },
+            new ApiResource("productswriteapi", "Products Write API", new[] { "role" })
+                {
+                    Scopes = { "productswriteapi.fullaccess" }
+                },
+            new ApiResource("accountsapi", "Accounts API", new[] { "role" })
+                {
+                    Scopes = { "accountsapi.fullaccess" }
+                },
+            new ApiResource("ordersapi", "Orders API", new[] { "role" })
+                {
+                    Scopes = { "ordersapi.fullaccess" }
                 }
+            
         };
     public static IEnumerable<Client> Clients =>
         new Client[]
@@ -45,8 +61,10 @@ public static class Config
                             IdentityServerConstants.StandardScopes.OpenId,
                             IdentityServerConstants.StandardScopes.Profile,
                             "roles",
-                            "cartsapi",
-                            "cartsapi.fullaccess"
+                            "cartsapi.fullaccess",
+                            "productswriteapi.fullaccess",
+                            "accountsapi.fullaccess",
+                            "ordersapi.fullaccess"
                         },
                         ClientSecrets = { new Secret("wendyandmarlowFSD".Sha256()) }    // *** move to secrets 
                         //ClientSecrets = { new Secret("wendyandmarlowarethebestoffriendsforclientblazor".Sha256()) }

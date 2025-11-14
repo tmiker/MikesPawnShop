@@ -1,0 +1,192 @@
+﻿@page "/claims/accountsApiClaims"
+@rendermode InteractiveServer
+@inject IAccountsHttpService _accountService
+
+<PageTitle>Accounts API Claims</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(_retrieveError))
+{
+    <div class="row mt-2">
+        <div class="col-12">
+            <h6 class="text-danger"><b>Retrieve Error:  @_retrieveError</b></h6>
+        </div>
+    </div>
+}
+
+@if (_apiUserInfoDTO != null)
+{
+    @if (_apiUserInfoDTO.ErrorMessage != null)
+    {
+        <div class="row mt-2">
+            <div class="col-12">
+                <h6 class="text-danger"><b>Error:  @_apiUserInfoDTO.ErrorMessage</b></h6>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-2">
+        @* LEFT COLUMN *@
+        <div class="col-6">
+            <div class="row">
+                <div class="col-12">
+                    <h5><b>Accounts API User Claims from User.Claims</b></h5>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <h6><b>Derived from query of User.Claims in API Controller</b></h6>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Claims</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @* LIST CLAIMS TYPE AND VALUE HERE *@
+                            @foreach (var item in _apiUserInfoDTO.ApiUserClaimsClaimsList)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p>@item</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Roles</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @* LIST ROLES HERE *@
+                            @foreach (var item in _apiUserInfoDTO.ApiUserClaimsRolesList)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p>@item</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="text-light"><b>Remarks: </b></p>
+                    @* LIST REMARKS HERE *@
+                    @foreach (var remark in _apiUserInfoDTO.Remarks)
+                    {
+                        <div class="row">
+                            <div class="col-12">
+                                <p>@remark</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        @* RIGHT COLUMN *@
+        <div class="col-6">
+            <div class="row">
+                <div class="col-12">
+                    <h5><b>Accounts API Access Token</b></h5>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <h6><b>Parsed from Authorization Header Value passed in API Request by IDP as a Bearer Token</b></h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Claims</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @* LIST CLAIMS TYPE AND VALUE HERE *@
+                            @foreach (var item in _apiUserInfoDTO.ApiAuthorizationHeaderClaimsList)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p>@item</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Roles</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @* LIST ROLES HERE *@
+                            @foreach (var item in _apiUserInfoDTO.ApiAuthorizationHeaderRolesList)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p>@item</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="mx-auto text-center mb-3 mt-3">
+        <div class="spinner-border text-yellow-alt role-status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@code {
+
+    private ApiUserInfoDTO? _apiUserInfoDTO { get; set; }
+    private string? _retrieveError { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await _accountService.GetAccountsApiUserInfoAsync();
+            if (result.IsSuccess)
+            {
+                _apiUserInfoDTO = result.ApiUserInfo;
+            }
+            this.StateHasChanged();
+        }
+    }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var result = await _cartService.GetCartsApiUserInfoAsync();
+    //     if (result.IsSuccess)
+    //     {
+    //         _apiUserInfoDTO = result.ApiUserInfo;
+    //     }
+    // }
+}

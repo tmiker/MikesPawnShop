@@ -1,11 +1,13 @@
-﻿using Development.Blazor.DTOs.Tests;
+﻿using Development.Blazor.Client.DTOs;
+using Development.Blazor.DTOs.Tests;
 using Development.Blazor.DTOs.Write;
 using Development.Blazor.Paging;
 
 namespace Development.Blazor.Abstractions
 {
-    public interface IProductsWriteHttpClient
+    public interface IProductsWriteHttpService
     {
+        Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetProductsWriteApiUserInfoAsync(string? token = null);
         Task<(bool IsSuccess, Guid? AggregateId, string? ErrorMessage)> AddProductAsync(AddProductDTO addProductDTO, CancellationToken cancellationToken);
         Task<(bool IsSuccess, string? ErrorMessage)> UpdateStatusAsync(UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken);
 

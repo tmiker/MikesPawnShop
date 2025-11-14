@@ -21,7 +21,7 @@ builder.Services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptio
 // Always explicitly set NameClaimType and RoleClaimType in TokenValidationParameters so your code is not dependent on defaults that may change.
 
 // Configure Auth
-JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Note: As configured, Roles are not populated by HttpContext.User.Claims without this
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

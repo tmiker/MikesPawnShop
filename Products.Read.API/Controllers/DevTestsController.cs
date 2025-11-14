@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Products.Read.API.Abstractions;
+using Products.Read.API.Auth;
 using Products.Read.API.Configuration;
 using Products.Read.API.DTOs.DevTests;
 using Products.Read.API.Exceptions;
+using System.Security.Claims;
 
 namespace Products.Read.API.Controllers
 {
@@ -12,14 +17,59 @@ namespace Products.Read.API.Controllers
     public class DevTestsController : ControllerBase
     {
         private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
+        private readonly ITokenDecoder _tokenDecoder;
         private readonly ILogger<DevTestsController> _logger;
         private readonly IProductMessageProcessor _productMessageProcessor;
 
-        public DevTestsController(IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger, IProductMessageProcessor productMessageProcessor)
+        public DevTestsController(IOptions<CloudAMQPSettings> cloudAmqpSettings, ITokenDecoder tokenDecoder, ILogger<DevTestsController> logger, IProductMessageProcessor productMessageProcessor)
         {
             _cloudAmqpSettings = cloudAmqpSettings;
+            _tokenDecoder = tokenDecoder;
             _logger = logger;
             _productMessageProcessor = productMessageProcessor;
+        }
+
+        // Claims
+        [HttpGet("[action]")]
+        [Authorize(Policy = "IsAdmin")]
+        public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
+        {
+            var contextClaims = HttpContext.User.Claims;
+            _logger.LogInformation("External Carts API method GetApiUserInfo HTTPCONTEXT CLAIMS COUNT: {count}", contextClaims.Count());    // 20
+            var actionClaims = User.Claims;
+            _logger.LogInformation("External Carts API method GetApiUserInfo ACTION CLAIMS COUNT: {count}", actionClaims.Count());          // 20
+            var username = User.Identity?.Name; // Works if "sub" or "name" claim is mapped
+            _logger.LogInformation("External Carts API method GetApiUserInfo was called. USERNAME: {username}", username);                  // null
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            _logger.LogInformation("External Carts API method GetApiUserInfo Owner Id: {id}.", ownerId);                                    // 3
+
+            string authHeaderPrefix = "Bearer ";
+            string authorizationHeaderValue = Request.Headers.Authorization.ToString();
+            string accessTokenFromHeader = authorizationHeaderValue.Substring(authHeaderPrefix.Length);
+
+            string? identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+            // string jsonIdentityToken = JsonSerializer.Serialize(identityToken, _jsonOptions);
+            _logger.LogInformation("External Carts API method GetApiUserInfo IDENTITY TOKEN from HttpContext: {idtoken}", identityToken);
+            string? accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            // string jsonAccessToken = JsonSerializer.Serialize(accessToken, _jsonOptions);
+            _logger.LogInformation("External Carts API method GetApiUserInfo ACCESS TOKEN from HttpContext: {accesstoken}", accessToken);
+
+            ApiUserInfoDTO apiUserInfoDTO = _tokenDecoder.GetTokenData(accessTokenFromHeader);
+
+            List<Claim> userClaims = HttpContext.User.Claims.ToList();
+            if (userClaims.Any())
+            {
+                foreach (var claim in userClaims)
+                {
+                    if (claim.Type == "role") apiUserInfoDTO.ApiUserClaimsRolesList.Add(claim.Value);
+                    apiUserInfoDTO.ApiUserClaimsClaimsList.Add($"{claim.Type} : {claim.Value}");
+                }
+            }
+            else
+            {
+                apiUserInfoDTO.ApiUserClaimsClaimsList.Add("User.Claims did not contain any claims.");
+            }
+            return Ok(apiUserInfoDTO);
         }
 
         [HttpPost("throwExceptionForTesting")]

@@ -18,8 +18,10 @@ namespace Carts.API.Auth
             return null;
         }
 
-        public ApiUserInfoDTO GetTokenData(string token)
+        public ApiUserInfoDTO GetTokenData(string? token)
         {
+            if (string.IsNullOrWhiteSpace(token)) return new ApiUserInfoDTO() { ErrorMessage = $"The provided token was a null or empty string." };
+
             JsonWebTokenHandler tokenHandler = new JsonWebTokenHandler();
             JsonWebToken? jsonWebToken = tokenHandler.ReadToken(token) as JsonWebToken;
 

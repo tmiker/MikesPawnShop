@@ -1,7 +1,7 @@
 ﻿@page "/products"
 @rendermode InteractiveServer
-@inject IProductsWriteHttpClient _writeSideHttpClient
-@inject IProductsReadHttpClient _readSideHttpClient
+@inject IProductsWriteHttpService _writeSideHttpClient
+@inject IProductsReadHttpService _readSideHttpClient
 @inject NavigationManager Nav
 
 <div class="card border-primary">

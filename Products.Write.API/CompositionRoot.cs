@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Products.Write.API.Auth;
 using Products.Write.API.Configuration;
 using Products.Write.Application;
 using Products.Write.Application.Configuration;
@@ -36,6 +37,9 @@ namespace Products.Write.API
             // Register Class Library services
             services.RegisterInfrastructureServices();
             services.RegisterApplicationServices();
+
+            // Auth Testing
+            services.AddScoped<ITokenDecoder, TokenDecoder>();
 
             return services;
         }

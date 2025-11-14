@@ -1,11 +1,13 @@
-﻿using Development.Blazor.DTOs.Read;
+﻿using Development.Blazor.Client.DTOs;
+using Development.Blazor.DTOs.Read;
 using Development.Blazor.DTOs.Tests;
 using Development.Blazor.Paging;
 
 namespace Development.Blazor.Abstractions
 {
-    public interface IProductsReadHttpClient
+    public interface IProductsReadHttpService
     {
+        Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetProductsReadApiUserInfoAsync(string? token = null);
         IAsyncEnumerable<ProductDTO> StreamProductsAsync();
         Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, string? ErrorMessage)> GetProductsAsync();
         Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? ProductSummaries, string? ErrorMessage)> GetProductSummariesAsync();

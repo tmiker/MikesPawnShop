@@ -1,4 +1,4 @@
-﻿namespace Development.Blazor.DTOs.Auth
+﻿namespace Products.Read.API.Auth
 {
     public class ApiUserInfoDTO
     {

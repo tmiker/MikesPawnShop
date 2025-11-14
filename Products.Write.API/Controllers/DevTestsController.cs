@@ -1,13 +1,18 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Products.Write.API.Auth;
 using Products.Write.API.Configuration;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.QueryResults;
 using Products.Write.Application.DTOs;
+using Products.Write.Auth;
 using Products.Write.Domain.Snapshots;
-using System;
+using System.Security.Claims;
 
 namespace Products.Write.API.Controllers
 {
@@ -17,15 +22,61 @@ namespace Products.Write.API.Controllers
     {
         private readonly IDevQueryService _devQueryService;
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ITokenDecoder _tokenDecoder;
         private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
         private readonly ILogger<DevTestsController> _logger;
 
-        public DevTestsController(IDevQueryService devQueryService , ICommandDispatcher commandDispatcher, IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger)
+        public DevTestsController(IDevQueryService devQueryService , ICommandDispatcher commandDispatcher, ITokenDecoder tokenDecoder, 
+            IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger)
         {
             _devQueryService = devQueryService;
             _commandDispatcher = commandDispatcher;
+            _tokenDecoder = tokenDecoder;
             _cloudAmqpSettings = cloudAmqpSettings;
             _logger = logger;
+        }
+
+        // Claims
+        [HttpGet("[action]")]
+        [Authorize(Policy = "IsAdmin")]
+        public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
+        {
+            var contextClaims = HttpContext.User.Claims;
+            _logger.LogInformation("External Carts API method GetApiUserInfo HTTPCONTEXT CLAIMS COUNT: {count}", contextClaims.Count());    // 20
+            var actionClaims = User.Claims;
+            _logger.LogInformation("External Carts API method GetApiUserInfo ACTION CLAIMS COUNT: {count}", actionClaims.Count());          // 20
+            var username = User.Identity?.Name; // Works if "sub" or "name" claim is mapped
+            _logger.LogInformation("External Carts API method GetApiUserInfo was called. USERNAME: {username}", username);                  // null
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            _logger.LogInformation("External Carts API method GetApiUserInfo Owner Id: {id}.", ownerId);                                    // 3
+
+            string authHeaderPrefix = "Bearer ";
+            string authorizationHeaderValue = Request.Headers.Authorization.ToString();
+            string accessTokenFromHeader = authorizationHeaderValue.Substring(authHeaderPrefix.Length);
+
+            string? identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
+            // string jsonIdentityToken = JsonSerializer.Serialize(identityToken, _jsonOptions);
+            _logger.LogInformation("External Carts API method GetApiUserInfo IDENTITY TOKEN from HttpContext: {idtoken}", identityToken);
+            string? accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            // string jsonAccessToken = JsonSerializer.Serialize(accessToken, _jsonOptions);
+            _logger.LogInformation("External Carts API method GetApiUserInfo ACCESS TOKEN from HttpContext: {accesstoken}", accessToken);
+
+            ApiUserInfoDTO apiUserInfoDTO = _tokenDecoder.GetTokenData(accessTokenFromHeader);
+
+            List<Claim> userClaims = HttpContext.User.Claims.ToList();
+            if (userClaims.Any())
+            {
+                foreach (var claim in userClaims)
+                {
+                    if (claim.Type == "role") apiUserInfoDTO.ApiUserClaimsRolesList.Add(claim.Value);
+                    apiUserInfoDTO.ApiUserClaimsClaimsList.Add($"{claim.Type} : {claim.Value}");
+                }
+            }
+            else
+            {
+                apiUserInfoDTO.ApiUserClaimsClaimsList.Add("User.Claims did not contain any claims.");
+            }
+            return Ok(apiUserInfoDTO);
         }
 
         // Query service propagated endpoints

@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Development.Blazor.Client.Services
 {
-    public class ClientCartHttpService : ICartHttpService
+    public class ClientCartHttpService : ICartsHttpService
     {
         private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         private readonly HttpClient _localAPIClient;
