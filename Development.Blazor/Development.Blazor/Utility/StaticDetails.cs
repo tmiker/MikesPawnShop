@@ -16,6 +16,7 @@ namespace Development.Blazor.Utility
         public const string ProductsWriteHttpClient_ProductsPath = "/api/productsManagement";
         public const string ProductsWriteHttpClient_DevTestsPath = "/api/devTests";
 
+        
 
     }
 }

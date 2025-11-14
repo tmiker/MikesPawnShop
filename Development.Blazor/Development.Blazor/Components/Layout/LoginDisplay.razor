@@ -1,0 +1,57 @@
+﻿@implements IDisposable
+@using System.Security.Claims;
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager;
+
+<ul class="navbar-nav me-auto">
+    <AuthorizeView>
+        <NotAuthorized>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="login">
+                    <i class="bi-door-open"></i> &nbsp; Login
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="register">
+                    <i class="bi-person-fill"></i> &nbsp; Register
+                </NavLink>
+            </li>
+        </NotAuthorized>
+        <Authorized>
+            <li class="nav-item px-3 button-logout">
+                <NavLink class="nav-link">
+                    <form action="logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                        <button type="submit" class="button-logout">
+                            <i class="bi-door-closed"></i> &nbsp; Logout @* (@context?.User?.Identity?.Name) *@
+                        </button>
+                    </form>
+                </NavLink>
+            </li>
+        </Authorized>
+    </AuthorizeView>
+</ul>
+
+
+@code {
+    private string? _currentUrl;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(args.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+}
