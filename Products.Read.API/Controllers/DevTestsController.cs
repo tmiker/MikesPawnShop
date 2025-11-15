@@ -31,7 +31,7 @@ namespace Products.Read.API.Controllers
 
         // Claims
         [HttpGet("[action]")]
-        [Authorize(Policy = "IsAdmin")]
+        // [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
         {
             var contextClaims = HttpContext.User.Claims;

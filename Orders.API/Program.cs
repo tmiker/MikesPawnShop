@@ -3,11 +3,23 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Orders.API.Abstractions;
 using Orders.API.Auth;
+using Scalar.AspNetCore;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddCors(setup =>
+{
+    setup.AddPolicy("AllowAnyPolicy", policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.WithExposedHeaders("X-Pagination");
+    });
+});
 
 // Configure Auth
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Note: As configured, Roles are not populated by HttpContext.User.Claims without this
@@ -48,9 +60,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Orders API");
+        options.WithTheme(ScalarTheme.Default);
+        options.EnableDarkMode();
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAnyPolicy");
 
 app.UseAuthentication();
 

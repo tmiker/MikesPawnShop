@@ -177,16 +177,11 @@ else
             {
                 _apiUserInfoDTO = result.ApiUserInfo;
             }
+            else _apiUserInfoDTO = new ApiUserInfoDTO() { ErrorMessage = result.ErrorMessage };
             this.StateHasChanged();
         }
     }
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var result = await _cartService.GetCartsApiUserInfoAsync();
-    //     if (result.IsSuccess)
-    //     {
-    //         _apiUserInfoDTO = result.ApiUserInfo;
-    //     }
-    // }
+    // OrdersHttpService.cs:line 22
+    // OrdersApiClaims.razor:line 175
 }

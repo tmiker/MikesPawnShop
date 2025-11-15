@@ -48,6 +48,7 @@ builder.Services.AddAuthentication(options =>
     // oidcOptions.Scope.Add(OpenIdConnectScope.OfflineAccess);
     oidcOptions.Scope.Add("roles");
     oidcOptions.Scope.Add("cartsapi.fullaccess");
+    oidcOptions.Scope.Add("productsreadapi.fullaccess");
     oidcOptions.Scope.Add("productswriteapi.fullaccess");
     oidcOptions.Scope.Add("accountsapi.fullaccess");
     oidcOptions.Scope.Add("ordersapi.fullaccess");

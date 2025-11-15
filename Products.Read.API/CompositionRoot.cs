@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Products.Read.API.Abstractions;
+using Products.Read.API.Auth;
 using Products.Read.API.Configuration;
 using Products.Read.API.Infrastructure.Data;
 using Products.Read.API.Infrastructure.Repositories;
@@ -29,6 +30,7 @@ namespace Products.Read.API
             services.AddScoped<IProductMessageProcessor, ProductMessageProcessor>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductQueryService, ProductQueryService>();
+            services.AddScoped<ITokenDecoder, TokenDecoder>();
 
             services.AddOptions<CloudAMQPSettings>().Configure<IConfiguration>((options, config) =>
             {

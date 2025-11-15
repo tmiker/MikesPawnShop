@@ -17,6 +17,7 @@ public static class Config
         new ApiScope[]
             {
                 new ApiScope("cartsapi.fullaccess"),
+                new ApiScope("productsreadapi.fullaccess"),
                 new ApiScope("productswriteapi.fullaccess"),
                 new ApiScope("accountsapi.fullaccess"),
                 new ApiScope("ordersapi.fullaccess")
@@ -28,6 +29,10 @@ public static class Config
             new ApiResource("cartsapi", "Shopping Carts API", new [] { "role" })
                 {
                     Scopes = { "cartsapi.fullaccess" }
+                },
+            new ApiResource("productsreadapi", "Products Read API", new[] { "role" })
+                {
+                    Scopes = { "productsreadapi.fullaccess" }
                 },
             new ApiResource("productswriteapi", "Products Write API", new[] { "role" })
                 {
@@ -62,6 +67,7 @@ public static class Config
                             IdentityServerConstants.StandardScopes.Profile,
                             "roles",
                             "cartsapi.fullaccess",
+                            "productsreadapi.fullaccess",
                             "productswriteapi.fullaccess",
                             "accountsapi.fullaccess",
                             "ordersapi.fullaccess"

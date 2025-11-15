@@ -177,6 +177,7 @@ else
             {
                 _apiUserInfoDTO = result.ApiUserInfo;
             }
+            else _apiUserInfoDTO = new ApiUserInfoDTO() { ErrorMessage = result.ErrorMessage };
             this.StateHasChanged();
         }
     }

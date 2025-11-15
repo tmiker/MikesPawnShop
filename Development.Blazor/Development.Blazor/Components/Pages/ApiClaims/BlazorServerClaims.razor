@@ -1,0 +1,126 @@
+﻿@page "/claims/blazorServerClaims"
+@using Development.Blazor.Client.Abstractions
+@using Development.Blazor.Client.DTOs
+@using System.Text
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@rendermode InteractiveServer
+
+<h3>Carts Auth Testing</h3>
+
+<h4 class="mt-4">This Blazor App Authentication State Task Data</h4>
+
+<div class="row mt-2">
+    <div class="col-4">
+        <a class="btn btn-primary form-control" @onclick="LoadAuthenticationStateAsync">Load Authentication State</a>
+    </div>
+    <div class="col-4">
+        <a class="btn btn-warning form-control" @onclick="ToggleShowBlazorAuthData">Toggle Show Blazor Auth Data</a>
+    </div>
+</div>
+
+@if (_showBlazorAuthData)
+{
+    <div class="row mt-2">
+        <div class="col-7">
+            <h5> Loaded OnAfterRender</h5>
+            @if (_claims is not null && _claims.Any())
+            {
+                <label>Claims List</label>
+                @foreach (var claim in _claims)
+                {
+                    <div class="row mt-2">
+                        <div class="col-5">
+                            <h6>Type: @claim.Type</h6>
+                        </div>
+                        <div class="col-6">
+                            <h6>Value: @claim.Value</h6>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="col-5">
+            <h5>Button Driven Data</h5>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <label>Auth Message</label>
+                    <textarea rows="4" type="text" class="form-control" @bind="_authMessage" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <div class="row mt-2">
+        <div class="col-12 text-danger">
+            <p><b><i>@_errorMessage</i></b></p>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <a class="btn btn-success form-control" @onclick="ClearError">Clear</a>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    // GET BLAZOR APP AUTH DATA
+
+    // [Inject]
+    // private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+
+    [CascadingParameter]
+    Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (authenticationStateTask == null) return;
+            var authState = await authenticationStateTask;
+            _claims = authState.User.Claims;
+            this.StateHasChanged();
+        }
+    }
+
+    private string? _authMessage;
+
+    private async Task LoadAuthenticationStateAsync()
+    {
+
+        // var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+
+        var user = (await authenticationStateTask).User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            var userClaimsStringBuilder = new StringBuilder();
+            foreach (var claim in user.Claims)
+            {
+                userClaimsStringBuilder.AppendLine($"Type: {claim.Type} = Value: {claim.Value}  ");
+            }
+            _authMessage = userClaimsStringBuilder.ToString();
+            Console.WriteLine($"User claims: \n{userClaimsStringBuilder}");
+        }
+        else
+        {
+            _authMessage = "The user is not authenticated.";
+        }
+    }
+
+    private bool _showBlazorAuthData = true;
+    private void ToggleShowBlazorAuthData() => _showBlazorAuthData = !_showBlazorAuthData;
+
+    private string? _errorMessage;
+    private void ClearError() => _errorMessage = null;
+
+
+}

@@ -27,9 +27,11 @@ namespace Orders.API.Controllers
         }
 
         [HttpGet("[action]")]
-        [Authorize(Policy = "IsAdmin")]
+        // [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
         {
+            // https://localhost:7019/api/devTests/getApiUserInfo
+
             var contextClaims = HttpContext.User.Claims;
             _logger.LogInformation("External Carts API method GetApiUserInfo HTTPCONTEXT CLAIMS COUNT: {count}", contextClaims.Count());    // 20
             var actionClaims = User.Claims;

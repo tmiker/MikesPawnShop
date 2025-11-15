@@ -1,6 +1,7 @@
 ﻿using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.DTOs;
 using Development.Blazor.Client.Utility;
+using System.Diagnostics;
 
 namespace Development.Blazor.HttpProviders
 {
@@ -16,9 +17,11 @@ namespace Development.Blazor.HttpProviders
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetOrdersApiUserInfoAsync(string? token = null)
         {
             string uri = $"{StaticData.OrdersHttpClient_DevTestsPath}{StaticData.OrdersHttpClient_GetApiUserInfoSubpath}";
+            Debug.WriteLine($"GET API USER INFO URI: {uri}");
             var client = _httpClientFactory.CreateClient(StaticData.OrdersHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            Debug.WriteLine($"GET API USER INFO REQUEST URI: {request.RequestUri}");
             HttpResponseMessage response = await client.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
