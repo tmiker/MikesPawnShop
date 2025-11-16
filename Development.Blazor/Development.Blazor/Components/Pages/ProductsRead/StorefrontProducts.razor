@@ -76,6 +76,9 @@
                                     <td>
                                         <a class="btn btn-primary" @onclick="() => Detail(product.AggregateId)">Detail</a>
                                     </td>
+                                    <td>
+                                        <a class="btn btn-success" @onclick="() => AddToCart(product.AggregateId)">Add to Cart</a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -108,9 +111,6 @@
                 </div>
             }
         </div>
-
-        
-
     </div>
 
     <div class="card-footer text-center bg-primary text-light">
@@ -131,32 +131,31 @@
     public EventCallback PageBackwardCallback { get; set; }
     [Parameter]
     public EventCallback<Guid> DetailCallback { get; set; }
-    
+    [Parameter]
+    public EventCallback<Guid> AddToCartCallback { get; set; }
 
     private async Task PageForward()
     {
-        if (PageForwardCallback.HasDelegate)
-        {
-            await PageForwardCallback.InvokeAsync();
-        }
+        if (PageForwardCallback.HasDelegate) await PageForwardCallback.InvokeAsync();
     }
 
     private async Task PageBackward()
     {
-        if (PageBackwardCallback.HasDelegate)
-        {
-            await PageBackwardCallback.InvokeAsync();
-        }
+        if (PageBackwardCallback.HasDelegate) await PageBackwardCallback.InvokeAsync();
     }
 
     private async Task Detail(Guid productId)
     {
-        if (DetailCallback.HasDelegate)
-        {
-            await DetailCallback.InvokeAsync(productId);
-        }
+        if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(productId);
     }
 
+    private async Task AddToCart(Guid productId)
+    {
+        if (AddToCartCallback.HasDelegate) await AddToCartCallback.InvokeAsync(productId);
+    }
+}
+
+@*  
     
     // private string? _nameFilter = null;
     // private string? _categoryFilter = null;
@@ -223,4 +222,5 @@
     //         this.StateHasChanged();
     //     }
     // }
-}
+
+*@

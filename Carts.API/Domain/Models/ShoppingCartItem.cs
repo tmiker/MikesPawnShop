@@ -20,7 +20,7 @@ namespace Carts.API.Domain.Models
         public ShoppingCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO, string shoppingCartId)
         {
             ShoppingCartId = shoppingCartId;
-            LineNumber = addShoppingCartItemDTO.LineNumber;
+            // LineNumber = addShoppingCartItemDTO.LineNumber;
             ProductId = addShoppingCartItemDTO.ProductId;
             Category = addShoppingCartItemDTO.Category;
             Name = addShoppingCartItemDTO.Name;
@@ -34,6 +34,10 @@ namespace Carts.API.Domain.Models
         public void UpdateItemQuantity(double quantity)
         {
             Quantity += quantity;
+        }
+        public void SetLineNumber(int number)
+        {
+            LineNumber = number;
         }
 
         public ShoppingCartItemDTO ToShoppingCartItemDTO()

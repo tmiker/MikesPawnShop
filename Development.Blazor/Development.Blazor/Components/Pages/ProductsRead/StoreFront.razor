@@ -1,6 +1,8 @@
 ﻿@page "/storefront"
+@using Development.Blazor.Client.DTOs.Carts
 @rendermode InteractiveServer
-@inject IProductsReadHttpService _readSideHttpClient
+@inject IProductsReadHttpService _productReadSideHttpClient
+@inject ICartsHttpService _cartsHttpClient
 @inject NavigationManager Nav
 
 <div class="card border-primary">
@@ -43,6 +45,9 @@
             <div class="col-2">
                 <a class="btn btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
             </div>
+            <div class="col-2">
+                <a class="btn btn-primary form-control mt-4" @onclick="ToggleShowCart">@_cartButtonText</a>
+            </div>
         </div>
     </div>
 
@@ -61,7 +66,7 @@
                     {
                         <CascadingValue Name="Products" Value="@Products">
                             <CascadingValue Name="PagingData" Value="@PagingData" >
-                                <StorefrontProducts DetailCallback="Detail" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward"/>
+                                <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward"/>
                             </CascadingValue>
                         </CascadingValue>
                     }
@@ -128,12 +133,61 @@
         await RefreshData();
     }
 
-    private void Detail(Guid aggregateId) => SelectedProduct = Products?.FirstOrDefault(p => p.AggregateId == aggregateId);
+    private void Detail(Guid productId) => SelectedProduct = Products?.FirstOrDefault(p => p.AggregateId == productId);
     private void BackToList() => SelectedProduct = null;
+
+    
+    private string? _cartButtonText = "Cart"; 
+    private async Task ToggleShowCart()
+    {
+        if (_showCart)
+        {
+            _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCart.Items.Count})";
+            _showCart = false;
+        }
+        else
+        {
+            if (ShoppingCart is null)
+            {
+                var result = await _cartsHttpClient.GetShoppingCartAsync();
+                if (result.IsSuccess) ShoppingCart = result.ShoppingCart;
+                else _errorMessage = result.ErrorMessage;
+            }
+            _cartButtonText = "Continue Shopping";
+            _showCart = true;
+        }
+    }
+
+    private async Task AddToCart(Guid productId)
+    {
+        ProductSummaryDTO? product = Products!.FirstOrDefault(p => p.AggregateId == productId);
+        if (product is null) return;
+        AddShoppingCartItemDTO addShoppingCartItemDTO = new AddShoppingCartItemDTO()
+        {
+            ProductId = product.AggregateId.ToString(),
+            Category = product.Category,
+            Name = product.Name,
+            Currency = product.Currency,
+            Price = product.Price,
+            UOM = product.UOM,
+            Quantity = 1,
+            ThumbnailUrl = null
+        };
+        var result = await _cartsHttpClient.AddNewCartItemAsync(addShoppingCartItemDTO);
+        if (result.IsSuccess)
+        {
+            ShoppingCart = null;    // will refresh if select cart view - otherwise, due to Event Sourcing lag, if ShoppingCart is not null, add the product to the existing cart object manually
+            _successMessage = "Product added to cart.";
+        }
+        else
+        {
+            _errorMessage = result.ErrorMessage;
+        }
+    }
 
     private async Task RefreshData()
     {
-        var result = await _readSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_nameFilter, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+        var result = await _productReadSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_nameFilter, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
         if (result.IsSuccess)
         {
             Products = result.Products?.ToList();

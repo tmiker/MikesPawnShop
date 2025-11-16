@@ -3,7 +3,7 @@
     public class AddShoppingCartItemDTO
     {
         // public string? ShoppingCartId { get; init; }  // assigned in Domain
-        public int LineNumber { get; init; }
+        // public int LineNumber { get; init; }
         public string? ProductId { get; init; }
         public string? Category { get; init; }
         public string? Name { get; init; }

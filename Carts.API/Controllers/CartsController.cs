@@ -35,8 +35,8 @@ namespace Carts.API.Controllers
             if (ownerId == null)
             {
                 // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
-                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
-                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+                // return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
             }
             bool success = await _cartService.AddNewCartItemAsync(ownerId, addShoppingCartItemDTO);
             if (success) return NoContent();

@@ -29,6 +29,8 @@ namespace Carts.API.Domain.Models
             ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == item.ProductId);
             if (existingItem is null)
             {
+                int maxLineNumber = Items.Count > 0 ? Items.Max(i => i.LineNumber) : 0;
+                item.SetLineNumber(maxLineNumber + 1);
                 Items.Add(item);
             }
             else

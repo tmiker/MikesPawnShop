@@ -1,7 +1,151 @@
-﻿<h3>Storefront Shopping Cart</h3>
+﻿@using Development.Blazor.Client.DTOs.Carts
+<h3>Storefront Shopping Cart</h3>
+
+@rendermode InteractiveServer
+@inject NavigationManager _nav
+@inject ICartsHttpService _cartService
+
+
+<div class="row mt-2">
+    <div class="col-2">
+    </div>
+    <div class="col-8">
+        <h5 class="text-center"><b>My Shopping Cart</b></h5>
+    </div>
+    <div class="col-2">
+        <a class="btn btn-success form-control" @onclick="ReviewOrder"><i class="bi-lightning-charge"></i> &nbsp; Checkout</a>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-2">
+        <p class="text-danger-alt"><b><i>Count: @MyCart?.Items?.Count</i></b></p>
+    </div>
+    <div class="col-3">
+        <p class="text-danger-alt"><b><i>MyCart Id: @MyCart?.Id</i></b></p>
+    </div>
+    <div class="col-5">
+        <p class="text-danger-alt"><b><i>ShoppingCart Id: @MyCart?.ShoppingCartId</i></b></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        @if (MyCart?.Items != null)
+        {
+            <table class="table table-bordered">
+                <thead class="bg-success text-light">
+                    <tr>
+                        <th>Line Number</th>
+                        <th>Product Id</th>
+                        <th>Category</th>
+                        <th>Product Name</th>
+                        <th>Price Each</th>
+                        <th>UOM</th>
+                        <th>Quantity</th>
+                        <th>Thumb URL</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in MyCart.Items)
+                    {
+                        <tr>
+                            <td>@item.LineNumber</td>
+                            <td>@item.ProductId?.Substring(0, 6)...</td>
+                            <td>@item.Category</td>
+                            <td>@item.Name</td>
+                            <td>@item.Price</td>
+                            <td>@item.UOM</td>
+                            <td>@item.Quantity</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.ThumbnailUrl))
+                                {
+                                    <img src="@item.ThumbnailUrl" alt="thumbnail" width="100" />
+                                }
+                                else
+                                {
+                                    <p>pending</p>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-primary form-control" @onclick="() => ProductDetail(item.ProductId!)"><b><i class="bi-list"></i>&nbsp; Detail</b></a>
+                            </td>
+                            <td>
+                                <a class="btn btn-success form-control" @onclick="() => IncrementAsync(item.ProductId!)"><b>+</b></a>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger form-control" @onclick="() => DecrementAsync(item.ProductId!)"><b>-</b></a>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger form-control" @onclick="() => RemoveItemAsync(item.ProductId!)"><b><i class="bi-trash"></i>&nbsp; Remove</b></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <br/>
+            <div class="row mt-2">
+                <div class="col-2">
+                    <h5 class="text-primary"><b><i>Order Total: @MyCart?.TotalAmount</i></b></h5>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="text-warning-alt"><i>No cart items were found.</i></h5>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 
 @code {
-
     [CascadingParameter(Name = "ShoppingCart")]
-    private ShoppingCartDTO? _shoppingCart { get; set; }
+    public ShoppingCartDTO? MyCart { get; set; }
+
+
+    public void ProductDetail(string productId)
+    {
+        _nav.NavigateTo($"/productDetail/{productId}");
+    }
+
+    private async Task IncrementAsync(string productId)
+    {
+        var result = await _cartService.UpdateProductQuantityAsync(productId, 1);
+        if (result.IsSuccess)
+        {
+            var item = MyCart!.Items?.FirstOrDefault(i => i.ProductId == productId);
+            if (item is not null) item.Quantity += 1.0;
+        }
+    }
+
+    private async Task DecrementAsync(string productId)
+    {
+        var result = await _cartService.UpdateProductQuantityAsync(productId, -1);
+        if (result.IsSuccess)
+        {
+            var item = MyCart!.Items?.FirstOrDefault(i => i.ProductId == productId);
+            if (item is not null) item.Quantity -= 1.0;
+        }
+    }
+
+    private async Task RemoveItemAsync(string productId)
+    {
+        var result = await _cartService.RemoveCartItemAsync(productId);
+        if (result.IsSuccess)
+        {
+            var item = MyCart!.Items?.FirstOrDefault(i => i.ProductId == productId);
+            if (item is not null) MyCart.Items!.Remove(item);
+        }
+    }
+
+    private void ReviewOrder()
+    {
+        _nav.NavigateTo("/reviewOrder");
+    }
 }

@@ -1,8 +1,8 @@
-﻿namespace Development.Blazor.DTOs.Carts
+﻿namespace Development.Blazor.Client.DTOs.Carts
 {
     public class AddShoppingCartItemDTO
     {
-        public int LineNumber { get; init; }
+        // public int LineNumber { get; init; }
         public string? ProductId { get; init; }
         public string? Category { get; init; }
         public string? Name { get; init; }

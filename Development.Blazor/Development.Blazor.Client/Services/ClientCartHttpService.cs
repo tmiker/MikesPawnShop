@@ -1,9 +1,11 @@
 ﻿using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.DTOs;
+using Development.Blazor.Client.DTOs.Carts;
+using Development.Blazor.Client.Utility;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace Development.Blazor.Client.Services
@@ -24,30 +26,6 @@ namespace Development.Blazor.Client.Services
             _localAPIClient = localAPIClient;
             _navigationManager = navigationManager;
             _authenticationStateProvider = authenticationStateProvider;
-        }
-
-        public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> CheckCartsOidcTestEndpointAsync(string? token = null)
-        {
-            var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                var request = new HttpRequestMessage(HttpMethod.Get, "localapi/cartsproxy/oidcTestEndpoint");
-                request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
-
-                var response = await _localAPIClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-
-                ApiUserInfoDTO? info = await response.Content.ReadFromJsonAsync<ApiUserInfoDTO>();
-
-                return (true, info, null);
-            }
-            else
-            {
-                string errorMessage = "Error Testing Endpoint";
-                return (false, null, errorMessage);
-            }
         }
 
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetCartsApiUserInfoAsync(string? token = null)
@@ -73,6 +51,31 @@ namespace Development.Blazor.Client.Services
 
             _navigationManager.NavigateTo("/login");
             return (false, null, "Invalid Credentials.");
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> UpdateProductQuantityAsync(string productId, int amount, string? token = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> RemoveCartItemAsync(string productId, string? token = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<(bool IsSuccess, ShoppingCartDTO? ShoppingCart, string? ErrorMessage)> GetShoppingCartAsync(string? token = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> RemoveShoppingCartAsync(string? token = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

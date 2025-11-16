@@ -1,4 +1,4 @@
-﻿namespace Development.Blazor.DTOs.Carts
+﻿namespace Development.Blazor.Client.DTOs.Carts
 {
     public class ShoppingCartItemDTO
     {
@@ -10,7 +10,7 @@
         public string? Currency { get; init; }
         public decimal Price { get; init; }
         public string? UOM { get; init; }
-        public double Quantity { get; init; }
+        public double Quantity { get; set; }
         public string? ThumbnailUrl { get; init; }
     }
 }

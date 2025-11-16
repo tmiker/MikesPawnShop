@@ -1,6 +1,8 @@
 ﻿using Carts.API.Abstractions;
 using Carts.API.Auth;
+using Carts.API.DTOs;
 using Carts.API.Exceptions;
+using Carts.API.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,13 +18,15 @@ namespace Carts.API.Controllers
     [ApiController]
     public class DevTestsController : ControllerBase
     {
+        private readonly ICartService _cartService;
         private readonly ITokenDecoder _tokenDecoder;
         private readonly ILogger<DevTestsController> _logger;
 
         JsonSerializerOptions _jsonOptions = new JsonSerializerOptions() { WriteIndented = true };
 
-        public DevTestsController(ITokenDecoder tokenDecoder, ILogger<DevTestsController> logger)
+        public DevTestsController(ICartService cartService, ITokenDecoder tokenDecoder, ILogger<DevTestsController> logger)
         {
+            _cartService = cartService;
             _tokenDecoder = tokenDecoder;
             _logger = logger;
         }
@@ -68,6 +72,14 @@ namespace Carts.API.Controllers
                 apiUserInfoDTO.ApiUserClaimsClaimsList.Add("User.Claims did not contain any claims.");
             }
             return Ok(apiUserInfoDTO);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult<ShoppingCartDTO?>> GetShoppingCartByOwnerId(string id)
+        {
+            ShoppingCartDTO? cartDTO = await _cartService.GetCartAsync(id);
+            if (cartDTO is not null) return Ok(cartDTO);
+            return NotFound($"A shopping cart with Owner Id {id} was not found.");
         }
 
         private async Task LogIdentityInformation()
