@@ -13,7 +13,7 @@
         <div class="row mt-2">
             <div class="col-2">
                 <label for="namefilter">Name Filter:</label>
-                <input id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
+                <input class="form-control" id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
             </div>
             <div class="col-2">
                 <label for="cat">Category Filter:</label>
@@ -38,10 +38,10 @@
             </div>
             <div class="col-2">
                 <label for="pagesize">Page Size:</label>
-                <input id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
+                <input class="form-control" id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
             </div>
             <div class="col-2">
-                <a class="btn btn-sm btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
+                <a class="btn btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
             </div>
         </div>
     </div>
@@ -61,14 +61,14 @@
                     {
                         <CascadingValue Name="Products" Value="@Products">
                             <CascadingValue Name="PagingData" Value="@PagingData" >
-                                <StorefrontProducts DetailCallback="Detail" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward" BackToListCallback="BackToList"/>
+                                <StorefrontProducts DetailCallback="Detail" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward"/>
                             </CascadingValue>
                         </CascadingValue>
                     }
                     else
                     {
                         <CascadingValue Name="SelectedProduct" Value="@SelectedProduct">
-                            <StorefrontProductDetail />
+                            <StorefrontProductDetail BackToListCallback="BackToList" />
                         </CascadingValue>
                     }
                 }

@@ -82,7 +82,7 @@ namespace Products.Write.API.Controllers
         // Query service propagated endpoints
 
         [HttpGet("pagedAndFilteredProductSnapshots")]
-        public async Task<ActionResult<PagedProductSnapshotResult>> GetFilteredProductSnapshots(
+        public async Task<ActionResult<PagedProductSnapshotResult>> GetPagedAndFilteredProductSnapshots(
             string? aggregateId,
             string? category,
             string? sortColumn,

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Products.Write.Application.Abstractions;
@@ -9,8 +8,6 @@ using Products.Write.Domain.Base;
 using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Data;
 using Products.Write.Infrastructure.DataAccess;
-using System.Collections.Generic;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Products.Write.Application.Services
 {
@@ -71,10 +68,10 @@ namespace Products.Write.Application.Services
                     break;
             }
 
-            IEnumerable<ProductSnapshot> records = await query.ToListAsync();
+            IEnumerable<ProductSnapshot> records = query.ToList();
             int totalCount = records.Count();
 
-            IEnumerable<ProductSnapshot> result = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            IEnumerable<ProductSnapshot> result = records.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
