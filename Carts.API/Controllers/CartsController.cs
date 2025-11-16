@@ -1,13 +1,10 @@
 ﻿using Carts.API.Abstractions;
-using Carts.API.Auth;
 using Carts.API.DTOs;
 using Carts.API.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -30,27 +27,68 @@ namespace Carts.API.Controllers
             _logger = logger;
         }
 
+        [HttpPost("items")]
+        // [Authorize]
+        public async Task<IActionResult> AddNewCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO)
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null)
+            {
+                // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+            }
+            bool success = await _cartService.AddNewCartItemAsync(ownerId, addShoppingCartItemDTO);
+            if (success) return NoContent();
+            else return BadRequest("Error adding the item to your cart. Please contact support.");
+        }
+
+        [HttpPut("items")]
+        // [Authorize]
+        public async Task<IActionResult> UpdateProductQuantity(string productId, int amount)
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null)
+            {
+                // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+            }
+            bool success = await _cartService.UpdateCartItemQuantityAsync(ownerId, productId, amount);
+            if (success) return NoContent();
+            else return BadRequest("Error updating product quantity in shopping cart. Ensure a cart containing the corresponding product exists.");
+        }
+
+        [HttpDelete("items")]
+        // [Authorize]
+        public async Task<IActionResult> RemoveCartItem(string productId)
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null)
+            {
+                // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+            }
+            bool success = await _cartService.RemoveCartItemAsync(ownerId, productId);
+            if (success) return NoContent();
+            else return BadRequest("Error removing the item from your cart. Please contact support.");
+        }
+
         [HttpGet]
         public async Task<ActionResult<ShoppingCartDTO?>> GetShoppingCart()
         {
             await LogIdentityInformation();
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+            if (ownerId == null)
+            {
+                // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+            }
             //return BadRequest($"User identity information unavailable. Unauthorized access to restricted resource.");
             ShoppingCartDTO? cartDTO = await _cartService.GetCartAsync(ownerId);
             return Ok(cartDTO);
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> SaveShoppingCart(ShoppingCartDTO cartDTO)
-        {
-            //await LogIdentityInformation();
-            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
-            //return BadRequest($"User identity information unavailable. Unauthorized access to restricted resource.");
-            bool success = await _cartService.UpdateCartAsync(cartDTO, ownerId);
-            if (success) return NoContent();
-            else return BadRequest("Error saving shopping cart.");
         }
 
         [HttpDelete]
@@ -58,7 +96,12 @@ namespace Carts.API.Controllers
         {
             //await LogIdentityInformation();
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+            if (ownerId == null)
+            {
+                // throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+                return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
+                // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
+            }
             //return BadRequest($"User identity information unavailable. Unauthorized access to restricted resource.");
             bool success = await _cartService.RemoveCartAsync(ownerId);
             if (success) return NoContent();

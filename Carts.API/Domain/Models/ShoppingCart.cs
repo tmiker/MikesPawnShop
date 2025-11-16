@@ -24,21 +24,39 @@ namespace Carts.API.Domain.Models
             Items = new List<ShoppingCartItem>();
         }
 
-        public void UpdateCartItems(IEnumerable<ShoppingCartItem> items)
+        public void AddCartItem(ShoppingCartItem item)
         {
-            Items.Clear();
-            Items.AddRange(items);
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+            if (existingItem is null)
+            {
+                Items.Add(item);
+            }
+            else
+            {
+                existingItem.UpdateItemQuantity(item.Quantity);
+            }
         }
 
-        public ShoppingCart(ShoppingCartDTO shoppingCartDTO, string ownerId)
+        public void UpdateCartItemQuantity(string productId, double amount)
         {
-            List<ShoppingCartItem> items = new List<ShoppingCartItem>();
-            shoppingCartDTO.Items.ForEach(dto => items.Add(new ShoppingCartItem(dto)));
-            Id = shoppingCartDTO.Id;
-            ShoppingCartId = shoppingCartDTO.ShoppingCartId;
-            OwnerId = ownerId;
-            CreditLimit = shoppingCartDTO.CreditLimit;
-            Items = items;
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
+            if (existingItem is not null)
+            {
+                existingItem.UpdateItemQuantity(amount);
+                if (existingItem.Quantity <= 0)
+                {
+                    Items.Remove(existingItem);
+                }
+            }
+        }
+
+        public void RemoveCartItem(string productId)
+        {
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
+            if (existingItem is not null)
+            {
+                Items.Remove(existingItem);
+            }
         }
 
         public ShoppingCartDTO ToShoppingCartDTO()

@@ -1,14 +1,9 @@
 ﻿using Carts.API.DTOs;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace Carts.API.Domain.Models
 {
     public class ShoppingCartItem
     {
-        //[BsonId]
-        //[BsonRepresentation(BsonType.ObjectId)]
-        // public string? Id { get; set; }
         public string? ShoppingCartId { get; private set; }
         public int LineNumber { get; private set; }
         public string? ProductId { get; private set; }
@@ -22,18 +17,23 @@ namespace Carts.API.Domain.Models
 
         private ShoppingCartItem() { }
 
-        public ShoppingCartItem(ShoppingCartItemDTO shoppingCartItemDTO)
+        public ShoppingCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO, string shoppingCartId)
         {
-            ShoppingCartId = shoppingCartItemDTO.ShoppingCartId;
-            LineNumber = shoppingCartItemDTO.LineNumber;
-            ProductId = shoppingCartItemDTO.ProductId;
-            Category = shoppingCartItemDTO.Category;
-            Name = shoppingCartItemDTO.Name;
-            Currency = shoppingCartItemDTO.Currency;
-            Price = shoppingCartItemDTO.Price;
-            UOM = shoppingCartItemDTO.UOM;
-            Quantity = shoppingCartItemDTO.Quantity;
-            ThumbnailUrl = shoppingCartItemDTO.ThumbnailUrl;
+            ShoppingCartId = shoppingCartId;
+            LineNumber = addShoppingCartItemDTO.LineNumber;
+            ProductId = addShoppingCartItemDTO.ProductId;
+            Category = addShoppingCartItemDTO.Category;
+            Name = addShoppingCartItemDTO.Name;
+            Currency = addShoppingCartItemDTO.Currency;
+            Price = addShoppingCartItemDTO.Price;
+            UOM = addShoppingCartItemDTO.UOM;
+            Quantity = addShoppingCartItemDTO.Quantity;
+            ThumbnailUrl = addShoppingCartItemDTO.ThumbnailUrl;
+        }
+
+        public void UpdateItemQuantity(double quantity)
+        {
+            Quantity += quantity;
         }
 
         public ShoppingCartItemDTO ToShoppingCartItemDTO()
