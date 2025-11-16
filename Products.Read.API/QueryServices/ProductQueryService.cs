@@ -70,10 +70,13 @@ namespace Products.Read.API.QueryServices
                     break;
             }
 
+            List<Product> records = await query.ToListAsync();
+            int totalCount = records.Count;
+
             var products = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             List<ProductDTO> productDTOs = MapProductsToDTOs(products);
-            PaginationMetadata metadata = new PaginationMetadata(products.Count(), pageSize, pageNumber);
+            PaginationMetadata metadata = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
             return new GetPagedAndFilteredProductsResult(true, productDTOs, metadata, null);
         }
@@ -243,6 +246,9 @@ namespace Products.Read.API.QueryServices
                     break;
             }
 
+            List<Product> records = await query.ToListAsync();
+            int totalCount = records.Count;
+
             var products = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             List<ProductSummaryDTO> summaryDTOs = new List<ProductSummaryDTO>();
@@ -272,7 +278,7 @@ namespace Products.Read.API.QueryServices
                 summaryDTOs.Add(dto);
             }
 
-            PaginationMetadata metadata = new PaginationMetadata(summaryDTOs.Count(), pageSize, pageNumber);
+            PaginationMetadata metadata = new PaginationMetadata(totalCount, pageSize, pageNumber);
             return new GetPagedAndFilteredProductSummariesResult(true, summaryDTOs, metadata, null);
         }
 

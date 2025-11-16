@@ -9,6 +9,8 @@ using Products.Write.Domain.Base;
 using Products.Write.Domain.Snapshots;
 using Products.Write.Infrastructure.Data;
 using Products.Write.Infrastructure.DataAccess;
+using System.Collections.Generic;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Products.Write.Application.Services
 {
@@ -69,9 +71,11 @@ namespace Products.Write.Application.Services
                     break;
             }
 
+            IEnumerable<ProductSnapshot> records = await query.ToListAsync();
+            int totalCount = records.Count();
 
             IEnumerable<ProductSnapshot> result = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            int totalCount = result.Count();
+            
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
             return (true, result, pagingData, null);
@@ -96,8 +100,11 @@ namespace Products.Write.Application.Services
                 Product product = new Product(aggregateEvents);
                 snapshots.Add(product.GetSnapshot());
             }
+
+            int totalCount = snapshots.Count();
+
             IEnumerable<ProductSnapshot> result = snapshots.OrderBy(p => p.Id).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            int totalCount = result.Count();
+            
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
             return (true, result, pagingData, null);
@@ -149,6 +156,7 @@ namespace Products.Write.Application.Services
 
             List<EventRecord> records = await query.ToListAsync();
             int totalCount = records.Count();
+
             var result = records.OrderBy(e => e.OccurredAt).Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
@@ -170,11 +178,14 @@ namespace Products.Write.Application.Services
             query = query.Where(o => o.AggregateVersion >= minVersion && o.AggregateVersion <= maxVersion);
             query = query.OrderBy(o => o.OccurredAt);
 
-            List<OutboxRecord> records = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<OutboxRecord> records = await query.ToListAsync();
             int totalCount = records.Count();
+
+            List<OutboxRecord> result = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
-            return (true, records, pagingData, null);
+            return (true, result, pagingData, null);
         }
 
         public async Task<(bool IsSuccess, IEnumerable<SnapshotRecord>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetSnapshotRecordsAsync(
@@ -189,11 +200,14 @@ namespace Products.Write.Application.Services
             if (aggregateId is not null && aggregateId != default(Guid)) query = query.Where(r => r.AggregateId == aggregateId);
             query = query.Where(r => r.AggregateVersion >= minVersion && r.AggregateVersion <= maxVersion);
 
-            List<SnapshotRecord> records = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<SnapshotRecord> records = await query.ToListAsync();
             int totalCount = records.Count();
+
+            List<SnapshotRecord> result = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
             PaginationMetadata pagingData = new PaginationMetadata(totalCount, pageSize, pageNumber);
 
-            return (true, records, pagingData, null);
+            return (true, result, pagingData, null);
         }
     }
 }

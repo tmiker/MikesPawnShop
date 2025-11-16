@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Pages\Carts\" />
     <Folder Include="DTOs\Auth\" />
     <Folder Include="Services\" />
   </ItemGroup>

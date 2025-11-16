@@ -1,0 +1,29 @@
+﻿<h3>Storefront Product Detail</h3>
+
+<h4>Product AggregateId: @SelectedProduct?.AggregateId</h4>
+
+
+<br />
+<div class="row">
+    <div class="col-5 offset-5">
+        <a class="btn btn-primary form-control" @onclick="BackToList">Back</a>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter(Name = "SelectedProduct")]
+    public ProductSummaryDTO? SelectedProduct { get; set; }
+
+    [Parameter]
+    public EventCallback BackToListCallback { get; set; }
+
+    private async Task BackToList()
+    {
+        if (BackToListCallback.HasDelegate)
+        {
+            await BackToListCallback.InvokeAsync();
+        }
+    }
+
+}
