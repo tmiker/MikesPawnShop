@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Orders.API.Abstractions;
 using Orders.API.Auth;
+using Orders.API.Infrastructure.Mongo;
+using Orders.API.Services;
 using Scalar.AspNetCore;
 using System.Security.Claims;
 
@@ -49,6 +52,11 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<ITokenDecoder, TokenDecoder>();
+
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetRequiredSection(nameof(MongoSettings)));
+builder.Services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptions<MongoSettings>>().Value);
+
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -30,7 +30,7 @@
 
         public const string OrdersHttpClient_ClientName = "OrdersHttpClient";
         public const string OrdersHttpClient_BaseURL = "https://localhost:7019";
-        public const string OrdersHttpClient_ProductsPath = "/api/accounts";
+        public const string OrdersHttpClient_OrdersPath = "/api/orders";
         public const string OrdersHttpClient_DevTestsPath = "/api/devTests";
         public const string OrdersHttpClient_GetApiUserInfoSubpath = "/getApiUserInfo";
     }

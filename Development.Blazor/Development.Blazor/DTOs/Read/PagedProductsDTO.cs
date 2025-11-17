@@ -1,4 +1,4 @@
-﻿using Development.Blazor.Paging;
+﻿using Development.Blazor.Client.Paging;
 
 namespace Development.Blazor.DTOs.Read
 {

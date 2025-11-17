@@ -1,7 +1,7 @@
 ﻿using Development.Blazor.Client.DTOs;
+using Development.Blazor.Client.Paging;
 using Development.Blazor.DTOs.Tests;
 using Development.Blazor.DTOs.Write;
-using Development.Blazor.Paging;
 
 namespace Development.Blazor.Abstractions
 {

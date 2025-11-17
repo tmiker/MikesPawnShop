@@ -1,0 +1,39 @@
+﻿@page "/orders"
+@rendermode InteractiveServer
+@inject IOrdersHttpService _orderHttpService
+
+@using Development.Blazor.Client.DTOs.Orders
+<h3>Orders</h3>
+
+
+<div class="row mt-2">
+    <div class="col-12">
+        <p>Success: @_reviewOrderResult?.IsSuccess</p>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        <p>Error: @_reviewOrderResult?.ErrorMessage</p>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-2">
+        <a class="btn btn-primary form-control" @onclick="ReviewOrderAsync">Review Order</a>
+    </div>
+</div>
+@code {
+
+
+    private ReviewOrderResultDTO? _reviewOrderResult;
+
+    private async Task ReviewOrderAsync()
+    {
+        var result = await _orderHttpService.ReviewOrderAsync();
+        if (result.IsSuccess)
+        {
+            _reviewOrderResult = result.ReviewOrderResult;
+        }
+    }
+}

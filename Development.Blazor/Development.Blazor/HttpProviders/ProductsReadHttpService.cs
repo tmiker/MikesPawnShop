@@ -4,8 +4,8 @@ using Development.Blazor.DTOs.Tests;
 using Development.Blazor.Client.Utility;
 using System.Text;
 using System.Text.Json;
-using Development.Blazor.Paging;
 using Development.Blazor.Client.DTOs;
+using Development.Blazor.Client.Paging;
 
 namespace Development.Blazor.HttpProviders
 {

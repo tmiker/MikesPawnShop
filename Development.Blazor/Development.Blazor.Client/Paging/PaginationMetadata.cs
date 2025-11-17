@@ -1,4 +1,4 @@
-﻿namespace Development.Blazor.Paging
+﻿namespace Development.Blazor.Client.Paging
 {
     public class PaginationMetadata
     {
