@@ -74,7 +74,7 @@
                                     <td>@product.QuantityAllocated</td>
                                     <td>@product.QuantityAvailable</td>
                                     <td>
-                                        <a class="btn btn-primary" @onclick="() => Detail(product.AggregateId)">Detail</a>
+                                        <a class="btn btn-primary" @onclick="() => Detail(product.Id)">Detail</a>
                                     </td>
                                     <td>
                                         <a class="btn btn-success" @onclick="() => AddToCart(product.AggregateId)">Add to Cart</a>
@@ -113,6 +113,30 @@
         </div>
     </div>
 
+    <br />
+    <div class="row mx-2 mt-2">
+        <div class="col-2">
+            <a class="btn btn-success form-control" @onclick="LoadFullProductsList">Load Full Product Cards</a>
+        </div>
+        @if (Products != null)
+        { 
+            <div class="col-2">
+                <a class="btn btn-success form-control" @onclick="DeleteFullProductsList">Delete Full Product Cards</a>
+            </div>
+        }
+    </div>
+    <div class="row mt-2">
+        @if (Products != null && Products.Any())
+        {
+            @foreach (var product in Products)
+            {
+                <div class="col-4">
+                    <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" />
+                </div>
+            }
+        }
+    </div>
+
     <div class="card-footer text-center bg-primary text-light">
         <h5><b><i>Be good to your pets!</i></b></h5>
     </div>
@@ -130,7 +154,7 @@
     [Parameter]
     public EventCallback PageBackwardCallback { get; set; }
     [Parameter]
-    public EventCallback<Guid> DetailCallback { get; set; }
+    public EventCallback<int> DetailCallback { get; set; }
     [Parameter]
     public EventCallback<Guid> AddToCartCallback { get; set; }
 
@@ -144,14 +168,29 @@
         if (PageBackwardCallback.HasDelegate) await PageBackwardCallback.InvokeAsync();
     }
 
-    private async Task Detail(Guid productId)
+    private async Task Detail(int id)
     {
-        if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(productId);
+        if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(id);
     }
 
     private async Task AddToCart(Guid productId)
     {
         if (AddToCartCallback.HasDelegate) await AddToCartCallback.InvokeAsync(productId);
+    }
+
+    public List<ProductDTO>? Products;
+    private void DeleteFullProductsList() => Products = null;
+    private async Task LoadFullProductsList()
+    {
+        var productsResult = await _readProductsClient.GetProductsAsync();
+        if (productsResult.IsSuccess)
+        {
+            if (productsResult.Products is not null && productsResult.Products.Any())
+            {
+                Products = productsResult.Products.ToList();
+            }
+        }
+        else Console.WriteLine(productsResult.ErrorMessage);
     }
 }
 

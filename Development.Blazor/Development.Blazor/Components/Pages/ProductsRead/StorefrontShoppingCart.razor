@@ -108,10 +108,17 @@
     [CascadingParameter(Name = "ShoppingCart")]
     public ShoppingCartDTO? MyCart { get; set; }
 
+    [Parameter]
+    public EventCallback<int> DetailCallback { get; set; }
 
-    public void ProductDetail(string productId)
+    // public void ProductDetail(string productId)
+    // {
+    //     _nav.NavigateTo($"/productDetail/{productId}");
+    // }
+
+    private async Task Detail(int id)
     {
-        _nav.NavigateTo($"/productDetail/{productId}");
+        if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(id);
     }
 
     private async Task IncrementAsync(string productId)

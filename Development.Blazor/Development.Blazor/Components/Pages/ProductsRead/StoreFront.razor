@@ -57,23 +57,23 @@
                 @if (_showCart)
                 {
                     <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                        <StorefrontShoppingCart />
+                        <StorefrontShoppingCart DetailCallback="Detail"/>
                     </CascadingValue>
                 }
                 else
                 {
-                    @if (SelectedProduct is null)
+                    @if (SelectedProductId > 0)
                     {
-                        <CascadingValue Name="Products" Value="@Products">
-                            <CascadingValue Name="PagingData" Value="@PagingData" >
-                                <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward"/>
-                            </CascadingValue>
+                        <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
+                            <StorefrontProductDetail BackToListCallback="BackToList" />
                         </CascadingValue>
                     }
                     else
                     {
-                        <CascadingValue Name="SelectedProduct" Value="@SelectedProduct">
-                            <StorefrontProductDetail BackToListCallback="BackToList" />
+                        <CascadingValue Name="Products" Value="@Products">
+                            <CascadingValue Name="PagingData" Value="@PagingData">
+                                <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward" />
+                            </CascadingValue>
                         </CascadingValue>
                     }
                 }
@@ -92,7 +92,7 @@
 
     public List<ProductSummaryDTO>? Products { get; set; } 
     public PaginationMetadata? PagingData { get; set; }
-    public ProductSummaryDTO? SelectedProduct { get; set; }
+    public int SelectedProductId { get; set; } = 0;
     public ShoppingCartDTO? ShoppingCart { get; set; }
     private bool _showCart = false;
 
@@ -133,16 +133,17 @@
         await RefreshData();
     }
 
-    private void Detail(Guid productId) => SelectedProduct = Products?.FirstOrDefault(p => p.AggregateId == productId);
-    private void BackToList() => SelectedProduct = null;
+    private void Detail(int id) => SelectedProductId = id;
+    private void BackToList() => SelectedProductId = 0;
 
-    
     private string? _cartButtonText = "Cart"; 
     private async Task ToggleShowCart()
     {
         if (_showCart)
         {
             _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCart.Items.Count})";
+            // if desired to always return to the product list, even if accessed cart from product detail page, also set the SelectedProductId to 0
+            SelectedProductId = 0;
             _showCart = false;
         }
         else
