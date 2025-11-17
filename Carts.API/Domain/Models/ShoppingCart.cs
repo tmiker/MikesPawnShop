@@ -26,7 +26,7 @@ namespace Carts.API.Domain.Models
 
         public void AddCartItem(ShoppingCartItem item)
         {
-            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.AggregateId == item.AggregateId);
             if (existingItem is null)
             {
                 int maxLineNumber = Items.Count > 0 ? Items.Max(i => i.LineNumber) : 0;
@@ -39,9 +39,9 @@ namespace Carts.API.Domain.Models
             }
         }
 
-        public void UpdateCartItemQuantity(string productId, double amount)
+        public void UpdateCartItemQuantity(string aggregateId, double amount)
         {
-            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.AggregateId == aggregateId);
             if (existingItem is not null)
             {
                 existingItem.UpdateItemQuantity(amount);
@@ -52,9 +52,9 @@ namespace Carts.API.Domain.Models
             }
         }
 
-        public void RemoveCartItem(string productId)
+        public void RemoveCartItem(string aggregateId)
         {
-            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
+            ShoppingCartItem? existingItem = Items.FirstOrDefault(i => i.AggregateId == aggregateId);
             if (existingItem is not null)
             {
                 Items.Remove(existingItem);

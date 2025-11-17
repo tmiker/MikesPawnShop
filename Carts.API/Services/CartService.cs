@@ -71,13 +71,13 @@ namespace Carts.API.Services
             return result.ModifiedCount > 0;
         }
 
-        public async Task<bool> UpdateCartItemQuantityAsync(string ownerId, string productId, double amount)
+        public async Task<bool> UpdateCartItemQuantityAsync(string ownerId, string aggregateId, double amount)
         {
             ShoppingCart? cart = await _carts.Find(c => c.OwnerId == ownerId).FirstOrDefaultAsync();
 
             if (cart is not null)
             {
-                cart.UpdateCartItemQuantity(productId, amount);
+                cart.UpdateCartItemQuantity(aggregateId, amount);
                 var result = await _carts.ReplaceOneAsync(c => c.ShoppingCartId == cart.ShoppingCartId, cart);
                 return result.ModifiedCount > 0;
             }
@@ -88,13 +88,13 @@ namespace Carts.API.Services
             }
         }
 
-        public async Task<bool> RemoveCartItemAsync(string ownerId, string productId)
+        public async Task<bool> RemoveCartItemAsync(string ownerId, string aggregateId)
         {
             ShoppingCart? cart = await _carts.Find(c => c.OwnerId == ownerId).FirstOrDefaultAsync();
 
             if (cart is not null)
             {
-                cart.RemoveCartItem(productId);
+                cart.RemoveCartItem(aggregateId);
                 var result = await _carts.ReplaceOneAsync(c => c.ShoppingCartId == cart.ShoppingCartId, cart);
                 return result.ModifiedCount > 0;
             }

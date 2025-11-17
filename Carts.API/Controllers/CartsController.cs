@@ -45,7 +45,7 @@ namespace Carts.API.Controllers
 
         [HttpPut("items")]
         // [Authorize]
-        public async Task<IActionResult> UpdateProductQuantity(string productId, int amount)
+        public async Task<IActionResult> UpdateProductQuantity(string aggregateId, int amount)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (ownerId == null)
@@ -54,14 +54,14 @@ namespace Carts.API.Controllers
                 return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
                 // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
             }
-            bool success = await _cartService.UpdateCartItemQuantityAsync(ownerId, productId, amount);
+            bool success = await _cartService.UpdateCartItemQuantityAsync(ownerId, aggregateId, amount);
             if (success) return NoContent();
             else return BadRequest("Error updating product quantity in shopping cart. Ensure a cart containing the corresponding product exists.");
         }
 
         [HttpDelete("items")]
         // [Authorize]
-        public async Task<IActionResult> RemoveCartItem(string productId)
+        public async Task<IActionResult> RemoveCartItem(string aggregateId)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (ownerId == null)
@@ -70,7 +70,7 @@ namespace Carts.API.Controllers
                 return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
                 // ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
             }
-            bool success = await _cartService.RemoveCartItemAsync(ownerId, productId);
+            bool success = await _cartService.RemoveCartItemAsync(ownerId, aggregateId);
             if (success) return NoContent();
             else return BadRequest("Error removing the item from your cart. Please contact support.");
         }

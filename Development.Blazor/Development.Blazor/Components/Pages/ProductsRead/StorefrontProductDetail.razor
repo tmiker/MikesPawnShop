@@ -319,6 +319,7 @@
     {
         if (isFirstRender)
         {
+            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProductDetail.razor OnAfterRender was called. *************** @@@@@@@@@");
             var result = await _readSideHttpClient.GetProductByIdAsync(SelectedProductId);
             if (result.IsSuccess) 
             {

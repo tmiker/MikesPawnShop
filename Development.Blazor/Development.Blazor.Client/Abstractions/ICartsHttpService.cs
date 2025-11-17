@@ -8,8 +8,8 @@ namespace Development.Blazor.Client.Abstractions
         Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetCartsApiUserInfoAsync(string? token = null);
 
         Task<(bool IsSuccess, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null);
-        Task<(bool IsSuccess, string? ErrorMessage)> UpdateProductQuantityAsync(string productId, int amount, string? token = null);
-        Task<(bool IsSuccess, string? ErrorMessage)> RemoveCartItemAsync(string productId, string? token = null);
+        Task<(bool IsSuccess, string? ErrorMessage)> UpdateProductQuantityAsync(string aggregateId, int amount, string? token = null);
+        Task<(bool IsSuccess, string? ErrorMessage)> RemoveCartItemAsync(string aggregateId, string? token = null);
 
         Task<(bool IsSuccess, ShoppingCartDTO? ShoppingCart, string? ErrorMessage)> GetShoppingCartAsync(string? token = null);
         Task<(bool IsSuccess, string? ErrorMessage)> RemoveShoppingCartAsync(string? token = null);

@@ -5,7 +5,6 @@ Read Side Products API
 		The queue is processed every time a new event occurs and messages are removed from the queue when processed
 		For performance, message processing needs to be converted to batch processing
 
-
 Adding a Use Case
 	Write Side
 		Domain

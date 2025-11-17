@@ -192,6 +192,15 @@
         }
         else Console.WriteLine(productsResult.ErrorMessage);
     }
+
+    protected override void OnAfterRender(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
+            // this.StateHasChanged();
+        }
+    }
 }
 
 @*  

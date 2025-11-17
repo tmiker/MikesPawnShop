@@ -62,7 +62,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
-        options.WithTitle("Orders API");
+        options.WithTitle("Accounts API");
         options.WithTheme(ScalarTheme.Alternate);
         options.EnableDarkMode();
     });

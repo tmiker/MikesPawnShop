@@ -62,9 +62,9 @@ namespace Development.Blazor.HttpProviders
 
         // [HttpPut("items")]
         // public async Task<IActionResult> UpdateProductQuantity(string productId, int amount)
-        public async Task<(bool IsSuccess, string? ErrorMessage)> UpdateProductQuantityAsync(string productId, int amount, string? token = null)
+        public async Task<(bool IsSuccess, string? ErrorMessage)> UpdateProductQuantityAsync(string aggregateId, int amount, string? token = null)
         {
-            string uri = $"{StaticData.CartsHttpClient_CartsPath}/items?productId={productId}&amount={amount}";
+            string uri = $"{StaticData.CartsHttpClient_CartsPath}/items?aggregateId={aggregateId}&amount={amount}";
             var client = _httpClientFactory.CreateClient(StaticData.CartsHttpClient_ClientName);
             // if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -84,9 +84,9 @@ namespace Development.Blazor.HttpProviders
 
         // [HttpDelete("items")]
         // public async Task<IActionResult> RemoveCartItem(string productId)
-        public async Task<(bool IsSuccess, string? ErrorMessage)> RemoveCartItemAsync(string productId, string? token = null)
+        public async Task<(bool IsSuccess, string? ErrorMessage)> RemoveCartItemAsync(string aggregateId, string? token = null)
         {
-            string uri = $"{StaticData.CartsHttpClient_CartsPath}/items?productId={productId}";
+            string uri = $"{StaticData.CartsHttpClient_CartsPath}/items?aggregateId={aggregateId}";
             var client = _httpClientFactory.CreateClient(StaticData.CartsHttpClient_ClientName);
             // if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

@@ -6,7 +6,8 @@ namespace Carts.API.Domain.Models
     {
         public string? ShoppingCartId { get; private set; }
         public int LineNumber { get; private set; }
-        public string? ProductId { get; private set; }
+        public int ProductId { get; private set; }
+        public string? AggregateId { get; private set; }
         public string? Category { get; private set; }
         public string? Name { get; private set; }
         public string? Currency { get; private set; }
@@ -20,7 +21,7 @@ namespace Carts.API.Domain.Models
         public ShoppingCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO, string shoppingCartId)
         {
             ShoppingCartId = shoppingCartId;
-            // LineNumber = addShoppingCartItemDTO.LineNumber;
+            AggregateId = addShoppingCartItemDTO.AggregateId;
             ProductId = addShoppingCartItemDTO.ProductId;
             Category = addShoppingCartItemDTO.Category;
             Name = addShoppingCartItemDTO.Name;
@@ -46,6 +47,7 @@ namespace Carts.API.Domain.Models
             {
                 ShoppingCartId = ShoppingCartId,
                 LineNumber = LineNumber,
+                AggregateId = AggregateId,
                 ProductId = ProductId,
                 Category = Category,
                 Name = Name,
