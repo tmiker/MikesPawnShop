@@ -1,0 +1,11 @@
+﻿@page "/checkout"
+@rendermode InteractiveServer
+@inject IOrdersHttpService _orderHttpService
+
+<h3>Checkout</h3>
+
+@code {
+
+    [CascadingParameter(Name = "ShoppingCart")]
+    public ShoppingCartDTO? MyCart { get; set; }
+}

@@ -1,0 +1,50 @@
+﻿@using Development.Blazor.Client.DTOs.Carts
+@using Development.Blazor.Client.DTOs.Orders
+@rendermode InteractiveServer
+@inject NavigationManager _nav
+@inject ICartsHttpService _cartService
+
+
+
+<div class="row mt-2">
+    <div class="col-2">
+    </div>
+    <div class="col-8">
+        <h5 class="text-center"><b>Checkout View</b></h5>
+    </div>  
+</div>
+
+<div class="row">
+    <div class="col-12">
+        @if (AddOrderDTO != null)
+        {
+            <h4 class="text-success">Add Order DTO Items Count: @AddOrderDTO.Items.Count</h4>
+        }
+        else
+        {
+            <h4 class="text-danger">No add order dto items were found.</h4>
+        }
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public AddOrderDTO? AddOrderDTO { get; set; }
+
+    protected override void OnAfterRender(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontCheckoutView.razor OnAfterRender was called. *************** @@@@@@@@@");
+            // this.StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine($"############ **************** StorefrontCheckoutView.razor OnInitialized was called. *************** ############");
+        
+    }
+}

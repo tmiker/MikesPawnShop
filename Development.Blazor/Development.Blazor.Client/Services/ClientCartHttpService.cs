@@ -53,7 +53,7 @@ namespace Development.Blazor.Client.Services
             return (false, null, "Invalid Credentials.");
         }
 
-        public async Task<(bool IsSuccess, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null)
+        public async Task<(bool IsSuccess, int CartItemQuantity, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null)
         {
             throw new NotImplementedException();
         }

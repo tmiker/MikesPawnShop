@@ -39,7 +39,7 @@ namespace Development.Blazor.HttpProviders
             }
         }
 
-        public async Task<(bool IsSuccess, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null)
+        public async Task<(bool IsSuccess, int CartItemQuantity, string? ErrorMessage)> AddNewCartItemAsync(AddShoppingCartItemDTO addShoppingCartItemDTO, string? token = null)
         {
             string uri = $"{StaticData.CartsHttpClient_CartsPath}/items";
             var client = _httpClientFactory.CreateClient(StaticData.CartsHttpClient_ClientName);
@@ -51,12 +51,13 @@ namespace Development.Blazor.HttpProviders
 
             if (response.IsSuccessStatusCode)
             {
-                return (true, null);
+                int cartItemQuantity = await response.Content.ReadFromJsonAsync<int>();
+                return (true, cartItemQuantity, null);
             }
             else
             {
                 string errorMessage = await GetErrorMessageAsync(response);
-                return (false, errorMessage);
+                return (false, -1, errorMessage);
             }
         }
 

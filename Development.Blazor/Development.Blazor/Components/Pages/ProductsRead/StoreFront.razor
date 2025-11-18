@@ -35,7 +35,7 @@
                     @if (_showCart)
                     {
                         <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                            <StorefrontShoppingCart DetailCallback="Detail" />
+                            <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
                         </CascadingValue>
                     }
                     else
@@ -102,7 +102,13 @@
     public PaginationMetadata? PagingData { get; set; }
     public int SelectedProductId { get; set; } = 0;
     public ShoppingCartDTO? ShoppingCart { get; set; }
+    public int ShoppingCartItemCount { get; set; }
     private bool _showCart = false;
+
+    private void CartItemQuantityChanged(int count)
+    {
+        ShoppingCartItemCount = count;
+    }
 
     private async Task PageForward()
     {
@@ -161,7 +167,11 @@
         if (ShoppingCart is null)
         {
             var result = await _cartsHttpClient.GetShoppingCartAsync();
-            if (result.IsSuccess) ShoppingCart = result.ShoppingCart;
+            if (result.IsSuccess) 
+            {
+                ShoppingCart = result.ShoppingCart;
+                ShoppingCartItemCount = ShoppingCart is null ? 0 : ShoppingCart.Items.Count;
+            }
             else _errorMessage = result.ErrorMessage;
         }
         _cartButtonText = "Continue Shopping";
@@ -169,7 +179,7 @@
     }
     private void HideCart()
     {
-        _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCart.Items.Count})";
+        _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCartItemCount})";
         // if desired to always return to the product list, even if accessed cart from product detail page, also set the SelectedProductId to 0
         SelectedProductId = 0;
         _showCart = false;
@@ -199,8 +209,9 @@
         var result = await _cartsHttpClient.AddNewCartItemAsync(addShoppingCartItemDTO);
         if (result.IsSuccess)
         {
-            ShoppingCart = null;    // will refresh if select cart view - otherwise, due to Event Sourcing lag, if ShoppingCart is not null, add the product to the existing cart object manually
-            _successMessage = "Product added to cart.";
+            ShoppingCartItemCount = result.CartItemQuantity;
+            _cartButtonText = $"Cart ({ShoppingCartItemCount})";
+            ShoppingCart = null; // will refresh when select cart view
         }
         else
         {

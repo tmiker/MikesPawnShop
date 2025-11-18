@@ -20,10 +20,13 @@ namespace Orders.API.Domain.Models
 
         public Order(string ownerId, List<OrderItem> items, Address? shippingAddress, Address? billingAddress)
         {
+            int lineNumber = 1;
             OrderId = Guid.NewGuid().ToString();
             OwnerId = ownerId;
             OrderDate = DateTime.Now;
             Items = items;
+            items.ForEach(i => i.LineNumber = lineNumber++);
+            items.ForEach(i => i.OrderId = OrderId);
             Status = "Placed";
             Version = 0;
             ShippingAddress = shippingAddress;

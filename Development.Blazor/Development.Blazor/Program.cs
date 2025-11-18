@@ -4,6 +4,7 @@ using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.Utility;
 using Development.Blazor.Components;
 using Development.Blazor.HttpProviders;
+using Development.Blazor.Mappers;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -78,6 +79,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("MarlowAndWendy", policy => policy.RequireClaim(ClaimTypes.Name, "Wendy Davenport", "Marlow Bean"));
     options.AddPolicy("DomesticDogs", policy => policy.RequireClaim("Genus", "Canis").RequireClaim("Species", "Familiaris"));
 });
+
+builder.Services.AddScoped<IOrderMapper, OrderMapper>();
 
 // Http Clients
 builder.Services.AddHttpClient(name: StaticData.ProductsReadHttpClient_ClientName, configureClient: config =>

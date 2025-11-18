@@ -29,7 +29,7 @@ namespace Carts.API.Controllers
 
         [HttpPost("items")]
         // [Authorize]
-        public async Task<IActionResult> AddNewCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO)
+        public async Task<ActionResult<int>> AddNewCartItem(AddShoppingCartItemDTO addShoppingCartItemDTO)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
             if (ownerId == null)
@@ -38,8 +38,8 @@ namespace Carts.API.Controllers
                 // return Unauthorized($"User identity information unavailable. Unauthorized access to restricted resource.");
                 ownerId = "3"; // TEMPORARY WORKAROUND FOR TESTING PURPOSES ONLY
             }
-            bool success = await _cartService.AddNewCartItemAsync(ownerId, addShoppingCartItemDTO);
-            if (success) return NoContent();
+            var result = await _cartService.AddNewCartItemAsync(ownerId, addShoppingCartItemDTO);
+            if (result.IsSuccess) return Ok(result.CartItemQuantity);
             else return BadRequest("Error adding the item to your cart. Please contact support.");
         }
 

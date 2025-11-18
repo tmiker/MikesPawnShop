@@ -29,7 +29,7 @@ namespace Orders.API.Services
         public async Task<(bool IsSuccess, string? OrderId, string? ErrorMessage)> AddOrderAsync(string ownerId, AddOrderDTO addOrderDTO, CancellationToken cancellationToken)
         {
             // SET ORDER ID HERE
-            string orderId = Guid.NewGuid().ToString();
+            // string orderId = Guid.NewGuid().ToString();              // done by domain model
 
             Address? shipping = addOrderDTO.ShippingAddress is null ? null : new Address(addOrderDTO.ShippingAddress);
             Address? billing = addOrderDTO.BillingAddress is null ? null : new Address(addOrderDTO.BillingAddress);
@@ -38,9 +38,9 @@ namespace Orders.API.Services
 
             List<OrderItem> items = new List<OrderItem>();
             addOrderDTO.Items.ForEach(itemDTO => items.Add(new OrderItem(itemDTO)));
-            int lineNumber = 1;
-            items.ForEach(i => i.LineNumber = lineNumber++);
-            items.ForEach(i => i.OrderId = orderId);
+            // int lineNumber = 1;
+            // items.ForEach(i => i.LineNumber = lineNumber++);         // done by domain model
+            // items.ForEach(i => i.OrderId = orderId);                 // done by domain model
             Order order = new Order(ownerId, items, shipping, billing);
             await _orders.InsertOneAsync(order);
 

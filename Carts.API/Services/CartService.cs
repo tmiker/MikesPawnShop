@@ -60,7 +60,7 @@ namespace Carts.API.Services
             return false;
         }
 
-        public async Task<bool> AddNewCartItemAsync(string ownerId, AddShoppingCartItemDTO addShoppingCartItemDTO)
+        public async Task<(bool IsSuccess, int CartItemQuantity, string? ErrorMessage)> AddNewCartItemAsync(string ownerId, AddShoppingCartItemDTO addShoppingCartItemDTO)
         {
             ShoppingCart cart = await EnsureCartExistsAsync(ownerId);
 
@@ -68,7 +68,7 @@ namespace Carts.API.Services
 
             var result = await _carts.ReplaceOneAsync(c => c.ShoppingCartId == cart.ShoppingCartId, cart);
 
-            return result.ModifiedCount > 0;
+            return (true, cart.Items.Count, null);
         }
 
         public async Task<bool> UpdateCartItemQuantityAsync(string ownerId, string aggregateId, double amount)
