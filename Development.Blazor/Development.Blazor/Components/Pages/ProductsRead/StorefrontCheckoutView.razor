@@ -3,48 +3,231 @@
 @rendermode InteractiveServer
 @inject NavigationManager _nav
 @inject ICartsHttpService _cartService
-
-
+@inject IAccountsHttpService _accountsService
+@inject IOrdersHttpService _ordersService
+@inject IOrderMapper _orderMapper
 
 <div class="row mt-2">
     <div class="col-2">
     </div>
     <div class="col-8">
         <h5 class="text-center"><b>Checkout View</b></h5>
-    </div>  
-</div>
-
-<div class="row">
-    <div class="col-12">
-        @if (AddOrderDTO != null)
-        {
-            <h4 class="text-success">Add Order DTO Items Count: @AddOrderDTO.Items.Count</h4>
-        }
-        else
-        {
-            <h4 class="text-danger">No add order dto items were found.</h4>
-        }
     </div>
 </div>
 
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <div class="row mt-2">
+        <div class="col-10">
+            <h5 class="text-danger"><b>Error:</b></h5>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            <textarea rows="2" class="text-danger form-control"><b>@_errorMessage</b></textarea>
+        </div>
+    </div>
+}
+
+@if (_submitOrderResult is not null)
+{
+    <div class="row">
+        <div class="col-12">
+            <h5 class="text-primary"><b><i>Your order with Order Id @_submitOrderResult.OrderId was successfully placed! Redirecting to Orders page...</i></b></h5>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row mt-2">
+        <div class="col-7">
+            @* LEFT COLUMN DATA *@
+            <h4><b>Order Items</b></h4>
+            <div class="row">
+                <div class="col-12">
+                    @if (AddOrderDTO != null)
+                    {
+                        @if (AddOrderDTO.Items != null && AddOrderDTO.Items.Any())
+                        {
+                            @foreach (var item in AddOrderDTO.Items!)
+                            {
+                                <div class="row mt-4">
+                                    <div class="col-3 offset-1">
+                                        <h5><b>Item: @item.Name</b></h5>
+                                    </div>
+                                    <div class="col-2">
+                                        <h5><b>Qty: @item.Quantity</b></h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <h5><b>Price Each: $ @item.Price</b></h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <h5><b>Line Total: $ @item.LineTotalPrice</b></h5>
+                                    </div>
+                                </div>
+                            }
+                            <div class="row mt-4">
+                                <div class="col-12 text-primary">
+                                    <h4><b><i>ORDER TOTAL: @AddOrderDTO.OrderTotalPrice</i></b></h4>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-12 text-center text-info">
+                                    <h5>There are no items in your cart!</h5>
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <h5>Shipping Address: @AddOrderDTO.ShippingAddress?.ToString()</h5>
+
+                        <h5>Billing Address: @AddOrderDTO.BillingAddress?.ToString()</h5>
+                    }
+                    else
+                    {
+                        <h4 class="text-danger">An order object with items was found.</h4>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-4 offset-1">
+            @* RIGHT COLUMN DATA *@
+            <h4><b>Account Data</b></h4>
+            <div class="row">
+                <div class="col-12">
+                    @if (_accountInfo != null)
+                    {
+                        @* <h4 class="text-success">Account Info Address Count: @_accountInfo.Addresses.Count</h4> *@
+
+                        foreach (var address in _accountInfo.Addresses)
+                        {
+                            if (address.IsPrimaryShipping)
+                            {
+                                <h5>Shipping Address: @address.ToString()</h5>
+                            }
+                            if (address.IsPrimaryBilling)
+                            {
+                                <h5>Billing Address: @address.ToString()</h5>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <h4 class="text-danger">Please complete your account setup.</h4>
+                    }
+                </div>
+            </div>
+
+            <hr />
+            <h5>Payment Details</h5>
+            <div class="row">
+                <div class="col-12">
+                    <label>Payment Method:</label>
+                    <select class="form-select" >
+                        <option selected>VISA ...1234</option>
+                        <option>MasterCard ...5678</option>
+                        <option>AMEX ...9012</option>
+                    </select>
+                </div>
+                @* <div class="col-12">
+                    <label>Name:</label>
+                    <input type="text" placeholder="Name on card" />
+                </div>
+                <div class="col-12">
+                    <label>Card Number:</label>
+                    <input type="text" />
+                </div>
+                <div class="col-12">
+                    <label>Card Type:</label>
+                    <input type="text" />
+                </div>
+                <div class="col-12">
+                    <label>Security Code:</label>
+                    <input type="number" />
+                </div> *@
+            </div>
+        </div>
+    </div>
+
+
+
+    <hr />
+    @if (AddOrderDTO != null && _accountInfo != null)
+    {
+        <div class="row">
+            <div class="col-4 offset-4">
+                <a class="btn btn-outline-success form-control" @onclick="SubmitOrder">Submit Order</a>
+            </div>
+        </div>
+    }
+}
 
 @code {
 
     [Parameter]
     public AddOrderDTO? AddOrderDTO { get; set; }
 
-    protected override void OnAfterRender(bool isFirstRender)
+    // [Parameter]
+    // public EventCallback OrderSuccessfullySubmittedCallback { get; set; }
+
+    // private async Task OrderSuccessfullySubmitted()
+    // {
+    //     if (OrderSuccessfullySubmittedCallback.HasDelegate) await OrderSuccessfullySubmittedCallback.InvokeAsync();
+    // }
+
+    private AccountDTO? _accountInfo { get; set; }
+
+    private SubmitOrderResultDTO? _submitOrderResult { get; set; }
+
+    private string? _errorMessage;
+    private void ClearErrorMessage() => _errorMessage = null;
+
+    private async Task SubmitOrder()
+    {
+        var submitOrderResult = await _ordersService.SubmitOrderAsync(AddOrderDTO!);
+
+        if (submitOrderResult.IsSuccess)
+        {
+            _submitOrderResult = new SubmitOrderResultDTO(submitOrderResult.IsSuccess, submitOrderResult.OrderId, submitOrderResult.ErrorMessage);
+            var deleteCartResult = await _cartService.RemoveShoppingCartAsync();
+            // instead of doing a bunch of callbacks on storefront pages to remove MyCart object in client, just redirect to orders page.
+            _nav.NavigateTo("/orders");
+        }
+        else _errorMessage = submitOrderResult.ErrorMessage;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
     {
         if (isFirstRender)
         {
             Console.WriteLine($"@@@@@@@@@@ **************** StorefrontCheckoutView.razor OnAfterRender was called. *************** @@@@@@@@@");
-            // this.StateHasChanged();
+
+            if (AddOrderDTO is null) _errorMessage = $"An order could not be created.";
+            else
+            {
+                var accountResult = await _accountsService.GetAccountAsync();
+                if (accountResult.IsSuccess)
+                {
+                    _accountInfo = accountResult.Account;
+                    AddOrderDTO.ShippingAddress = _accountInfo?.Addresses.FirstOrDefault(a => a.IsPrimaryShipping);
+                    AddOrderDTO.BillingAddress = _accountInfo?.Addresses.FirstOrDefault(a => a.IsPrimaryBilling);
+                }
+            }
+
+            this.StateHasChanged();
         }
     }
 
     protected override void OnInitialized()
     {
         Console.WriteLine($"############ **************** StorefrontCheckoutView.razor OnInitialized was called. *************** ############");
-        
+
     }
 }

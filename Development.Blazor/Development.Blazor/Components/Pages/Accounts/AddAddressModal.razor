@@ -1,0 +1,138 @@
+﻿﻿
+<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="Cancel"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content">
+            @if (AddressToAdd != null)
+            {
+                <EditForm Model="AddressToAdd" OnValidSubmit="SubmitAddress" FormName="addAddressForm">
+                    <DataAnnotationsValidator />
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Title</h5>
+                        <button type="button" class="close" aria-label="Close" @onclick="Cancel">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="street1">Street 1:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="bg-dark text-light form-control " id="street1" @bind-Value="@AddressToAdd.Street1" />
+                                <ValidationMessage For="@(() => AddressToAdd.Street1)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="street2">Street 2:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="bg-dark text-light form-control" id="street2" @bind-Value="@AddressToAdd.Street2" />
+                                <ValidationMessage For="@(() => AddressToAdd.Street2)" />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="city">City:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="bg-dark text-light form-control " id="city" @bind-Value="@AddressToAdd.City" />
+                                <ValidationMessage For="@(() => AddressToAdd.City)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="state">State:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="bg-dark text-light form-control" id="state" @bind-Value="@AddressToAdd.State" />
+                                <ValidationMessage For="@(() => AddressToAdd.State)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 ">
+                                <label for="zip">Postal Code:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="bg-dark text-light form-control" id="zip" @bind-Value="@AddressToAdd.PostalCode" />
+                                <ValidationMessage For="@(() => AddressToAdd.PostalCode)" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-4 ">
+                                <label class="form-check-label" for="isShipping">Primary Shipping:</label>
+                            </div>
+                            <div class="col-1">
+                                <InputCheckbox class="bg-dark text-light form-check-input" id="isShipping" @bind-Value="AddressToAdd.IsPrimaryShipping" />
+                                <ValidationMessage For="@(() => AddressToAdd!.IsPrimaryShipping)" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 ">
+                                <label class="form-check-label" for="isBilling">Primary Billing:</label>
+                            </div>
+                            <div class="col-1">
+                                <InputCheckbox class="bg-dark text-light form-check-input" id="isBilling" @bind-Value="AddressToAdd.IsPrimaryBilling" />
+                                <ValidationMessage For="@(() => AddressToAdd!.IsPrimaryBilling)" />
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row">
+                            <div class="col-5 offset-1">
+                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                            </div>
+                            <div class="col-5">
+                                <button class="btn btn-success form-control" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-around">
+                    </div>
+                </EditForm>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="text-danger"><b><i>Error: No Address object provided.</i></b></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-4 text-center">
+                        <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public AddAddressDTO? AddressToAdd { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+
+
+    public async Task SubmitAddress()
+    {
+        await Submit.InvokeAsync();
+    }
+}
+﻿

@@ -1,4 +1,6 @@
-﻿namespace Development.Blazor.Client.DTOs.Orders
+﻿using Development.Blazor.Client.DTOs.Shared;
+
+namespace Development.Blazor.Client.DTOs.Orders
 {
     public class OrderDTO
     {

@@ -134,6 +134,7 @@ else
         if (CartItemQuantityChangedCallback.HasDelegate) await CartItemQuantityChangedCallback.InvokeAsync(count);
     }
 
+    
     private AddOrderDTO? _addOrderDTO;
 
     private void Checkout()

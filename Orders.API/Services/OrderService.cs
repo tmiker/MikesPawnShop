@@ -23,6 +23,33 @@ namespace Orders.API.Services
 
         public async Task<(bool IsSuccess, ReviewOrderResultDTO? ReviewDTO, string? ErrorMessage)> ReviewOrderAsync(string ownerId, CancellationToken cancellationToken)
         {
+            // THIS ENDPOINT MOVED TO INTERNAL ORDERS SERVICE
+
+            string errors = string.Empty;
+            ReviewOrderResultDTO resultDTO = new ReviewOrderResultDTO();
+
+            // ORIGINAL
+            // 1. Get account detail dto from internal accounts services - note the http service will add api key for internal account api call and encrypt data
+            // var accountResult = await _internalAccountsHttpService.GetAccountDetailsFromInternalApiAsync(ownerId);
+            //if (accountResult.IsSuccess)
+            //{
+            //    resultDTO.AccountOwnerId = accountResult.AccountDetail?.AccountOwnerId;
+            //    resultDTO.AccountDetail = accountResult.AccountDetail;
+            //}
+            // else errors += $"{accountResult.ErrorMessage} \n";
+
+            // 2. Get cart from internal cart services - note the http service will add api key for internal cart api call and encrypt data
+
+            //var cartResult = await _internalCartsHttpService.GetShoppingCartAsync(ownerId);
+            //if (cartResult.IsSuccess)
+            //{
+            //    resultDTO.ShoppingCart = cartResult.ShoppingCart;
+            //}
+            //else errors += $"{cartResult.ErrorMessage}";
+
+            //if (string.IsNullOrWhiteSpace(errors)) return (true, resultDTO, null);
+            //else return (false, resultDTO, errors);
+
             return (true, new ReviewOrderResultDTO() { IsSuccess = true, ErrorMessage = null }, null);
         }
 

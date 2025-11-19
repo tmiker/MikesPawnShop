@@ -24,7 +24,7 @@
 
         public const string AccountsHttpClient_ClientName = "AccountsHttpClient";
         public const string AccountsHttpClient_BaseURL = "https://localhost:7033";
-        public const string AccountsHttpClient_ProductsPath = "/api/accounts";
+        public const string AccountsHttpClient_AccountsPath = "/api/accounts";
         public const string AccountsHttpClient_DevTestsPath = "/api/devTests";
         public const string AccountsHttpClient_GetApiUserInfoSubpath = "/getApiUserInfo";
 

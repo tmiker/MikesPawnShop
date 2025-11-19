@@ -1,0 +1,124 @@
+﻿using Accounts.API.Abstractions;
+using Accounts.API.DTOs;
+using Accounts.API.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Text.Json;
+
+namespace Accounts.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AccountsController : ControllerBase
+    {
+        private readonly IAccountService _accountService;
+        private readonly ILogger<AccountsController> _logger;
+        private readonly IAccountDataMapper _mapper;
+
+        public AccountsController(IAccountService accountService, ILogger<AccountsController> logger, IAccountDataMapper mapper)
+        {
+            _accountService = accountService;
+            _logger = logger;
+            _mapper = mapper;
+        }
+
+        [HttpGet("accoutEstablished")]
+        public async Task<ActionResult<bool>> AccountIsEstablished()
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+
+            var result = await _accountService.GetAccountByOwnerIdAsync(ownerId);
+
+            if (result.IsSuccess) return Ok(true);
+            return BadRequest(false);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<AccountDTO>> GetByOwnerId()
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+
+            var result = await _accountService.GetAccountByOwnerIdAsync(ownerId);
+
+            if (result.Account is not null)
+            {
+                string jsonAccount = JsonSerializer.Serialize(result.Account);
+                Console.WriteLine($"\n************\nExternalAccountsController GetByOwnerId() result: \n{jsonAccount}\n************\n");
+            }
+
+            if (result.IsSuccess) return Ok(result.Account);
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("{accountId}")]
+        public async Task<ActionResult<AccountDTO>> GetByAccountId(string accountId)
+        {
+            var result = await _accountService.GetAccountByAccountIdAsync(accountId);
+            if (result.IsSuccess) return Ok(result.Account);
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(AddAccountDTO addAccountDTO)
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+
+            var result = await _accountService.CreateAccountAsync(ownerId, addAccountDTO);
+            if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPut("addAddress")]
+        public async Task<IActionResult> Put(AddAddressDTO addAddressDTO)
+        {
+            string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+
+            var result = await _accountService.AddAddressAsync(ownerId, addAddressDTO);
+            if (result.IsSuccess) return NoContent();
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("[action]")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<string> AllowAdminUserByRole()
+        {
+            bool isAdmin = User.IsInRole("Admin");
+            string result = $"API Controller Authorization by Roles; User.IsInRole(Admin) = {isAdmin}";
+            List<Claim> userClaims = User.Claims.ToList();
+            if (userClaims.Any())
+            {
+                foreach (var claim in userClaims)
+                {
+                    if (claim.Type == ClaimTypes.Role) result += $";  User has ClaimTypes.Role value of {claim.Value}";
+                    if (claim.Type == "role") result += $";  User has \n'role\n' claim value of {claim.Value}";
+                    // break;
+                }
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("[action]")]
+        [Authorize(Policy = "IsAdmin")]
+        public ActionResult<string> AllowAdminUserByPolicy()
+        {
+            bool isAdmin = User.IsInRole("Admin");
+            string result = $"API Controller Authorization by Policy; User.IsInRole(Admin) = {isAdmin}";
+            List<Claim> userClaims = User.Claims.ToList();
+            if (userClaims.Any())
+            {
+                foreach (var claim in userClaims)
+                {
+                    if (claim.Type == ClaimTypes.Role) result += $";  User has ClaimTypes.Role value of {claim.Value}\n";
+                    if (claim.Type == "role") result += $";  User has \n'role\n' claim value of {claim.Value}";
+                    // break;
+                }
+            }
+            return Ok(result);
+        }
+    }
+}

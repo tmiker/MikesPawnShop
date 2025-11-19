@@ -1,6 +1,10 @@
 using Accounts.API.Abstractions;
 using Accounts.API.Auth;
+using Accounts.API.Infrastructure.Mongo;
+using Accounts.API.Mappers;
+using Accounts.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -48,7 +52,12 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("DomesticDogs", policy => policy.RequireClaim("Genus", "Canis").RequireClaim("Species", "Familiaris"));
 });
 
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetRequiredSection(nameof(MongoSettings)));
+builder.Services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptions<MongoSettings>>().Value);
+
 builder.Services.AddScoped<ITokenDecoder, TokenDecoder>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountDataMapper, AccountDataMapper>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

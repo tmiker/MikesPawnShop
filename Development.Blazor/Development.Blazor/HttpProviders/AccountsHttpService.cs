@@ -1,6 +1,11 @@
 ﻿using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.DTOs;
+using Development.Blazor.Client.DTOs.Accounts;
+using Development.Blazor.Client.DTOs.Shared;
 using Development.Blazor.Client.Utility;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Development.Blazor.HttpProviders
 {
@@ -30,6 +35,93 @@ namespace Development.Blazor.HttpProviders
             {
                 string errorMessage = await GetErrorMessageAsync(response);
                 return (false, new ApiUserInfoDTO() { ErrorMessage = errorMessage }, errorMessage);
+            }
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablished(string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/accoutEstablished";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, null);
+            }
+            else
+            {
+                return (false, "An account was not found");
+            }
+        }
+
+        public async Task<(bool IsSuccess, AccountDTO? Account, string? ErrorMessage)> GetAccountAsync(string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                AccountDTO? accountDTO = await response.Content.ReadFromJsonAsync<AccountDTO>();
+                if (accountDTO is not null)
+                {
+                    string jsonAccount = JsonSerializer.Serialize(accountDTO);
+                    Console.WriteLine($"\n************\nAccountsHttpService GetAccountAsync() result: \n{jsonAccount}\n************\n");
+                }
+                return (true, accountDTO, null);
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, errorMessage);
+            }
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> CreateAccountAsync(AddAccountDTO addAccountDTO, string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            // if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Content = new StringContent(JsonSerializer.Serialize(addAccountDTO), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, null);
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> AddAddressAsync(AddAddressDTO addAddressDTO, string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/addAddress";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Content = new StringContent(JsonSerializer.Serialize(addAddressDTO), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, null);
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
             }
         }
 

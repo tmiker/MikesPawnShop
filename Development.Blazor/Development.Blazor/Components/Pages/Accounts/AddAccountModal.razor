@@ -1,0 +1,138 @@
+﻿﻿
+<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="Cancel"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content">
+            @if (AccountToAdd != null)
+            {
+                <EditForm Model="AccountToAdd" OnValidSubmit="SubmitAccount" FormName="addAccountForm">
+                    <DataAnnotationsValidator />
+                    <div class="modal-header">
+                        <h5 class="modal-title">@Title</h5>
+                        <button type="button" class="close" aria-label="Close" @onclick="Cancel">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        @* <div hidden class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="id">Account Id:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText inert class="form-control" id="accountId" @bind-Value="@AccountToAdd.AccountId" />
+                                <ValidationMessage For="@(() => AccountToAdd.AccountId)" />
+                            </div>
+                        </div> *@
+
+                        <div class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="first">First:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control " id="first" @bind-Value="@AccountToAdd.FirstName" />
+                                <ValidationMessage For="@(() => AccountToAdd.FirstName)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="last">Last:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control" id="last" @bind-Value="@AccountToAdd.LastName" />
+                                <ValidationMessage For="@(() => AccountToAdd.LastName)" />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="email">Email:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control " id="email" @bind-Value="@AccountToAdd.Email" />
+                                <ValidationMessage For="@(() => AccountToAdd.Email)" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="phone">Phone:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText class="form-control" id="phone" @bind-Value="@AccountToAdd.PhoneNumber" />
+                                <ValidationMessage For="@(() => AccountToAdd.PhoneNumber)" />
+                            </div>
+                        </div>
+                        @* <div hidden class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="status">Status:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputText inert class="form-control " id="status" @bind-Value="@AccountToAdd.AccountStatus" />
+                                <ValidationMessage For="@(() => AccountToAdd.AccountStatus)" />
+                            </div>
+                        </div>
+                        <div hidden class="form-group row">
+                            <div class="col-3 text-center">
+                                <label for="credit">Credit Limit:</label>
+                            </div>
+                            <div class="col-9">
+                                <InputNumber inert class="form-control " id="credit" @bind-Value="@AccountToAdd.CreditLimit" />
+                                <ValidationMessage For="@(() => AccountToAdd.CreditLimit)" />
+                            </div>
+                        </div> *@
+
+                        <br />
+                        <div class="row">
+                            <div class="col-5 offset-1">
+                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                            </div>
+                            <div class="col-5">
+                                <button class="btn btn-success form-control" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-around">
+                    </div>
+                </EditForm>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="text-danger"><b><i>Error: No Account object provided.</i></b></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-4 text-center">
+                        <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public AddAccountDTO? AccountToAdd { get; set; }
+
+    [Parameter]
+    public EventCallback Submit { get; set; }
+
+    [Parameter]
+    public EventCallback Cancel { get; set; }
+
+
+    public async Task SubmitAccount()
+    {
+        await Submit.InvokeAsync();
+    }
+}
+﻿

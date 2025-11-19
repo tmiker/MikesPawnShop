@@ -27,5 +27,28 @@ namespace Development.Blazor.Mappers
                 BillingAddress = null
             };
         }
+
+        public List<AddOrderItemDTO> MapCartItemDTOsToAddOrderItemDTOs(IEnumerable<ShoppingCartItemDTO> cartItemDTOs)
+        {
+            List<AddOrderItemDTO> orderItemDTOs = new List<AddOrderItemDTO>();
+            if (cartItemDTOs is null) return orderItemDTOs;
+            foreach (var item in cartItemDTOs)
+            {
+                AddOrderItemDTO orderItemDTO = new AddOrderItemDTO()
+                {
+                    //OrderId = null, // populated by Orders.API
+                    //LineNumber = item.LineNumber,
+                    ProductId = item.ProductId,
+                    Category = item.Category,
+                    Name = item.Name,
+                    Currency = item.Currency,
+                    Price = item.Price,
+                    UOM = item.UOM,
+                    Quantity = item.Quantity
+                };
+                orderItemDTOs.Add(orderItemDTO);
+            }
+            return orderItemDTOs;
+        }
     }
 }

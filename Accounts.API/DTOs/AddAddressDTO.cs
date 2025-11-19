@@ -1,6 +1,6 @@
-﻿namespace Development.Blazor.Client.DTOs.Orders
+﻿namespace Accounts.API.DTOs
 {
-    public class AddressDTO
+    public class AddAddressDTO
     {
         public bool IsPrimaryBilling { get; set; }
         public bool IsPrimaryShipping { get; set; }

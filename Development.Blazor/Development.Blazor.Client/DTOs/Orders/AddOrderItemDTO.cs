@@ -1,4 +1,6 @@
-﻿namespace Development.Blazor.Client.DTOs.Orders
+﻿using System.Text.Json.Serialization;
+
+namespace Development.Blazor.Client.DTOs.Orders
 {
     public class AddOrderItemDTO
     {
@@ -12,5 +14,14 @@
         public decimal Price { get; set; }
         public string? UOM { get; set; }
         public double Quantity { get; set; }
+
+        [JsonIgnore]
+        public decimal LineTotalPrice
+        {
+            get
+            {
+                return Price * (decimal)Quantity;
+            }
+        }
     }
 }

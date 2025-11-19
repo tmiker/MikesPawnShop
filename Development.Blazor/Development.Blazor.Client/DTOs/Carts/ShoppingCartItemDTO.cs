@@ -1,4 +1,6 @@
-﻿namespace Development.Blazor.Client.DTOs.Carts
+﻿using System.Text.Json.Serialization;
+
+namespace Development.Blazor.Client.DTOs.Carts
 {
     public class ShoppingCartItemDTO
     {
@@ -13,5 +15,11 @@
         public string? UOM { get; init; }
         public double Quantity { get; set; }
         public string? ThumbnailUrl { get; init; }
+
+        [JsonIgnore]
+        public decimal TotalItemPrice
+        {
+            get => Price * (decimal)Quantity;
+        }
     }
 }
