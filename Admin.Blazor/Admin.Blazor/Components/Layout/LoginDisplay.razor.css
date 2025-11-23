@@ -1,0 +1,23 @@
+﻿.button-logout {
+    background-color: #1c2841;
+    color: lightgray;
+    border: none;
+}
+
+form {
+    appearance: none;
+    -webkit-appearance: none; /* Safari */
+}
+
+/*input {
+    appearance: none;
+    -webkit-appearance: none;*/ /* Safari */
+/*}*/
+
+button {
+    color: #999EA9;
+}
+
+    button:hover {
+        color: lightgray;
+    }

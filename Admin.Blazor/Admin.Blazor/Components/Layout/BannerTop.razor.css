@@ -1,0 +1,17 @@
+﻿.banner-top-dark {
+    background-color: #1E1E1E;
+    min-height: 30px;
+    /*    border-top: groove;*/
+    border-bottom: groove;
+    border-color: #454C54;
+    margin: 0;
+}
+
+.banner-top-light {
+    background-color: #282D31;
+    min-height: 30px;
+    /*    border-top: groove;*/
+    border-bottom: groove;
+    border-color: #454C54;
+    margin: 0;
+}

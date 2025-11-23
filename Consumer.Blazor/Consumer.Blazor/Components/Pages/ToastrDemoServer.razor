@@ -1,0 +1,45 @@
+﻿@page "/dev/toastr-demo-server"
+@rendermode InteractiveServer
+
+@inject IToastrService _toastrService
+
+<PageTitle>Server Toastr Demo</PageTitle>
+
+<h1>Server Toastr Demo</h1>
+
+<p>This component demonstrates ToastrService functionality.</p>
+
+
+<div class="container p-5">
+    <div class="row mt-2">
+        <div class="col-4 text-center">
+            <a class="btn button-custom-success " @onclick="() => ShowToastrSuccess(_message)">
+                <i class="bi-lightning-charge text-success-alt"></i> &nbsp; Success
+                @* <span class="text-success-alt">Success</span> *@
+            </a>
+        </div>
+        <div class="col-4 text-center">
+            <a class="btn button-custom-info " @onclick="() => ShowToastrInfo(_message)">
+                <i class="bi-lightning-charge text-info-alt"></i> &nbsp; Info
+                @* <span class="text-info-alt">Info</span> *@
+            </a>
+        </div>
+        <div class="col-4 text-center">
+            <a class="btn button-custom-danger " @onclick="() => ShowToastrError(_message)">
+                <i class="bi-lightning-charge text-danger-alt"></i> &nbsp; Error
+                @* <span class="text-danger-alt">Error</span> *@
+            </a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _message = "This is a Toastr Message";
+    private async Task ShowToastrSuccess(string message) => await _toastrService.ShowToastrSuccess(message);
+    private async Task ShowToastrError(string message) => await _toastrService.ShowToastrError(message);
+    private async Task ShowToastrInfo(string message) => await _toastrService.ShowToastrInfo(message);
+
+    // private async Task ShowToastrSuccess(string message) => await _toastrService.ShowToastrSuccess(message, 1000);
+    // private async Task ShowToastrError(string message) => await _toastrService.ShowToastrError(message, 5000);
+    // private async Task ShowToastrInfo(string message) => await _toastrService.ShowToastrInfo(message, 2000);
+}
