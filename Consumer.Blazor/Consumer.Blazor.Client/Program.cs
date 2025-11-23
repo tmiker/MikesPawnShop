@@ -6,7 +6,13 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-
+builder.Services.AddKeyedScoped<HttpClient>("LocalConsumerWasmClient",
+    (sp, key) =>
+       new HttpClient
+       {
+           BaseAddress = new Uri(builder.Configuration["LocalConsumerWasmClientBaseAddress"] ??
+                throw new Exception("LocalConsumerWasmClient BaseAddress is missing."))
+       });
 
 builder.Services.AddScoped<IToastrService, ToastrService>();
 
