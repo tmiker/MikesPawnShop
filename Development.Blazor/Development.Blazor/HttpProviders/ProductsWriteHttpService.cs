@@ -432,6 +432,5 @@ namespace Development.Blazor.HttpProviders
             if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"Response Content: {responseContent}; ";
             return errorMessage;
         }
-
     }
 }

@@ -1,0 +1,334 @@
+﻿@page "/store/storefrontProductDetail"
+@using Admin.Blazor.Client.DTOs.Products
+@rendermode InteractiveServer
+@inject IProductsReadHttpService _readSideHttpClient
+
+<h3>Storefront Product Detail</h3>
+
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <h4 class="text-danger"><b>@_errorMessage</b></h4>
+}
+@if (!string.IsNullOrWhiteSpace(_successMessage))
+{
+    <h4 class="text-success"><b>@_successMessage</b></h4>
+}
+
+@if (_product is not null)
+{
+    <div class="row">
+        <div class="col-6 text-center">
+
+            <!-- COLUMN 1 START-->
+
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="id">Id:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber inert class="bg-dark text-light form-control" id="id" @bind-Value="@_product.Id" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="aggId">Aggregate Id:</label>
+                </div>
+                <div class="col-9">
+                    <InputText inert class="bg-dark text-light form-control" id="aggId" @bind-Value="@_productAggregateId" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="name">Name:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="bg-dark text-light form-control " id="name" @bind-Value="@_product.Name" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="category">Category:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="bg-dark text-light form-control " id="category" @bind-Value="@_product.Category" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="description">Description:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="bg-dark text-light form-control " id="description" @bind-Value="@_product.Description" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="price">Price:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="bg-dark text-light form-control " id="price" @bind-Value="@_product.Price" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="currency">Currency:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="bg-dark text-light form-control " id="currency" @bind-Value="@_product.Currency" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="status">Status:</label>
+                </div>
+                <div class="col-9">
+                    <InputText class="bg-dark text-light form-control" id="status" @bind-Value="@_product.Status" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-3 text-center">
+                    <label for="version">Version:</label>
+                </div>
+                <div class="col-9">
+                    <InputNumber class="bg-dark text-light form-control" id="version" @bind-Value="@_product.Version" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-3">
+                    <label for="qoh">Quantity On Hand:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="bg-dark text-light form-control " id="qoh" @bind-Value="_product.QuantityOnHand" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <label for="qavail">Quantity Available:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="bg-dark text-light form-control " id="qavail" @bind-Value="_product.QuantityAllocated" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <label for="uom">UOM:</label>
+                </div>
+                <div class="col-7">
+                    <InputText class="bg-dark text-light form-control " id="uom" @bind-Value="_product.UOM" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <label for="lowstock">Low Stock Threshold:</label>
+                </div>
+                <div class="col-7">
+                    <InputNumber class="bg-dark text-light form-control " id="lowstock" @bind-Value="_product.LowStockThreshold" />
+                </div>
+            </div>
+            <br />
+            <!-- COLUMN 1 END -->
+
+            <br />
+            <div class="row">
+                <div class="col-5 offset-5">
+                    <a class="btn btn-primary form-control" @onclick="BackToList">Back</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 text-center">
+            <!-- COLUMN 2 START -->
+
+            <div class="row mt-2">
+                @if (_showDocuments)
+                {
+                    <div class="col-4">
+                        <a class="btn btn-primary form-control" @onclick="ToogleShowDocuments">Show Images</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-4">
+                        <a class="btn btn-primary form-control" @onclick="ToogleShowDocuments">Show Documents</a>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            @if (_showDocuments)
+            {
+                if (_product.Documents is not null && _product.Documents.Any())
+                {
+                    <div class="row mt-2">
+                        <div class="col-12 text-center ">
+                            <h5><b>Documents</b></h5>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered mt-2">
+                        <thead>
+                            <tr>
+                                <th>Seq. No.</th>
+                                <th>File Name</th>
+                                <th>Title</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var doc in _product.Documents)
+                            {
+                                <tr>
+                                    <td>@doc.SequenceNumber</td>
+                                    <td>@doc.Name</td>
+                                    <td>@doc.Title</td>
+                                    <td>
+                                        <a class="btn btn-primary">View</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <h5 class="mt-2"><i>There are currently no product documents.</i></h5>
+                }
+            }
+            else
+            {
+                // show images
+                if (_product.Images is not null && _product.Images.Any())
+                {
+                    <div class="row mt-2">
+                        <div class="col-12 text-center ">
+                            <h5><b>Images</b></h5>
+                        </div>
+                    </div>
+                    @if (_primaryImage != null)
+                    {
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <img src="@_primaryImage.ImageUrl" width="400" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <p class="text-primary"><i>@_primaryImage.Caption</i></p>
+                            </div>
+                        </div>
+                    }
+                    <div class="row">
+                        @if (_primaryImage != null)
+                        {
+                            <div class="col-1 text-center ">
+                                <span><i>@_primaryImage.SequenceNumber</i></span>
+                            </div>
+                            <div class="col-6 offset-2 text-center">
+                                <span><i>@_primaryImage.Name</i></span>
+                            </div>
+
+                        }
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="row">
+                            @foreach (var thumb in _product.Images)
+                            {
+                                <div class="col-3 text-center">
+                                    <img src="@thumb.ThumbnailUrl" width="100" />
+                                    <label class="text-primary"><i>@thumb.Caption</i></label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h5 class="mt-2"><i>There are currently no product images.</i></h5>
+                }
+
+                <br />
+
+                <div class="row">
+                    @if (_product.Images != null && _product.Images.Any())
+                    {
+                        @foreach (var image in _product.Images)
+                        {
+                            <div class="col-2">
+                                @if (image.SequenceNumber == _primaryImage?.SequenceNumber)
+                                {
+                                    <img src="@image.ThumbnailUrl" width="100" style="border:2px solid blue;" />
+                                }
+                                else
+                                {
+                                    <img src="@image.ThumbnailUrl" width="100" style="cursor:pointer;" @onclick="(() => SetPrimaryImage(image.SequenceNumber))" />
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            <!-- COLUMN 2 END -->
+        </div>
+    </div>
+}
+
+@code {
+
+    [CascadingParameter(Name = "SelectedProductId")]
+    public int SelectedProductId { get; set; }
+
+    [Parameter]
+    public EventCallback BackToListCallback { get; set; }
+
+    private async Task BackToList()
+    {
+        if (BackToListCallback.HasDelegate)
+        {
+            await BackToListCallback.InvokeAsync();
+        }
+    }
+
+    private ProductDTO? _product;
+    private string? _productAggregateId;
+
+    private string? _errorMessage;
+    private string? _successMessage;
+
+    private ImageDataDTO? _primaryImage { get; set; }
+
+    private bool _showDocuments = false;
+    private void ToogleShowDocuments() => _showDocuments = !_showDocuments;
+
+    private void SetPrimaryImage(int sequenceNumber)
+    {
+        var primaryImage = _product!.Images?.FirstOrDefault(i => i.SequenceNumber == sequenceNumber);
+        if (primaryImage != null)
+        {
+            _primaryImage = primaryImage;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProductDetail.razor OnAfterRender was called. *************** @@@@@@@@@");
+            var result = await _readSideHttpClient.GetProductByIdAsync(SelectedProductId);
+            if (result.IsSuccess) 
+            {
+                _product = result.Product;
+                _productAggregateId = _product?.AggregateId.ToString();
+            }
+            else _errorMessage = result.ErrorMessage;
+            this.StateHasChanged();
+        }
+    }
+}

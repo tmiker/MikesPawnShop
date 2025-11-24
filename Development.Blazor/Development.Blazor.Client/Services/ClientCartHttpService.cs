@@ -1,11 +1,9 @@
 ﻿using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.DTOs;
 using Development.Blazor.Client.DTOs.Carts;
-using Development.Blazor.Client.Utility;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using System.Text;
 using System.Text.Json;
 
 namespace Development.Blazor.Client.Services

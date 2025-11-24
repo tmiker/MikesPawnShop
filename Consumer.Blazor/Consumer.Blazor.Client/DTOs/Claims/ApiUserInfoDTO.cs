@@ -1,4 +1,4 @@
-﻿namespace Consumer.Blazor.Client.DTOs
+﻿namespace Consumer.Blazor.Client.DTOs.Claims
 {
     public class ApiUserInfoDTO
     {

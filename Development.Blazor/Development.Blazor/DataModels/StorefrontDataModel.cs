@@ -17,8 +17,6 @@ namespace Development.Blazor.DataModels
             _readProductsClient = readProductsClient;
         }
 
-        
-
         public List<ProductSummaryDTO>? Products { get; set; }
         public PaginationMetadata? PagingData { get; set; }
         public ProductSummaryDTO? SelectedProduct { get; set; }

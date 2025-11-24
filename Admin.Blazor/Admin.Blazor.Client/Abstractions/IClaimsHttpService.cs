@@ -1,4 +1,4 @@
-﻿using Admin.Blazor.Client.DTOs;
+﻿using Admin.Blazor.Client.DTOs.Claims;
 
 namespace Admin.Blazor.Client.Abstractions
 {

@@ -1,4 +1,4 @@
-﻿using Consumer.Blazor.Client.DTOs;
+﻿using Consumer.Blazor.Client.DTOs.Claims;
 
 namespace Consumer.Blazor.Client.Abstractions
 {
@@ -8,6 +8,5 @@ namespace Consumer.Blazor.Client.Abstractions
         Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetCartsApiUserInfoAsync(string? token = null);
         Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetOrdersApiUserInfoAsync(string? token = null);
         Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetProductsReadApiUserInfoAsync(string? token = null);
-        Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetProductsWriteApiUserInfoAsync(string? token = null);
     }
 }

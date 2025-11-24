@@ -1,4 +1,5 @@
 ﻿using Development.Blazor.Client.DTOs.Shared;
+using System.Text.Json.Serialization;
 
 namespace Development.Blazor.Client.DTOs.Orders
 {
@@ -9,6 +10,7 @@ namespace Development.Blazor.Client.DTOs.Orders
         public AddressDTO? ShippingAddress { get; set; }
         public AddressDTO? BillingAddress { get; set; }
 
+        [JsonIgnore]
         public decimal OrderTotalPrice 
         { 
             get

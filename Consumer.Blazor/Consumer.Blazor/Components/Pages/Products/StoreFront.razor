@@ -1,0 +1,232 @@
+﻿@page "/store/storefront"
+@rendermode InteractiveServer
+@inject IProductsReadHttpService _productReadSideHttpClient
+@inject ICartsHttpService _cartsHttpClient
+@inject NavigationManager Nav
+
+
+        <div class="row">
+            <div class="col-2">
+            </div>
+            <div class="col-8 text-center">
+                <h4><b>STORE FRONT</b></h4>
+            </div>
+            <div class="col-2">
+                <a class="btn btn-warning form-control" @onclick="ToggleShowCart">@_cartButtonText</a>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                @if (SelectedProductId > 0)
+                {
+                    <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
+                        <StorefrontProductDetail BackToListCallback="BackToList" />
+                    </CascadingValue>
+                }
+                else
+                {
+                    @if (_showCart)
+                    {
+                        <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
+                            <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
+                        </CascadingValue>
+                    }
+                    else
+                    {
+                        <div class="card-header">
+                            <div class="row mt-2">
+                                <div class="col-2">
+                                    <label for="namefilter">Name Filter:</label>
+                                    <input class="bg-dark text-light form-control" id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
+                                </div>
+                                <div class="col-2">
+                                    <label for="cat">Category Filter:</label>
+                            <select class="bg-dark text-light form-select" id="cat" type="text" @bind="_categoryFilter" @bind:after="RefreshData">
+                                        <option value=""></option>
+                                        <option value="Astronomy">Astronomy</option>
+                                        <option value="Books">Books</option>
+                                        <option value="Computers">Computers</option>
+                                        <option value="Electronics">Electronics</option>
+                                        <option value="Music">Music</option>
+                                        <option value="Photography">Photography</option>
+                                        <option value="Sports">Sports</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <label for="sort">Sort Column:</label>
+                            <select class="bg-dark text-light form-select" id="sort" type="text" @bind="_sortColumn" @bind:after="RefreshData">
+                                        <option value=""></option>
+                                        <option value="Name">Name</option>
+                                        <option value="Price">Price</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <label for="pagesize">Page Size:</label>
+                            <input class="bg-dark text-light form-control" id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
+                                </div>
+                                <div class="col-2">
+                                    <a class="btn btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <CascadingValue Name="Products" Value="@Products">
+                            <CascadingValue Name="PagingData" Value="@PagingData">
+                                <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward" />
+                            </CascadingValue>
+                        </CascadingValue>
+                    }
+                }
+            </div>
+        </div>
+
+@code {
+
+    public List<ProductSummaryDTO>? Products { get; set; } 
+    public PaginationMetadata? PagingData { get; set; }
+    public int SelectedProductId { get; set; } = 0;
+    public ShoppingCartDTO? ShoppingCart { get; set; }
+    public int ShoppingCartItemCount { get; set; }
+    private bool _showCart = false;
+
+    private void CartItemQuantityChanged(int count)
+    {
+        ShoppingCartItemCount = count;
+    }
+
+    private async Task PageForward()
+    {
+        if (PagingData is null || _pageNumber >= PagingData.TotalPageCount) return;
+        _pageNumber = _pageNumber + 1;
+        await RefreshData();
+    }
+
+    private async Task PageBackward()
+    {
+        if (_pageNumber <= 1) return;
+        _pageNumber = _pageNumber - 1;
+        await RefreshData();
+    }
+
+    private string? _nameFilter = null;
+    private string? _categoryFilter = null;
+    private string? _sortColumn = "Name";
+    private int _pageNumber = 1;
+    private int _pageSize = 10;
+
+    private string? _errorMessage;
+    private string? _successMessage;
+    private void ClearMessages()
+    {
+        _errorMessage = null;
+        _successMessage = null;
+    }
+
+    private async Task ClearFilters()
+    {
+        _nameFilter = null;
+        _categoryFilter = null;
+        _sortColumn = "Name";
+        _pageSize = 10;
+        await RefreshData();
+    }
+
+    private void Detail(int id) 
+    {
+        SelectedProductId = id;
+        // HideCart();
+    }
+    private void BackToList() 
+    {
+        SelectedProductId = 0;
+    }
+    // private void BackToCart() 
+    // {
+    //     _showCart = true;
+    // }
+
+    private string? _cartButtonText = "Cart";
+    private async Task ShowCart()
+    {
+        if (ShoppingCart is null)
+        {
+            var result = await _cartsHttpClient.GetShoppingCartAsync();
+            if (result.IsSuccess) 
+            {
+                ShoppingCart = result.ShoppingCart;
+                ShoppingCartItemCount = ShoppingCart is null ? 0 : ShoppingCart.Items.Count;
+            }
+            else _errorMessage = result.ErrorMessage;
+        }
+        _cartButtonText = "Continue Shopping";
+        _showCart = true;
+    }
+    private void HideCart()
+    {
+        _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCartItemCount})";
+        // if desired to always return to the product list, even if accessed cart from product detail page, also set the SelectedProductId to 0
+        SelectedProductId = 0;
+        _showCart = false;
+    }
+    private async Task ToggleShowCart()
+    {
+        if (_showCart) HideCart();
+        else await ShowCart();
+    }
+
+    private async Task AddToCart(Guid productId)
+    {
+        ProductSummaryDTO? product = Products!.FirstOrDefault(p => p.AggregateId == productId);
+        if (product is null) return;
+        AddShoppingCartItemDTO addShoppingCartItemDTO = new AddShoppingCartItemDTO()
+        {
+            ProductId = product.Id,
+            AggregateId = product.AggregateId.ToString(),
+            Category = product.Category,
+            Name = product.Name,
+            Currency = product.Currency,
+            Price = product.Price,
+            UOM = product.UOM,
+            Quantity = 1,
+            ThumbnailUrl = null
+        };
+        var result = await _cartsHttpClient.AddNewCartItemAsync(addShoppingCartItemDTO);
+        if (result.IsSuccess)
+        {
+            ShoppingCartItemCount = result.CartItemQuantity;
+            _cartButtonText = $"Cart ({ShoppingCartItemCount})";
+            ShoppingCart = null; // will refresh when select cart view
+        }
+        else
+        {
+            _errorMessage = result.ErrorMessage;
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        var result = await _productReadSideHttpClient.GetPagedAndFilteredProductSummariesAsync(_nameFilter, _categoryFilter, _sortColumn, _pageNumber, _pageSize);
+        if (result.IsSuccess)
+        {
+            Products = result.Products?.ToList();
+            PagingData = result.PagingData;
+        }
+        else
+        {
+            _errorMessage = result.ErrorMessage;
+        }
+        this.StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine($"@@@@@@@@@@ **************** Storefront.razor OnAfterRender was called. *************** @@@@@@@@@");
+            await RefreshData();
+            StateHasChanged();
+        }
+    }    
+}

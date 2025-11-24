@@ -1,5 +1,5 @@
 ﻿using Admin.Blazor.Client.Abstractions;
-using Admin.Blazor.Client.DTOs;
+using Admin.Blazor.Client.DTOs.Claims;
 using Admin.Blazor.Client.Utility;
 using System.Diagnostics;
 

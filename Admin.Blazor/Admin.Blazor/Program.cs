@@ -1,5 +1,6 @@
 using Admin.Blazor;
 using Admin.Blazor.Client.Abstractions;
+using Admin.Blazor.Client.Mappers;
 using Admin.Blazor.Client.Services;
 using Admin.Blazor.Client.Utility;
 using Admin.Blazor.Components;
@@ -86,43 +87,41 @@ builder.Services.AddHttpClient(name: StaticData.ProductsReadHttpClient_ClientNam
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-// builder.Services.AddSingleton<IProductsReadHttpService, ProductsReadHttpService>();
+builder.Services.AddSingleton<IProductsReadHttpService, ProductsReadHttpService>();
 builder.Services.AddHttpClient(name: StaticData.ProductsWriteHttpClient_ClientName, configureClient: config =>
 {
     config.BaseAddress = new Uri(StaticData.ProductsWriteHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-// builder.Services.AddSingleton<IProductsWriteHttpService, ProductsWriteHttpService>();
+builder.Services.AddSingleton<IProductsWriteHttpService, ProductsWriteHttpService>();
 builder.Services.AddHttpClient(name: StaticData.CartsHttpClient_ClientName, configureClient: config =>
 {
     config.BaseAddress = new Uri(StaticData.CartsHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-// builder.Services.AddSingleton<ICartsHttpService, CartsHttpService>();
+builder.Services.AddSingleton<ICartsHttpService, CartsHttpService>();
 builder.Services.AddHttpClient(name: StaticData.AccountsHttpClient_ClientName, configureClient: config =>
 {
     config.BaseAddress = new Uri(StaticData.AccountsHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-// builder.Services.AddSingleton<IAccountsHttpService, AccountsHttpService>();
+builder.Services.AddSingleton<IAccountsHttpService, AccountsHttpService>();
 builder.Services.AddHttpClient(name: StaticData.OrdersHttpClient_ClientName, configureClient: config =>
 {
     config.BaseAddress = new Uri(StaticData.OrdersHttpClient_BaseURL);
     config.DefaultRequestHeaders.Clear();
     config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 }).AddUserAccessTokenHandler();
-// builder.Services.AddSingleton<IOrdersHttpService, OrdersHttpService>();
+builder.Services.AddSingleton<IOrdersHttpService, OrdersHttpService>();
 
 builder.Services.AddSingleton<IClaimsHttpService, ClaimsHttpService>();
 
 // Services
+builder.Services.AddScoped<IOrderMapper, OrderMapper>();
 builder.Services.AddScoped<IToastrService, ToastrService>();
-
-
-
 
 var app = builder.Build();
 
@@ -186,7 +185,7 @@ app.MapPost("/logout", async ([FromForm] string? returnUrl, HttpContext httpCont
             [CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme]);
 });
 
-app.MapControllers();
+// app.MapControllers();
 
 app.Run();
 

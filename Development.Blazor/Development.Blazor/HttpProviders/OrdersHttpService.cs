@@ -12,11 +12,13 @@ namespace Development.Blazor.HttpProviders
 {
     public class OrdersHttpService : IOrdersHttpService
     {
-        private IHttpClientFactory _httpClientFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<OrdersHttpService> _logger;
 
-        public OrdersHttpService(IHttpClientFactory httpClientFactory)
+        public OrdersHttpService(IHttpClientFactory httpClientFactory, ILogger<OrdersHttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetOrdersApiUserInfoAsync(string? token = null)

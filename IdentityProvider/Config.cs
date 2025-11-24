@@ -58,9 +58,9 @@ public static class Config
                         AllowedGrantTypes = GrantTypes.Code,
                         RequirePkce = true,
                         RequireConsent = true,   // default = false
-                        RedirectUris = { "https://localhost:7030/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
-                        PostLogoutRedirectUris = { "https://localhost:7030/signout-callback-oidc" },       
-                        // FrontChannelLogoutUri =    "https://localhost:7030/signout-callback-oidc",      
+                        RedirectUris = { "https://localhost:7217/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
+                        PostLogoutRedirectUris = { "https://localhost:7217/signout-callback-oidc" },       
+                        // FrontChannelLogoutUri =    "https://localhost:7217/signout-callback-oidc",      
                         AllowedScopes =
                         {
                             IdentityServerConstants.StandardScopes.OpenId,
@@ -71,7 +71,7 @@ public static class Config
                             "accountsapi.fullaccess",
                             "ordersapi.fullaccess"
                         },
-                        ClientSecrets = { new Secret("xxx".Sha256()) }    // *** move to secrets 
+                        ClientSecrets = { new Secret("consumerBlazorServer".Sha256()) }    // *** move to secrets 
                     },
                 new Client()
                     {
@@ -80,9 +80,9 @@ public static class Config
                         AllowedGrantTypes = GrantTypes.Code,
                         RequirePkce = true,
                         RequireConsent = true,   // default = false
-                        RedirectUris = { "https://localhost:7030/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
-                        PostLogoutRedirectUris = { "https://localhost:7030/signout-callback-oidc" },       
-                        // FrontChannelLogoutUri =    "https://localhost:7030/signout-callback-oidc",      
+                        RedirectUris = { "https://localhost:7088/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
+                        PostLogoutRedirectUris = { "https://localhost:7088/signout-callback-oidc" },       
+                        // FrontChannelLogoutUri =    "https://localhost:7088/signout-callback-oidc",      
                         AllowedScopes =
                         {
                             IdentityServerConstants.StandardScopes.OpenId,
@@ -94,7 +94,7 @@ public static class Config
                             "accountsapi.fullaccess",
                             "ordersapi.fullaccess"
                         },
-                        ClientSecrets = { new Secret("xxx".Sha256()) }    // *** move to secrets 
+                        ClientSecrets = { new Secret("adminBlazorServer".Sha256()) }    // *** move to secrets 
                     },
                 new Client()
                     {

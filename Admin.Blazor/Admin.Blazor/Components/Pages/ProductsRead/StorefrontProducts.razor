@@ -1,0 +1,191 @@
+﻿@using Admin.Blazor.Client.DTOs.Products
+@rendermode InteractiveServer
+@inject IProductsReadHttpService _readProductsClient
+
+<div class="row mt-2">
+    <div class="col-10">
+        <h4><b>Read Side Storefront Products</b></h4>
+    </div>
+    <div class="col-2">
+        <a class="btn btn-primary form-control" @onclick="ToggleTableView">@_tableViewButtonText</a>
+    </div>
+</div>
+
+
+@if (_tableView)
+{
+    if (ProductSummaries is not null)
+    {
+        <div class="row mt-2">
+            <div class="col-12">
+
+
+                <table class="table table-dark table-bordered text-center">
+                    <thead class="bg-primary text-light">
+                        <tr>
+                            <th>Id</th>
+                            <th>Aggregate Id</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Currency</th>
+                            <th>Status</th>
+                            <th>Images</th>
+                            <th>Docs</th>
+                            <th>Ver</th>
+                            <th>On Hand</th>
+                            <th>Allocated</th>
+                            <th>Available</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in ProductSummaries)
+                        {
+                            <tr>
+                                <td>@product.Id</td>
+                                <td>@product.AggregateId.ToString()[0..8]-...</td>
+                                <td>@product.Name</td>
+                                <td>@product.Category</td>
+                                <td>@product.Price</td>
+                                <td>@product.Currency</td>
+                                <td>@product.Status</td>
+                                <td>@product.ImageCount</td>
+                                <td>@product.DocumentCount</td>
+                                <td>@product.Version</td>
+                                <td>@product.QuantityOnHand</td>
+                                <td>@product.QuantityAllocated</td>
+                                <td>@product.QuantityAvailable</td>
+                                <td>
+                                    <a class="btn btn-primary" @onclick="() => Detail(product.Id)">Detail</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success" @onclick="() => AddToCart(product.AggregateId)">Add to Cart</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    }
+    else
+    {
+
+    }
+}
+else
+{
+    @if (Products != null && Products.Any())
+    {
+        <div class="row mt-2">
+            @foreach (var product in Products)
+            {
+                <div class="col-4">
+                    <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" />
+                </div>
+            }
+        </div>
+    }
+}
+
+<div class="row m-2">
+    @if (PagingData is not null)
+    {
+        <div class="col-2 offset-2">
+            <span class="text-primary">Page @PagingData.CurrentPage of @PagingData.TotalPageCount</span>
+        </div>
+        <div class="col-1">
+            <a class="btn btn-sm btn-primary form-control" @onclick="PageBackward">Back</a>
+        </div>
+        <div class="col-1">
+            <a class="btn btn-sm btn-primary form-control" @onclick="PageForward">Fwd</a>
+        </div>
+        <div class="col-2 offset-1">
+            <span class="text-primary">Page Size: @PagingData.PageSize</span>
+        </div>
+        <div class="col-2">
+            <span class="text-primary">Total Items: @PagingData.TotalItemCount</span>
+        </div>
+    }
+</div>
+
+@code {
+
+    [CascadingParameter(Name = "Products")]
+    public List<ProductSummaryDTO>? ProductSummaries { get; set; }
+    [CascadingParameter(Name = "PagingData")]
+    public PaginationMetadata? PagingData { get; set; }
+
+    [Parameter]
+    public EventCallback PageForwardCallback { get; set; }
+    [Parameter]
+    public EventCallback PageBackwardCallback { get; set; }
+    [Parameter]
+    public EventCallback<int> DetailCallback { get; set; }
+    [Parameter]
+    public EventCallback<Guid> AddToCartCallback { get; set; }
+
+    private bool _tableView = true;
+    private string _tableViewButtonText = "Card View";
+    private async Task ToggleTableView()
+    {
+        _tableView = !_tableView;
+        if (_tableView)
+        {
+            _tableViewButtonText = "Card View";
+            DeleteFullProductsList();
+        }
+        else
+        {
+            _tableViewButtonText = "Table View";
+            await LoadFullProductsList();
+        }
+    }
+
+    private async Task PageForward()
+    {
+        if (PageForwardCallback.HasDelegate) await PageForwardCallback.InvokeAsync();
+    }
+
+    private async Task PageBackward()
+    {
+        if (PageBackwardCallback.HasDelegate) await PageBackwardCallback.InvokeAsync();
+    }
+
+    private async Task Detail(int id)
+    {
+        if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(id);
+    }
+
+    private async Task AddToCart(Guid productId)
+    {
+        if (AddToCartCallback.HasDelegate) await AddToCartCallback.InvokeAsync(productId);
+    }
+
+    public List<ProductDTO>? Products;
+    private void DeleteFullProductsList() => Products = null;
+    private async Task LoadFullProductsList()
+    {
+        var productsResult = await _readProductsClient.GetProductsAsync();
+        if (productsResult.IsSuccess)
+        {
+            if (productsResult.Products is not null && productsResult.Products.Any())
+            {
+                Products = productsResult.Products.ToList();
+            }
+        }
+        else Console.WriteLine(productsResult.ErrorMessage);
+    }
+
+    protected override void OnAfterRender(bool isFirstRender)
+    {
+        if (isFirstRender)
+        {
+            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
+            // this.StateHasChanged();
+        }
+    }
+}

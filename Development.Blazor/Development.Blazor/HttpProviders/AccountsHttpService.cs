@@ -1,7 +1,6 @@
 ﻿using Development.Blazor.Client.Abstractions;
 using Development.Blazor.Client.DTOs;
 using Development.Blazor.Client.DTOs.Accounts;
-using Development.Blazor.Client.DTOs.Shared;
 using Development.Blazor.Client.Utility;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,11 +10,13 @@ namespace Development.Blazor.HttpProviders
 {
     public class AccountsHttpService : IAccountsHttpService
     {
-        private IHttpClientFactory _httpClientFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<AccountsHttpService> _loggeer;
 
-        public AccountsHttpService(IHttpClientFactory httpClientFactory)
+        public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> loggeer)
         {
             _httpClientFactory = httpClientFactory;
+            _loggeer = loggeer;
         }
 
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetAccountsApiUserInfoAsync(string? token = null)

@@ -12,10 +12,12 @@ namespace Development.Blazor.HttpProviders
     public class CartsHttpService : ICartsHttpService
     {
         private IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<CartsHttpService> _logger;
 
-        public CartsHttpService(IHttpClientFactory httpClientFactory)
+        public CartsHttpService(IHttpClientFactory httpClientFactory, ILogger<CartsHttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetCartsApiUserInfoAsync(string? token = null)

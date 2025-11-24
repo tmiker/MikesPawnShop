@@ -1,0 +1,418 @@
+﻿@page "/orders/reviewOrder"
+@rendermode InteractiveServer
+@inject IOrdersHttpService _ordersService
+@inject IAccountsHttpService _accountsService
+@inject IOrderMapper _orderMapper
+@inject NavigationManager _nav
+@using System.Text.Json
+
+<PageTitle>Review Order</PageTitle>
+
+<div class="row mt-2">
+    <div class="col-8">
+        <h4><b>Review Order</b></h4>
+    </div>
+    <div class="col-2">
+        <a class="btn btn-outline-warning form-control" @onclick="BackToCart">Back to Cart</a>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="col-2">
+            <a class="btn btn-danger form-control" @onclick="ClearErrorMessage">CLEAR ERRORS</a>
+        </div>
+    }
+</div>
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <h5 class="text-danger"><b>@_errorMessage</b></h5>
+        </div>
+    </div>
+}
+
+@if (_accountEstablished)
+{
+    <div class="row mt-2">
+        <div class="col-2 offset-5 text-center">
+            <a class="btn btn-primary form-control" @onclick="ReviewCustomerOrder">REVIEW ORDER</a>
+        </div>
+    </div>
+
+    @if (_shoppingCart != null && _shoppingCart.Items.Any())
+    {
+        <br />
+        <h4>Order Items</h4>
+        @* <div class="row">
+        <div class="col-12 text-center text-info">
+        <textarea class="form-control" rows="10">@_jsonCart</textarea>
+        </div>
+        </div> *@
+        @foreach (var item in _shoppingCart.Items!)
+        {
+            <div class="row mt-4">
+                <div class="col-3 offset-1">
+                    <h5><b>Item: @item.Name</b></h5>
+                </div>
+                <div class="col-2">
+                    <h5><b>Qty: @item.Quantity</b></h5>
+                </div>
+                <div class="col-3">
+                    <h5><b>Price Each: $ @item.Price</b></h5>
+                </div>
+                <div class="col-3">
+                    <h5><b>Line Total: $ @item.TotalItemPrice</b></h5>
+                </div>
+                @* <div class="col-2">
+            <img src="@item.ThumbnailUrl" width="80" />
+            </div> *@
+            </div>
+        }
+        <div class="row mt-4">
+            <div class="col-12 text-center text-danger">
+                <h5><b><i>NEED ORDER TOTAL!</i></b></h5>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 text-center text-info">
+                <h5>There are no items in your cart!</h5>
+            </div>
+        </div>
+    }
+
+    @if (_accountInfo != null)
+    {
+        <br />
+        <div class="card-body bg-dark text-light mt-4">
+            <div class="row">
+                @* <div class="col-2 text-center text-info">
+                    <p><b>Account Owner Id: @_accountInfo.AccountOwnerId</b></p>
+                </div> *@
+                <div class="col-4 text-center text-info">
+                    <p><b>Account Id: @_accountInfo.AccountId</b></p>
+                </div>
+                <div class="col-3 text-center text-info">
+                    <p><b>Status: @_accountInfo.AccountStatus</b></p>
+                </div>
+                <div class="col-3 text-center text-info">
+                    <p><b>Credit Limit: @_accountInfo.CreditLimit</b></p>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <h4>Shipping Info</h4>
+        @if (_shippingAddress != null)
+        {
+            <div class="card-body bg-dark text-light mt-2">
+                <div class="row">
+                    <div class="col-2 offset-1">
+                        <p><b>@_shippingAddress.Street1</b></p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(_shippingAddress.Street2))
+                    {
+                        <div class="col-1">
+                            <p><b>@_shippingAddress.Street2</b></p>
+                        </div>
+                    }
+                    <div class="col-1">
+                        <p><b>@_shippingAddress.City</b></p>
+                    </div>
+
+                    <div class="col-1">
+                        <p><b> @_shippingAddress.State</b></p>
+                    </div>
+                    <div class="col-1">
+                        <p><b>@_shippingAddress.PostalCode</b></p>
+                    </div>
+                    @if (!_showSelectShipping)
+                    {
+                        <div class="col-2 offset-1">
+                            <a class="btn btn-outline-info form-control" @onclick="ToggleSelectShipping">Change</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-1 offset-2 ">
+                            <a class="btn btn-outline-warning form-control" @onclick="ToggleSelectShipping">Cancel</a>
+                        </div>
+                    }
+                </div>
+
+                @if (_showSelectShipping)
+                {
+                    @foreach (var address in _accountInfo.Addresses)
+                    {
+                        <div class="row mt-2">
+                            <div class="col-7 offset-2">
+                                @address.Street1 @address.Street2 @address.City @address.State @address.PostalCode
+                            </div>
+                            <div class="col-1">
+                                <a class="btn btn-outline-success form-control" @onclick="() => SelectNewShipping(address.Street1!)">Select</a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12 text-center text-danger">
+                    <h5>No Shipping Information - please add Shipping Info!</h5>
+                </div>
+            </div>
+        }
+
+        <br />
+        <h4>Billing Info</h4>
+        @if (_billingAddress != null)
+        {
+            <div class="card-body  bg-dark text-light mt-2">
+                <div class="row">
+                    <div class="col-2 offset-1">
+                        <p><b>@_billingAddress.Street1</b></p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(_billingAddress.Street2))
+                    {
+                        <div class="col-1">
+                            <p><b>@_billingAddress.Street2</b></p>
+                        </div>
+                    }
+                    <div class="col-1">
+                        <p><b>@_billingAddress.City</b></p>
+                    </div>
+
+                    <div class="col-1">
+                        <p><b> @_billingAddress.State</b></p>
+                    </div>
+                    <div class="col-1">
+                        <p><b>@_billingAddress.PostalCode</b></p>
+                    </div>
+
+                    @if (!_showSelectBilling)
+                    {
+                        <div class="col-2 offset-1">
+                            <a class="btn btn-outline-info form-control" @onclick="ToggleSelectBilling">Change</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-1 offset-2">
+                            <a class="btn btn-outline-warning form-control" @onclick="ToggleSelectBilling">Cancel</a>
+                        </div>
+                    }
+
+                </div>
+
+                @if (_showSelectBilling)
+                {
+                    @foreach (var address in _accountInfo.Addresses)
+                    {
+                        <div class="row mt-2">
+                            <div class="col-7 offset-2">
+                                @address.Street1 @address.Street2 @address.City @address.State @address.PostalCode
+                            </div>
+                            <div class="col-1">
+                                <a class="btn btn-outline-success form-control" @onclick="() => SelectNewBilling(address.Street1!)">Select</a>
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12 text-center text-danger">
+                    <h5>No Billing Information - please add Billing Info!</h5>
+                </div>
+            </div>
+        }
+    }
+
+    <hr />
+    <h5>Payment Gateway Details</h5>
+    <div class="row mt-2">
+        <div class="col-1 offset-1">
+            <p><b>Name</b></p>
+        </div>
+        <div class="col-2">
+            <p><b>Card Number</b></p>
+        </div>
+        <div class="col-2">
+            <p><b>Card Type</b></p>
+        </div>
+        <div class="col-2">
+            <p><b>Security Code</b></p>
+        </div>
+        <div class="col-4">
+            <h5 class="text-danger"><b>(An Orders.API Component)</b></h5>
+        </div>
+    </div>
+    <hr />
+    @if (_reviewOrderResult != null)
+    {
+        @* <EditForm Model="@_reviewOrderResult" OnValidSubmit="SubmitOrderAsync" FormName="submitOrderForm"> *@
+
+        <div class="row">
+            <div class="col-3 offset-2">
+                <a class="btn btn-outline-warning form-control" @onclick="BackToCart">Cancel</a>
+            </div>
+            <div class="col-3 offset-2">
+                <a class="btn btn-outline-success form-control" @onclick="SubmitOrderAsync">Submit Order</a>
+            </div>
+        </div>
+        @* </EditForm> *@
+    }
+
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <h4 class="text-yellow-alt"><b><i>Please set up your account before placing an order!</i></b></h4>
+        </div>
+    </div>
+}
+
+@code {
+
+    [CascadingParameter(Name = "MyShoppingCart")]
+    public ShoppingCartDTO? MyCart { get; set; }
+
+    private bool _accountEstablished = false;
+    private ReviewOrderResultDTO? _reviewOrderResult { get; set; }
+    private AccountDTO? _accountInfo { get; set; }
+    private ShoppingCartDTO? _shoppingCart { get; set; }
+    private AddressDTO? _shippingAddress { get; set; }
+    private AddressDTO? _billingAddress { get; set; }
+
+    private string? _errorMessage { get; set; }
+
+    private bool _showSelectShipping { get; set; } = false;
+    private bool _showSelectBilling { get; set; } = false;
+
+    // // Dev Helpers
+    // private string? _jsonAccount { get; set; }
+    // private string? _jsonCart { get; set; }
+    // private string? _jsonShipping { get; set; }
+    // private string? _jsonBilling { get; set; }
+
+    private async Task ReviewCustomerOrder()
+    {
+        var result = await _ordersService.ReviewOrderAsync();
+        if (result.IsSuccess && result.ReviewOrderResult?.Account is null)
+        {
+
+        }
+        if (result.IsSuccess && result.ReviewOrderResult != null)
+        {
+            _reviewOrderResult = result.ReviewOrderResult;
+            _accountInfo = result.ReviewOrderResult.Account;
+            _shoppingCart = result.ReviewOrderResult.ShoppingCart;
+            // _jsonAccount = JsonSerializer.Serialize(_accountDetail);
+            // _jsonCart = JsonSerializer.Serialize(_shoppingCart);
+
+            _shippingAddress = _accountInfo?.Addresses.FirstOrDefault(a => a.IsPrimaryShipping == true);
+            _billingAddress = _accountInfo?.Addresses.FirstOrDefault(a => a.IsPrimaryBilling == true);
+            // _jsonShipping = JsonSerializer.Serialize(_shippingAddress);
+            // _jsonBilling = JsonSerializer.Serialize(_billingAddress);
+
+        }
+        if (!string.IsNullOrWhiteSpace(result.ErrorMessage))
+        {
+            _errorMessage = result.ErrorMessage;
+            // await _toastr.ShowToastrError(result.ErrorMessage!);
+        }
+
+    }
+
+    private void ToggleSelectShipping() => _showSelectShipping = !_showSelectShipping;
+    private void SelectNewShipping(string street1)
+    {
+        _shippingAddress = _accountInfo?.Addresses.First(a => a.Street1 == street1);
+        _showSelectShipping = false;
+    }
+    private void ToggleSelectBilling() => _showSelectBilling = !_showSelectBilling;
+    private void SelectNewBilling(string street1)
+    {
+        _billingAddress = _accountInfo?.Addresses.First(a => a.Street1 == street1);
+        _showSelectBilling = false;
+    }
+
+    private void ClearErrorMessage() => _errorMessage = null;
+
+    private void BackToCart() => _nav.NavigateTo("/storefront/showCart=true");
+
+    private async Task SubmitOrderAsync()
+    {
+        // map cart items to order items with order id - but don't know order id yet - orderid provided in external orders service in orders.api
+        // so should be able to leave empty for now vs have orders.api get on it's own from user cart like in review order
+        if (_accountInfo is null)
+        {
+            _errorMessage = $"No account found.  Please go to My Account and create an account.";
+            // await _toastr.ShowToastrError($"No account found.  Please go to My Account and create an account.");
+            return;
+        }
+        if (_shippingAddress is null || _billingAddress is null)
+        {
+            _errorMessage = $"Missing address details.  Please go to My Account and add address information.";
+            // await _toastr.ShowToastrError($"Missing address details.  Please go to My Account and add address information.");
+            return;
+        }
+        if (_shoppingCart?.Items is null || !_shoppingCart.Items.Any())
+        {
+            _errorMessage = $"No shopping cart or no shopping cart items.";
+            // await _toastr.ShowToastrError($"No shopping cart or no shopping cart items.");
+            return;
+        }
+
+        IEnumerable<AddOrderItemDTO> orderItems = _orderMapper.MapCartItemDTOsToAddOrderItemDTOs(_shoppingCart?.Items!);
+        AddOrderDTO addOrderDTO = new AddOrderDTO()
+        {
+            Items = orderItems.ToList(),
+            ShippingAddress = _shippingAddress,
+            BillingAddress = _billingAddress
+        };
+
+        var submitOrderResult = await _ordersService.SubmitOrderAsync(addOrderDTO);
+        if (submitOrderResult.IsSuccess)
+        {
+            //await _toastr.ShowToastrSuccess($"Order submitted. Reference OrderId: {submitOrderResult.OrderId}.");
+            // _nav.NavigateTo("myOrders");
+            // _nav.NavigateTo($"orderDetail/{submitOrderResult.OrderId}");
+            _nav.NavigateTo($"orderSummary/{submitOrderResult.OrderId}");
+        }
+        else 
+        {
+            _errorMessage = submitOrderResult.ErrorMessage;
+            // await _toastr.ShowToastrError($"{submitOrderResult.ErrorMessage}");
+        }
+
+        _errorMessage = $"API KEY AUTH AND PII ENCRYPTION REQUIRED FOR CART INTERNAL SERVICES!!!";
+        // await _toastr.ShowToastrInfo($"API KEY AUTH AND PII ENCRYPTION REQUIRED FOR CART INTERNAL SERVICES!!!");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var accountInfoResult = await _accountsService.GetAccountAsync();
+            if (accountInfoResult.IsSuccess) _accountInfo = accountInfoResult.Account;
+
+            var accountResult = await _accountsService.AccountIsEstablished();
+            if (accountResult.IsSuccess) _accountEstablished = true;
+            this.StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // _shoppingCart = MyCart?.ToDTO();
+    }
+}
