@@ -17,6 +17,7 @@
         public int Version { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateUpdated { get; init; }
+        public string? DefaultImageUri { get; init; }
         public int ImageCount { get; init; }
         public int DocumentCount { get; init; }
     }

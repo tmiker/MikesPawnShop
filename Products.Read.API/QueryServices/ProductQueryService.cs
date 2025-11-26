@@ -204,6 +204,7 @@ namespace Products.Read.API.QueryServices
                     Version = product.Version,
                     DateCreated = product.DateCreated,
                     DateUpdated = product.DateUpdated,
+                    DefaultImageUri = product.Images != null && product.Images.Any() ? product.Images.OrderBy(i => i.SequenceNumber).First().ImageUrl : null,
                     ImageCount = product.Images is null ? 0 : product.Images.Count(),               
                     DocumentCount = product.Documents is null ? 0 : product.Documents.Count() 
 
@@ -271,6 +272,7 @@ namespace Products.Read.API.QueryServices
                     Version = product.Version,
                     DateCreated = product.DateCreated,
                     DateUpdated = product.DateUpdated,
+                    DefaultImageUri = product.Images != null && product.Images.Any() ? product.Images.OrderBy(i => i.SequenceNumber).First().ImageUrl : null,
                     ImageCount = product.Images is null ? 0 : product.Images.Count(),
                     DocumentCount = product.Documents is null ? 0 : product.Documents.Count()
 
@@ -304,9 +306,9 @@ namespace Products.Read.API.QueryServices
                 Version = product.Version,
                 DateCreated = product.DateCreated,
                 DateUpdated = product.DateUpdated,
+                DefaultImageUri = product.Images != null && product.Images.Any() ? product.Images.OrderBy(i => i.SequenceNumber).First().ImageUrl : null,
                 ImageCount = product.Images is null ? 0 : product.Images.Count(),
                 DocumentCount = product.Documents is null ? 0 : product.Documents.Count()
-
             };
             
             return new GetProductSummaryByIdResult(true, dto, null);

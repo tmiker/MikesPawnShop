@@ -21,6 +21,8 @@ namespace Consumer.Blazor.Client.DTOs.Products
         public DateTime DateUpdated { get; init; }
         public int ImageCount { get; init; }
         public int DocumentCount { get; init; }
+        public string? DefaultImageUri { get; init; }
+
 
         [JsonIgnore]
         public int QuantityAvailable { get => QuantityOnHand - QuantityAllocated; }
