@@ -82,23 +82,54 @@
     </div>
 </div>
 
-<div class="row m2">
+<div class="toolbar-paging">
     @if (_pagingData is not null)
     {
-        <div class="col-2 offset-2">
-            <span class="text-primary">Page @_pagingData.CurrentPage of @_pagingData.TotalPageCount</span>
-        </div>
-        <div class="col-1">
-            <a class="btn btn-sm btn-primary form-control" @onclick="PageBackward">Back</a>
-        </div>
-        <div class="col-1">
-            <a class="btn btn-sm btn-primary form-control" @onclick="PageForward">Fwd</a>
-        </div>
-        <div class="col-2 offset-1">
-            <span class="text-primary">Page Size: @_pagingData.PageSize</span>
-        </div>
-        <div class="col-2">
-            <span class="text-primary">Total Items: @_pagingData.TotalItemCount</span>
+        <div class="row p-4">
+            <div class="col-8">
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a class="btn button-custom-paging-arrow" role="button" @onclick="PageBackward">
+                            <i class="bi-chevron-double-left text-primary-alt"></i>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= _pagingData.TotalPageCount; i++)
+                    {
+                        int page = i;
+                        if (page == _pagingData.CurrentPage)
+                        {
+                            <li class="page-item active">
+                                <a class="btn button-custom-paging-current" role="button" @onclick="(() => PageTo(page))">
+                                    <span class="text-info-alt">@i</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="btn button-custom-paging-page" role="button" @onclick="(() => PageTo(page))">
+                                    <span class="text-primary-alt">@i</span>
+                                </a>
+                            </li>
+                        }
+                    }
+                    <li class="page-item">
+                        <a class="btn button-custom-paging-arrow" role="button" @onclick="PageForward">
+                            <i class="bi-chevron-double-right text-primary-alt"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-4 ">
+                <div class="row ">
+                    <div class="col-6 text-center ">
+                        <span class="text-primary-alt"><i>Page Size: @_pagingData.PageSize</i></span>
+                    </div>
+                    <div class="col-6 text-center ">
+                        <span class="text-primary-alt"><i>Item Count: @_pagingData.TotalItemCount</i></span>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>
@@ -139,6 +170,12 @@
         await RefreshData();
     }
 
+    private async Task PageTo(int page)
+    {
+        if (page == _pagingData!.CurrentPage || page < 0 || page > _pagingData.TotalPageCount) return;
+        _pageNumber = page;
+        await RefreshData();
+    }
 
     private async Task RefreshData()
     {
