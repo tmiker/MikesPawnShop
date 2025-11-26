@@ -74,7 +74,8 @@
 
                 <CascadingValue Name="Products" Value="@Products">
                     <CascadingValue Name="PagingData" Value="@PagingData">
-                        <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" PageBackwardCallback="PageBackward" />
+                        <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward"
+                                            PageBackwardCallback="PageBackward" PageToCallback="PageTo" />
                     </CascadingValue>
                 </CascadingValue>
             }
@@ -108,6 +109,14 @@
         if (_pageNumber <= 1) return;
         _pageNumber = _pageNumber - 1;
         await RefreshData();
+    }
+
+    private async Task PageTo(int page)
+    {
+        if (page == PagingData!.CurrentPage || page < 0 || page > PagingData.TotalPageCount) return;
+        _pageNumber = page;
+        await RefreshData();
+
     }
 
     private string? _nameFilter = null;
