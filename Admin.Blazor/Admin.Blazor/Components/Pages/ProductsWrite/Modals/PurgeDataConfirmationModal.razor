@@ -6,7 +6,7 @@
 
         <div class="modal-content rounded-3 border">
 
-            <div class="modal-header bg-primary text-light">
+            <div class="modal-header">
                 <h5>@ModalTitle</h5>
             </div>
 
@@ -36,10 +36,10 @@
 
                         <div class="row mt-2">
                             <div class="col-4 offset-3">
-                                <button class="btn btn-modal-primary form-control" @onclick="CancelPurgeData">Cancel</button>
+                                <button class="btn button-modal-primary form-control" @onclick="CancelPurgeData">Cancel</button>
                             </div>
                             <div class="col-4 offset-1">
-                                <button class="btn btn-modal-success form-control" type="submit">@SubmitButtonTitle</button>
+                                <button class="btn button-modal-success form-control" type="submit">@SubmitButtonTitle</button>
                             </div>
                         </div>
 
@@ -53,14 +53,13 @@
                         </div>
                         <div class="row">
                             <div class="col-4 offset-4 text-center">
-                                <button class="btn btn-modal-primary form-control" @onclick="CancelPurgeData">Cancel</button>
+                                <button class="btn button-modal-primary form-control" @onclick="CancelPurgeData">Cancel</button>
                             </div>
                         </div>
                     }
                 </EditForm>
-
-                <div class="modal-footer justify-content-around">
-                </div>
+            </div>
+            <div class="modal-footer justify-content-around">
             </div>
         </div>
     </div>

@@ -11,29 +11,16 @@
                     <DataAnnotationsValidator />
                     <div class="modal-header">
                         <h5 class="modal-title">@Title</h5>
-                        <button type="button" class="close" aria-label="Close" @onclick="Cancel">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
 
                     <div class="modal-body">
-
-                        @* <div hidden class="form-group row">
-                            <div class="col-3 text-center">
-                                <label for="id">Account Id:</label>
-                            </div>
-                            <div class="col-9">
-                                <InputText inert class="form-control" id="accountId" @bind-Value="@AccountToAdd.AccountId" />
-                                <ValidationMessage For="@(() => AccountToAdd.AccountId)" />
-                            </div>
-                        </div> *@
 
                         <div class="form-group row">
                             <div class="col-3 text-center">
                                 <label for="first">First:</label>
                             </div>
                             <div class="col-9">
-                                <InputText class="form-control bg-dark text-light " id="first" @bind-Value="@AccountToAdd.FirstName" />
+                                <InputText class="bg-dark text-light form-control" id="first" @bind-Value="@AccountToAdd.FirstName" />
                                 <ValidationMessage For="@(() => AccountToAdd.FirstName)" />
                             </div>
                         </div>
@@ -42,7 +29,7 @@
                                 <label for="last">Last:</label>
                             </div>
                             <div class="col-9">
-                                <InputText class="form-control" id="last" @bind-Value="@AccountToAdd.LastName" />
+                                <InputText class="bg-dark text-light form-control" id="last" @bind-Value="@AccountToAdd.LastName" />
                                 <ValidationMessage For="@(() => AccountToAdd.LastName)" />
                             </div>
                         </div>
@@ -52,7 +39,7 @@
                                 <label for="email">Email:</label>
                             </div>
                             <div class="col-9">
-                                <InputText class="form-control bg-dark text-light " id="email" @bind-Value="@AccountToAdd.Email" />
+                                <InputText class="bg-dark text-light form-control" id="email" @bind-Value="@AccountToAdd.Email" />
                                 <ValidationMessage For="@(() => AccountToAdd.Email)" />
                             </div>
                         </div>
@@ -61,7 +48,7 @@
                                 <label for="phone">Phone:</label>
                             </div>
                             <div class="col-9">
-                                <InputText class="form-control" id="phone" @bind-Value="@AccountToAdd.PhoneNumber" />
+                                <InputText class="bg-dark text-light form-control" id="phone" @bind-Value="@AccountToAdd.PhoneNumber" />
                                 <ValidationMessage For="@(() => AccountToAdd.PhoneNumber)" />
                             </div>
                         </div>
@@ -87,10 +74,10 @@
                         <br />
                         <div class="row">
                             <div class="col-5 offset-1">
-                                <button class="btn btn-modal-primary form-control" @onclick="Cancel">Cancel</button>
+                                <button class="btn button-modal-primary form-control" @onclick="Cancel">Cancel</button>
                             </div>
                             <div class="col-5">
-                                <button class="btn btn-modal-success form-control" type="submit">Submit</button>
+                                <button class="btn button-modal-success form-control" type="submit">Submit</button>
                             </div>
                         </div>
                     </div>
@@ -107,7 +94,7 @@
                 </div>
                 <div class="row">
                     <div class="col-4 offset-4 text-center">
-                        <button class="btn btn-modal-primary form-control" @onclick="Cancel">Cancel</button>
+                        <button class="btn button-modal-primary form-control" @onclick="Cancel">Cancel</button>
                     </div>
                 </div>
             }

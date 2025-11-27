@@ -10,19 +10,15 @@
                     <DataAnnotationsValidator />
                     <div class="modal-header">
                         <h5 class="modal-title">@Title</h5>
-                        <button type="button" class="close" aria-label="Close" @onclick="Cancel">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
 
                     <div class="modal-body">
-
                         <div class="form-group row">
                             <div class="col-3 ">
                                 <label for="street1">Street 1:</label>
                             </div>
                             <div class="col-9">
-                                <InputText class="bg-dark text-light form-control " id="street1" @bind-Value="@AddressToAdd.Street1" />
+                                <InputText class="bg-dark text-light form-control" id="street1" @bind-Value="@AddressToAdd.Street1" />
                                 <ValidationMessage For="@(() => AddressToAdd.Street1)" />
                             </div>
                         </div>
@@ -86,10 +82,10 @@
                         <br />
                         <div class="row">
                             <div class="col-5 offset-1">
-                                <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                                <button class="btn button-modal-primary form-control" @onclick="Cancel">Cancel</button>
                             </div>
                             <div class="col-5">
-                                <button class="btn btn-success form-control" type="submit">Submit</button>
+                                <button class="btn button-modal-success form-control" type="submit">Submit</button>
                             </div>
                         </div>
                     </div>
@@ -106,14 +102,13 @@
                 </div>
                 <div class="row">
                     <div class="col-4 offset-4 text-center">
-                        <button class="btn btn-primary form-control" @onclick="Cancel">Cancel</button>
+                        <button class="btn button-modal-primary form-control" @onclick="Cancel">Cancel</button>
                     </div>
                 </div>
             }
         </div>
     </div>
 </div>
-
 
 @code {
 
@@ -128,7 +123,6 @@
 
     [Parameter]
     public EventCallback Cancel { get; set; }
-
 
     public async Task SubmitAddress()
     {
