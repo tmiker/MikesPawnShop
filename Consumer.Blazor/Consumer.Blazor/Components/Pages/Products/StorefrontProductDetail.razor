@@ -235,7 +235,7 @@
 
                         }
                     </div>
-                    <hr />
+                    @* <hr />
                     <div class="row">
                         <div class="row">
                             @foreach (var thumb in _product.Images)
@@ -246,7 +246,7 @@
                                 </div>
                             }
                         </div>
-                    </div>
+                    </div> *@
                 }
                 else
                 {
@@ -325,6 +325,7 @@
             {
                 _product = result.Product;
                 _productAggregateId = _product?.AggregateId.ToString();
+                if (_product?.Images is not null && _product.Images.Any()) _primaryImage = _product.Images.FirstOrDefault();
             }
             else _errorMessage = result.ErrorMessage;
             this.StateHasChanged();

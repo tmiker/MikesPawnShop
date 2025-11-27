@@ -1,145 +1,78 @@
 ﻿@rendermode InteractiveServer
 @inject IProductsReadHttpService _readProductsClient
 
-
-<h4 class="mt-2"><b>READ SIDE STOREFRONT PRODUCTS</b></h4>
-
+<p class="text-secondary mt-2"><b><i>Product summaries sourced from Products Read Side API</i></b></p>
 
 <div class="row mt-2">
-    <div class="col-12">
+    @if (ProductSummaries != null && ProductSummaries.Any())
+    {
+        @* <div class="product-section"> *@
 
-        @if (ProductSummaries is not null)
-        {
-            <table class="table table-dark table-bordered text-center">
-                <thead class="bg-primary text-light">
-                    <tr>
-                        <th>Id</th>
-                        <th>Aggregate Id</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Currency</th>
-                        <th>Status</th>
-                        <th>Images</th>
-                        <th>Docs</th>
-                        <th>Ver</th>
-                        <th>On Hand</th>
-                        <th>Allocated</th>
-                        <th>Available</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var product in ProductSummaries)
-                    {
-                        <tr>
-                            <td>@product.Id</td>
-                            <td>@product.AggregateId.ToString()[0..8]-...</td>
-                            <td>@product.Name</td>
-                            <td>@product.Category</td>
-                            <td>@product.Price</td>
-                            <td>@product.Currency</td>
-                            <td>@product.Status</td>
-                            <td>@product.ImageCount</td>
-                            <td>@product.DocumentCount</td>
-                            <td>@product.Version</td>
-                            <td>@product.QuantityOnHand</td>
-                            <td>@product.QuantityAllocated</td>
-                            <td>@product.QuantityAvailable</td>
-                            <td>
-                                <a class="btn btn-primary" @onclick="() => Detail(product.Id)">Detail</a>
-                            </td>
-                            <td>
-                                <a class="btn btn-success" @onclick="() => AddToCart(product.AggregateId)">Add to Cart</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
+            @foreach (var product in ProductSummaries)
+            {
+                @* <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" /> *@
 
-        }
-    </div>
+                <div class="col-3">
+                    <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" />
+                </div>
+
+            }
+
+        @* </div> *@
+    }
 </div>
 
-<div class="toolbar-paging">
-    @if (PagingData is not null)
-    {
-        <div class="row p-4">
-            <div class="col-8">
-                <ul class="pagination">
-                    <li class="page-item">
-                        <a class="btn button-custom-paging-arrow" role="button" @onclick="PageBackward">
-                            <i class="bi-chevron-double-left text-primary-alt"></i>
-                        </a>
-                    </li>
-                    @for (int i = 1; i <= PagingData.TotalPageCount; i++)
+
+@if (PagingData is not null)
+{
+    <div class="row p-4">
+        <div class="col-8">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="btn button-custom-paging-arrow" role="button" @onclick="PageBackward">
+                        <i class="bi-chevron-double-left text-primary-alt"></i>
+                    </a>
+                </li>
+                @for (int i = 1; i <= PagingData.TotalPageCount; i++)
+                {
+                    int page = i;
+                    if (page == PagingData.CurrentPage)
                     {
-                        int page = i;
-                        if (page == PagingData.CurrentPage)
-                        {
-                            <li class="page-item active">
-                                <a class="btn button-custom-paging-current" role="button" @onclick="(() => PageTo(page))">
-                                    <span class="text-info-alt">@i</span>
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="page-item">
-                                <a class="btn button-custom-paging-page" role="button" @onclick="(() => PageTo(page))">
-                                    <span class="text-primary-alt">@i</span>
-                                </a>
-                            </li>
-                        }
+                        <li class="page-item active">
+                            <a class="btn button-custom-paging-current" role="button" @onclick="(() => PageTo(page))">
+                                <span class="text-info-alt">@i</span>
+                            </a>
+                        </li>
                     }
-                    <li class="page-item">
-                        <a class="btn button-custom-paging-arrow" role="button" @onclick="PageForward">
-                            <i class="bi-chevron-double-right text-primary-alt"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-4 ">
-                <div class="row ">
-                    <div class="col-6 text-center ">
-                        <span class="text-primary-alt"><i>Page Size: @PagingData.PageSize</i></span>
-                    </div>
-                    <div class="col-6 text-center ">
-                        <span class="text-primary-alt"><i>Item Count: @PagingData.TotalItemCount</i></span>
-                    </div>
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="btn button-custom-paging-page" role="button" @onclick="(() => PageTo(page))">
+                                <span class="text-primary-alt">@i</span>
+                            </a>
+                        </li>
+                    }
+                }
+                <li class="page-item">
+                    <a class="btn button-custom-paging-arrow" role="button" @onclick="PageForward">
+                        <i class="bi-chevron-double-right text-primary-alt"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-4 ">
+            <div class="row ">
+                <div class="col-6 text-center ">
+                    <span class="text-primary-alt"><i>Page Size: @PagingData.PageSize</i></span>
+                </div>
+                <div class="col-6 text-center ">
+                    <span class="text-primary-alt"><i>Item Count: @PagingData.TotalItemCount</i></span>
                 </div>
             </div>
         </div>
-    }
-</div>
-
-<br />
-<div class="row mx-2 mt-2">
-    <div class="col-2">
-        <a class="btn btn-success form-control" @onclick="LoadFullProductsList">Load Full Product Cards</a>
     </div>
-    @if (Products != null)
-    {
-        <div class="col-2">
-            <a class="btn btn-success form-control" @onclick="DeleteFullProductsList">Delete Full Product Cards</a>
-        </div>
-    }
-</div>
-<div class="row mt-2">
-    @if (Products != null && Products.Any())
-    {
-        @foreach (var product in Products)
-        {
-            <div class="col-4">
-                <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" />
-            </div>
-        }
-    }
-</div>
+}
+
 
 @code {
 
@@ -184,20 +117,20 @@
         if (AddToCartCallback.HasDelegate) await AddToCartCallback.InvokeAsync(productId);
     }
 
-    public List<ProductDTO>? Products;
-    private void DeleteFullProductsList() => Products = null;
-    private async Task LoadFullProductsList()
-    {
-        var productsResult = await _readProductsClient.GetProductsAsync();
-        if (productsResult.IsSuccess)
-        {
-            if (productsResult.Products is not null && productsResult.Products.Any())
-            {
-                Products = productsResult.Products.ToList();
-            }
-        }
-        else Console.WriteLine(productsResult.ErrorMessage);
-    }
+    // public List<ProductDTO>? Products;
+    // private void DeleteFullProductsList() => Products = null;
+    // private async Task LoadFullProductsList()
+    // {
+    //     var productsResult = await _readProductsClient.GetProductsAsync();
+    //     if (productsResult.IsSuccess)
+    //     {
+    //         if (productsResult.Products is not null && productsResult.Products.Any())
+    //         {
+    //             Products = productsResult.Products.ToList();
+    //         }
+    //     }
+    //     else Console.WriteLine(productsResult.ErrorMessage);
+    // }
 
     protected override void OnAfterRender(bool isFirstRender)
     {
