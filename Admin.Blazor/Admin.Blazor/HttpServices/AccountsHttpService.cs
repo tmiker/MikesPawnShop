@@ -20,7 +20,7 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablished(string? token = null)
         {
-            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/accoutEstablished";
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/accountEstablished";
             var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

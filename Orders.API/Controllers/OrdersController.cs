@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -26,6 +27,7 @@ namespace Orders.API.Controllers
         }
 
         [HttpGet("reviewOrder")]
+        [Authorize]
         public async Task<ActionResult<ReviewOrderResultDTO?>> ReviewOrder()
         {
             Console.WriteLine("OrdersController.ReviewOrder() called.");
@@ -51,6 +53,7 @@ namespace Orders.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> PostOrder(AddOrderDTO addOrderDTO)
         {
             // await LogIdentityInformation();
@@ -71,6 +74,7 @@ namespace Orders.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetUserOrders(string? filter = null, string? sortColumn = null, string? sortOrder = null, int pageNumber = 1, int pageSize = 10)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -91,6 +95,7 @@ namespace Orders.API.Controllers
         }
 
         [HttpGet("{orderId}")]
+        [Authorize]
         public async Task<ActionResult<OrderDTO?>> GetOrderByOrderId(string orderId)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;

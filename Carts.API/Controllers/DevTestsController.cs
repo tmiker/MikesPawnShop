@@ -32,7 +32,7 @@ namespace Carts.API.Controllers
         }
 
         [HttpGet("[action]")]
-        [Authorize(Policy = "IsAdmin")]
+        [Authorize]
         public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
         {
             var contextClaims = HttpContext.User.Claims;

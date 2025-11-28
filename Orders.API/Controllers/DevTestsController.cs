@@ -27,7 +27,7 @@ namespace Orders.API.Controllers
         }
 
         [HttpGet("[action]")]
-        // [Authorize(Policy = "IsAdmin")]
+        [Authorize]
         public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
         {
             // https://localhost:7019/api/devTests/getApiUserInfo

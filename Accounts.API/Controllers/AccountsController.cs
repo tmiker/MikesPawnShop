@@ -23,7 +23,8 @@ namespace Accounts.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("accoutEstablished")]
+        [HttpGet("accountEstablished")]
+        [Authorize]
         public async Task<ActionResult<bool>> AccountIsEstablished()
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -36,6 +37,7 @@ namespace Accounts.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<AccountDTO>> GetByOwnerId()
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -54,6 +56,7 @@ namespace Accounts.API.Controllers
         }
 
         [HttpGet("{accountId}")]
+        [Authorize]
         public async Task<ActionResult<AccountDTO>> GetByAccountId(string accountId)
         {
             var result = await _accountService.GetAccountByAccountIdAsync(accountId);
@@ -62,6 +65,7 @@ namespace Accounts.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Post(AddAccountDTO addAccountDTO)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -73,6 +77,7 @@ namespace Accounts.API.Controllers
         }
 
         [HttpPut("addAddress")]
+        [Authorize]
         public async Task<IActionResult> Put(AddAddressDTO addAddressDTO)
         {
             string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;

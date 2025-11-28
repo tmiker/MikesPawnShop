@@ -38,7 +38,7 @@ namespace Products.Write.API.Controllers
 
         // Claims
         [HttpGet("[action]")]
-        [Authorize(Policy = "IsAdmin")]
+        [Authorize]
         public async Task<ActionResult<ApiUserInfoDTO>> GetApiUserInfo()
         {
             var contextClaims = HttpContext.User.Claims;
@@ -82,6 +82,7 @@ namespace Products.Write.API.Controllers
         // Query service propagated endpoints
 
         [HttpGet("pagedAndFilteredProductSnapshots")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<PagedProductSnapshotResult>> GetPagedAndFilteredProductSnapshots(
             string? aggregateId,
             string? category,
@@ -98,6 +99,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpGet("productSnapshots")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<PagedProductSnapshotResult>> GetProductSnapshots(
             string? aggregateId,
             int minVersion = 0,
@@ -113,6 +115,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpGet("productSnapshot/{aggregateId}")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<ProductSnapshot>> GetProductSnapshot(
             string? aggregateId,
             int minVersion = 0,
@@ -126,6 +129,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpGet("eventRecords")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<PagedEventRecordResult>>  GetEventRecords(
             string? aggregateId,
             string? correlationId = null,
@@ -146,6 +150,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpGet("outboxRecords")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<PagedOutboxRecordResult>> GetOutboxRecords(
             string? aggregateId,
             string? correlationId = null,
@@ -162,6 +167,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpGet("snapshotRecords")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<ActionResult<PagedSnapshotRecordResult>> GetSnapshotRecords(
             string? aggregateId,
             string? correlationId = null,
@@ -180,6 +186,7 @@ namespace Products.Write.API.Controllers
         // Command propagated endpoints
 
         [HttpPost("throwExceptionForTesting")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<IActionResult> ThrowExceptionForTesting([FromBody] ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends
@@ -195,6 +202,7 @@ namespace Products.Write.API.Controllers
 
 
         [HttpGet("getCloudAmqpSettingsTestingDummyValue")]
+        [Authorize(Policy = "IsAdmin")]
         public IActionResult GetCloudAmqpTestingDummyValue(CancellationToken cancellationToken)
         {
             string? value = _cloudAmqpSettings.Value.TestingDummyValue;
@@ -203,6 +211,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("purgeData")]
+        [Authorize(Policy = "IsAdmin")]
         public async Task<IActionResult> PurgeData([FromBody] PurgeDataDTO purgeDataDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];

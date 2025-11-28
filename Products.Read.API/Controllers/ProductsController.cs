@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Products.Read.API.Abstractions;
 using Products.Read.API.Domain.Models;
 using Products.Read.API.DTOs;
@@ -21,6 +22,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("productStream")]
+        [AllowAnonymous]
         public async IAsyncEnumerable<Product> StreamProducts()
         {
             await foreach (var product in _productQueryService.GetProductsAsAsyncEnumerable())
@@ -30,6 +32,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
             GetProductsResult result = await _productQueryService.GetAllProductsAsync();
@@ -38,6 +41,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("summaries")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductSummaryDTO>>> GetProductSummaries()
         {
             GetProductSummariesResult result = await _productQueryService.GetAllProductSummariesAsync();
@@ -46,6 +50,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("paged")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedProductsDTO>> GetPagedAndFilteredProducts(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductsResult result = await _productQueryService.GetPagedAndFilteredProductsAsync(filter, category, sortColumn, pageNumber, pageSize);
@@ -54,6 +59,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("paged/summaries")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedProductSummariesDTO>> GetPagedAndFilteredProductSummaries(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductSummariesResult result = await _productQueryService.GetPagedAndFilteredProductSummariesAsync(filter, category, sortColumn, pageNumber, pageSize);
@@ -62,6 +68,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             GetProductByIdResult result = await _productQueryService.GetProductByIdAsync(id);
@@ -70,6 +77,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpGet("summary/{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ProductSummaryDTO>> GetProductSummaryById(int id)
         {
             GetProductSummaryByIdResult result = await _productQueryService.GetProductSummaryByIdAsync(id);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.Configuration;
@@ -24,7 +25,8 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] AddProductDTO addProductDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<AddProductResult>> AddProduct([FromBody] AddProductDTO addProductDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends
             // caution using IHttpContextAccessor to get http context if want to pull header in handlers
@@ -38,7 +40,8 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("image")]
-        public async Task<IActionResult> AddImage([FromForm] AddImageDTO addImageDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<AddImageResult>> AddImage([FromForm] AddImageDTO addImageDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddImage command = new AddImage(addImageDTO, correlationId);
@@ -48,7 +51,8 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("document")]
-        public async Task<IActionResult> AddDocument([FromForm] AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<AddDocumentResult>> AddDocument([FromForm] AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken)
         {
             if (addDocumentDTO.DocumentBlob is null) Console.WriteLine($"The Document Blob is null.");
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
@@ -59,7 +63,8 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("status")]
-        public async Task<IActionResult> UpdateStatus([FromBody] UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<UpdateStatusResult>> UpdateStatus([FromBody] UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             UpdateStatus command = new UpdateStatus(updateStatusDTO, correlationId);
@@ -69,7 +74,8 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpDelete("image")]
-        public async Task<IActionResult> DeleteImage(DeleteImageDTO deleteImageDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<DeleteImageResult>> DeleteImage(DeleteImageDTO deleteImageDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
 
@@ -79,7 +85,8 @@ namespace Products.Write.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
         [HttpDelete("document")]
-        public async Task<IActionResult> DeleteDocument(DeleteDocumentDTO deleteDocumentDTO, CancellationToken cancellationToken)
+        [Authorize(Policy = "IsAdminOrManager")]
+        public async Task<ActionResult<DeleteDocumentResult>> DeleteDocument(DeleteDocumentDTO deleteDocumentDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             DeleteDocument command = new DeleteDocument(deleteDocumentDTO, correlationId);
