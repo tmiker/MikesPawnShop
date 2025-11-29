@@ -5,87 +5,92 @@
 @inject NavigationManager Nav
 
 
-        <div class="row">
-            <div class="col-2">
-            </div>
-            <div class="col-8 text-center">
-                <h4><b>STORE FRONT</b></h4>
-            </div>
+<div class="row">
+    <div class="col-2">
+    </div>
+    <div class="col-8 text-center">
+        <h4><b>STORE FRONT</b></h4>
+    </div>
+    <AuthorizeView>
+        <Authorized>
             <div class="col-2">
                 <a class="btn button-custom-warning form-control" @onclick="ToggleShowCart">@_cartButtonText</a>
             </div>
-        </div>
+        </Authorized>
+    </AuthorizeView>
 
-        <div class="row mt-2">
-            <div class="col-12">
-                @if (SelectedProductId > 0)
-                {
-                    <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
-                        <StorefrontProductDetail BackToListCallback="BackToList" />
-                    </CascadingValue>
-                }
-                else
-                {
-                    @if (_showCart)
-                    {
-                        <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                            <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
-                        </CascadingValue>
-                    }
-                    else
-                    {
-                        <div class="card-header">
-                            <div class="row mt-2">
-                                <div class="col-2">
-                                    <label for="namefilter">Name Filter:</label>
-                                    <input class="bg-dark text-light form-control" id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
-                                </div>
-                                <div class="col-2">
-                                    <label for="cat">Category Filter:</label>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        @if (SelectedProductId > 0)
+        {
+            <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
+                <StorefrontProductDetail BackToListCallback="BackToList" />
+            </CascadingValue>
+        }
+        else
+        {
+            @if (_showCart)
+            {
+                <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
+                    <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
+                </CascadingValue>
+            }
+            else
+            {
+                <div class="card-header">
+                    <div class="row mt-2">
+                        <div class="col-2">
+                            <label for="namefilter">Name Filter:</label>
+                            <input class="bg-dark text-light form-control" id="namefilter" type="text" @bind="_nameFilter" @bind:after="RefreshData" />
+                        </div>
+                        <div class="col-2">
+                            <label for="cat">Category Filter:</label>
                             <select class="bg-dark text-light form-select" id="cat" type="text" @bind="_categoryFilter" @bind:after="RefreshData">
-                                        <option value=""></option>
-                                        <option value="Astronomy">Astronomy</option>
-                                        <option value="Books">Books</option>
-                                        <option value="Computers">Computers</option>
-                                        <option value="Electronics">Electronics</option>
-                                        <option value="Music">Music</option>
-                                        <option value="Photography">Photography</option>
-                                        <option value="Sports">Sports</option>
-                                    </select>
-                                </div>
-                                <div class="col-2">
-                                    <label for="sort">Sort Column:</label>
+                                <option value=""></option>
+                                <option value="Astronomy">Astronomy</option>
+                                <option value="Books">Books</option>
+                                <option value="Computers">Computers</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Music">Music</option>
+                                <option value="Photography">Photography</option>
+                                <option value="Sports">Sports</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <label for="sort">Sort Column:</label>
                             <select class="bg-dark text-light form-select" id="sort" type="text" @bind="_sortColumn" @bind:after="RefreshData">
-                                        <option value=""></option>
-                                        <option value="Name">Name</option>
-                                        <option value="Price">Price</option>
-                                    </select>
-                                </div>
-                                <div class="col-2">
-                                    <label for="pagesize">Page Size:</label>
+                                <option value=""></option>
+                                <option value="Name">Name</option>
+                                <option value="Price">Price</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <label for="pagesize">Page Size:</label>
                             <input class="bg-dark text-light form-control" id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
-                                </div>
-                                <div class="col-2">
-                                    <a class="btn btn-outline-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
-                                </div>
-                                
-                            </div>
+                        </div>
+                        <div class="col-2">
+                            <a class="btn btn-outline-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
                         </div>
 
-                        <CascadingValue Name="Products" Value="@Products">
-                            <CascadingValue Name="PagingData" Value="@PagingData">
-                                <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward" 
-                                    PageBackwardCallback="PageBackward" PageToCallback="PageTo" />
-                            </CascadingValue>
-                        </CascadingValue>
-                    }
-                }
-            </div>
-        </div>
+                    </div>
+                </div>
+
+                <CascadingValue Name="Products" Value="@Products">
+                    <CascadingValue Name="PagingData" Value="@PagingData">
+                        <StorefrontProducts DetailCallback="Detail" AddToCartCallback="AddToCart" PageForwardCallback="PageForward"
+                                            PageBackwardCallback="PageBackward" PageToCallback="PageTo" />
+                    </CascadingValue>
+                </CascadingValue>
+            }
+        }
+    </div>
+</div>
 
 @code {
 
-    public List<ProductSummaryDTO>? Products { get; set; } 
+    public List<ProductSummaryDTO>? Products { get; set; }
     public PaginationMetadata? PagingData { get; set; }
     public int SelectedProductId { get; set; } = 0;
     public ShoppingCartDTO? ShoppingCart { get; set; }
@@ -141,16 +146,16 @@
         await RefreshData();
     }
 
-    private void Detail(int id) 
+    private void Detail(int id)
     {
         SelectedProductId = id;
         // HideCart();
     }
-    private void BackToList() 
+    private void BackToList()
     {
         SelectedProductId = 0;
     }
-    // private void BackToCart() 
+    // private void BackToCart()
     // {
     //     _showCart = true;
     // }
@@ -161,7 +166,7 @@
         if (ShoppingCart is null)
         {
             var result = await _cartsHttpClient.GetShoppingCartAsync();
-            if (result.IsSuccess) 
+            if (result.IsSuccess)
             {
                 ShoppingCart = result.ShoppingCart;
                 ShoppingCartItemCount = ShoppingCart is null ? 0 : ShoppingCart.Items.Count;
@@ -236,5 +241,5 @@
             await RefreshData();
             StateHasChanged();
         }
-    }    
+    }
 }

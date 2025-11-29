@@ -28,8 +28,16 @@
             </div> *@
         </div>
         <div class="card-footer bg-dark text-light text-center">
-            <a class="btn btn-primary btn-sm" style="width:120px" @onclick="ProductDetail">Details</a>
-            <a class="btn btn-success btn-sm" style="width:120px" @onclick="AddToCart">Add to Cart</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a class="btn btn-primary btn-sm" style="width:120px" @onclick="ProductDetail">Details</a>
+                    <a class="btn btn-success btn-sm" style="width:120px" @onclick="AddToCart">Add to Cart</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="btn btn-primary btn-sm" style="width:120px" @onclick="ProductDetail">Details</a>
+                </NotAuthorized>
+            </AuthorizeView>
+            
         </div>
     </div>
 }
