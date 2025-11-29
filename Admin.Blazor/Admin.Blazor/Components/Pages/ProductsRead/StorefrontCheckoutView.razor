@@ -4,6 +4,7 @@
 @inject IAccountsHttpService _accountsService
 @inject IOrdersHttpService _ordersService
 @inject IOrderMapper _orderMapper
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
     <div class="col-2">

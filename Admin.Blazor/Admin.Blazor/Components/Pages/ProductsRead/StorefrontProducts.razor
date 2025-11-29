@@ -1,6 +1,6 @@
-﻿@using Admin.Blazor.Client.DTOs.Products
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
 @inject IProductsReadHttpService _readProductsClient
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
     <div class="col-10">

@@ -1,5 +1,4 @@
 ﻿@page "/products/snapshotRecordsWrite"
-@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 @inject IProductsWriteHttpService _writeSideHttpClient
 @attribute [Authorize(Policy = "IsAdminOrManager")]

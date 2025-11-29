@@ -1,9 +1,9 @@
 ﻿@page "/store/storefront"
-@using Admin.Blazor.Client.DTOs.Products
 @rendermode InteractiveServer
 @inject IProductsReadHttpService _productReadSideHttpClient
 @inject ICartsHttpService _cartsHttpClient
 @inject NavigationManager Nav
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
     <div class="col-2">

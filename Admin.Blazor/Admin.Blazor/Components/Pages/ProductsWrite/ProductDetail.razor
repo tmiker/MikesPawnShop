@@ -1,5 +1,4 @@
 ﻿@page "/products/productDetail/{aggregateId}"
-@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 @inject IProductsWriteHttpService _writeSideHttpClient
 @attribute [Authorize(Policy = "IsAdminOrManager")]
