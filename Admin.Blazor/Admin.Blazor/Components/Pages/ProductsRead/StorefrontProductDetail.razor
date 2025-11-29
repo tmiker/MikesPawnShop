@@ -7,7 +7,19 @@
 
 @if (!string.IsNullOrWhiteSpace(_errorMessage))
 {
-    <h4 class="text-danger"><b>@_errorMessage</b></h4>
+    <div class="row mt-2">
+        <div class="col-10">
+            <h5 class="text-danger"><b>Error:</b></h5>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <textarea rows="2" class="bg-dark text-danger form-control">@_errorMessage</textarea>
+        </div>
+    </div>
 }
 @if (!string.IsNullOrWhiteSpace(_successMessage))
 {
@@ -236,7 +248,7 @@
 
                         }
                     </div>
-                    <hr />
+                    @* <hr />
                     <div class="row">
                         <div class="row">
                             @foreach (var thumb in _product.Images)
@@ -247,7 +259,7 @@
                                 </div>
                             }
                         </div>
-                    </div>
+                    </div> *@
                 }
                 else
                 {
@@ -300,6 +312,7 @@
     private string? _productAggregateId;
 
     private string? _errorMessage;
+    private void ClearErrorMessage() => _errorMessage = null;
     private string? _successMessage;
 
     private ImageDataDTO? _primaryImage { get; set; }
@@ -326,6 +339,7 @@
             {
                 _product = result.Product;
                 _productAggregateId = _product?.AggregateId.ToString();
+                if (_product?.Images is not null && _product.Images.Any()) _primaryImage = _product.Images.FirstOrDefault();
             }
             else _errorMessage = result.ErrorMessage;
             this.StateHasChanged();

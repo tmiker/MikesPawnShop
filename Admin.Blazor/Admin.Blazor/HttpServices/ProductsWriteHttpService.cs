@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Net;
 
 namespace Admin.Blazor.HttpServices
 {
@@ -37,6 +38,10 @@ namespace Admin.Blazor.HttpServices
                 ApiUserInfoDTO? apiUserInfoDTO = await response.Content.ReadFromJsonAsync<ApiUserInfoDTO>();
                 return (true, apiUserInfoDTO, null);
             }
+            else if (response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return (false, new ApiUserInfoDTO() { ErrorMessage = $"Access denied." }, "Access denied.");
+            }
             else
             {
                 string errorMessage = await GetErrorMessageAsync(response);
@@ -60,11 +65,13 @@ namespace Admin.Blazor.HttpServices
             if (response.IsSuccessStatusCode)
             {
                 AddProductResult? result = await response.Content.ReadFromJsonAsync<AddProductResult>();
-
                 return (true, result?.ProductId, null);
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> UpdateStatusAsync(UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
@@ -80,8 +87,11 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode) return (true, null);
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AddImageAsync(AddImageDTO addImageDTO, CancellationToken cancellationToken)
@@ -97,8 +107,11 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode) return (true, null);
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AddDocumentAsync(AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken)
@@ -114,8 +127,11 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode) return (true, null);
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
         }
 
         // UPDATED METHODS FOR IMAGES AND DOCUMENTS
@@ -147,8 +163,8 @@ namespace Admin.Blazor.HttpServices
                     if (response.IsSuccessStatusCode) return (true, null);
                     else
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        return (false, error);
+                        string errorMessage = await GetErrorMessageAsync(response);
+                        return (false, errorMessage);
                     }
                 }
 
@@ -187,8 +203,8 @@ namespace Admin.Blazor.HttpServices
                     if (response.IsSuccessStatusCode) return (true, null);
                     else
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        return (false, error);
+                        string errorMessage = await GetErrorMessageAsync(response);
+                        return (false, errorMessage);
                     }
                 }
                 else return (false, "No document was provided.");
@@ -207,8 +223,8 @@ namespace Admin.Blazor.HttpServices
             if (response.IsSuccessStatusCode) return (true, null);
             else
             {
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, error);
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
             }
         }
 
@@ -224,8 +240,8 @@ namespace Admin.Blazor.HttpServices
             if (response.IsSuccessStatusCode) return (true, null);
             else
             {
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, error);
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
             }
         }
 
@@ -249,12 +265,13 @@ namespace Admin.Blazor.HttpServices
             {
                 PagedProductSnapshotResult? result = await response.Content.ReadFromJsonAsync<PagedProductSnapshotResult>();
                 return (true, result?.ProductSnapshots, result?.PagingData, null);
-
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, null, errorMessage);
+            }
         }
-
 
         public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedProductSnapshotsAsync(
             string? aggregateId,
@@ -273,10 +290,12 @@ namespace Admin.Blazor.HttpServices
             {
                 PagedProductSnapshotResult? result = await response.Content.ReadFromJsonAsync<PagedProductSnapshotResult>();
                 return (true, result?.ProductSnapshots, result?.PagingData, null);
-
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, ProductSnapshotDTO? ProductSnapshot, string? ErrorMessage)> GetProductSnapshotByIdAsync(
@@ -294,10 +313,12 @@ namespace Admin.Blazor.HttpServices
             {
                 ProductSnapshotDTO? snapshotDTO = await response.Content.ReadFromJsonAsync<ProductSnapshotDTO>();
                 return (true, snapshotDTO, null);
-
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, IEnumerable<EventRecordDTO>? EventRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedEventRecordsAsync(
@@ -319,10 +340,12 @@ namespace Admin.Blazor.HttpServices
             {
                 PagedEventRecordResult? result = await response.Content.ReadFromJsonAsync<PagedEventRecordResult>();
                 return (true, result?.EventRecords, result?.PagingData, null);
-
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, IEnumerable<OutboxRecordDTO>? OutboxRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedOutboxRecordsAsync(
@@ -339,14 +362,17 @@ namespace Admin.Blazor.HttpServices
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
             HttpResponseMessage response = await client.SendAsync(request);
+            
             if (response.IsSuccessStatusCode)
             {
                 PagedOutboxRecordResult? result = await response.Content.ReadFromJsonAsync<PagedOutboxRecordResult>();
                 return (true, result?.OutboxRecords, result?.PagingData, null);
-
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, IEnumerable<SnapshotRecordDTO>? SnapshotRecords, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedSnapshotRecordsAsync(
@@ -369,8 +395,11 @@ namespace Admin.Blazor.HttpServices
                 return (true, result?.SnapshotRecords, result?.PagingData, null);
 
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> ThrowExceptionForTestingAsync(ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
@@ -388,8 +417,15 @@ namespace Admin.Blazor.HttpServices
                     "HttptatusCode success. It should return Problem Details.");
                 return (true, null);
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, $"Expected: Problem Details. Actual: {error}");
+            else if (response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return (false, $"Access denied.");
+            }
+            else
+            {
+                string error = await response.Content.ReadAsStringAsync();
+                return (false, $"Expected: Problem Details. Actual: {error}");
+            }
         }
 
         public async Task<(bool IsSuccess, string? Value, string? ErrorMessage)> GetCloudAmqpSettingsTestingDummyValueAsync(CancellationToken cancellationToken)
@@ -405,8 +441,11 @@ namespace Admin.Blazor.HttpServices
                 string value = await response.Content.ReadAsStringAsync();
                 return (true, value, null);
             }
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, null, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, null, errorMessage);
+            }
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> PurgeDataAsync(PurgeDataDTO purgeDataDTO, CancellationToken cancellationToken)
@@ -419,8 +458,11 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode) return (true, null);
-            string error = await response.Content.ReadAsStringAsync();
-            return (false, error);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
         }
 
         private async Task<string> GetErrorMessageAsync(HttpResponseMessage response)

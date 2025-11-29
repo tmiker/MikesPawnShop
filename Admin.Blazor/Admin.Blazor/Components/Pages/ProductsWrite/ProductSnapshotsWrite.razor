@@ -1,6 +1,8 @@
 ﻿@page "/products/productSnapshotsWrite"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 @inject IProductsWriteHttpService _writeSideHttpClient
+@attribute [Authorize]
 
 <h4 class="mt-2"><b>WRITE SIDE PRODUCT SNAPSHOTS</b></h4>
 <h6 class="mt-2"><i>Record Count: @_productSnapshotCount</i></h6>
@@ -8,6 +10,23 @@
 {
     <h6><b><i>Add Result: @_addResultString</i></b></h6>
     <a class="btn btn-success" @onclick="ClearAddResultString">Clear</a>
+}
+
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <div class="row mt-2">
+        <div class="col-10">
+            <h5 class="text-danger"><b>Error:</b></h5>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <textarea rows="2" class="bg-dark text-danger form-control">@_errorMessage</textarea>
+        </div>
+    </div>
 }
 
 <div class="row mt-2">
@@ -236,6 +255,9 @@
 
     private int _productSnapshotCount;
 
+    private string? _errorMessage;
+    private void ClearErrorMessage() => _errorMessage = null;
+
     //// ****************** ADD AND REMOVE IMAGES AND DOCUMENTS START *******************
 
     private AddImageDTO? _addImageDTO;
@@ -377,7 +399,7 @@
                     _productSnapshotCount = _productSnapshots.Count;
                 }
             }
-            else Console.WriteLine(snapshotsResult.ErrorMessage);
+            else _errorMessage = snapshotsResult.ErrorMessage;
             this.StateHasChanged();
         }
     }

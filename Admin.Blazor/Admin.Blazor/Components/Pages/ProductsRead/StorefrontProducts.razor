@@ -11,6 +11,22 @@
     </div>
 </div>
 
+@if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <div class="row mt-2">
+        <div class="col-10">
+            <h5 class="text-danger"><b>Error:</b></h5>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <textarea rows="2" class="bg-dark text-danger form-control">@_errorMessage</textarea>
+        </div>
+    </div>
+}
 
 @if (_tableView)
 {
@@ -160,6 +176,9 @@ else
     public EventCallback<int> DetailCallback { get; set; }
     [Parameter]
     public EventCallback<Guid> AddToCartCallback { get; set; }
+
+    private string? _errorMessage;
+    private void ClearErrorMessage() => _errorMessage = null;
 
     private bool _tableView = true;
     private string _tableViewButtonText = "Card View";
