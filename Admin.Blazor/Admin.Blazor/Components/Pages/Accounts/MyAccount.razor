@@ -1,6 +1,7 @@
 ﻿@page "/account/myAccount"
 @rendermode InteractiveServer
 @inject IAccountsHttpService _accountHttpService
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
     

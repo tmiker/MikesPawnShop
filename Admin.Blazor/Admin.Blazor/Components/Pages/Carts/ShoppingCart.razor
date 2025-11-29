@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager _nav
 @inject ICartsHttpService _cartService
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 @* <div class="row mt-2">
     <div class="col-2">
