@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 @inject IProductsWriteHttpService _writeSideHttpClient
-@attribute [Authorize]
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <h4 class="mt-2"><b>WRITE SIDE EVENT RECORDS</b></h4>
 <h6 class="mt-2"><i>Record Count: @_eventRecordCount</i></h6>

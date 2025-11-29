@@ -4,7 +4,7 @@
 @inject IProductsWriteHttpService _writeSideHttpClient
 @inject IProductsReadHttpService _readSideHttpClient
 @inject NavigationManager Nav
-@attribute [Authorize]
+@attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <h4 class="mt-2"><b>WRITE SIDE PRODUCTS</b></h4>
 <h6 class="mt-2"><i>Record Count: @_productsCount</i></h6>
