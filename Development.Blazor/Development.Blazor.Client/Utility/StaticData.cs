@@ -2,6 +2,8 @@
 {
     public class StaticData
     {
+        // NOTE: This client accesses API Resources directly and NOT through the YARP Reverse Proxy.
+
         public const int PurgeDataPinNumber = 7453;
 
         public const string ProductsReadHttpClient_ClientName = "ProductsReadHttpClient";

@@ -2,6 +2,8 @@
 {
     public class StaticData
     {
+        // NOTE: This client accesses API Resources through the YARP Reverse Proxy.
+
         public const string ProductsReadHttpClient_ClientName = "ProductsReadHttpClient";
         // public const string ProductsReadHttpClient_BaseURL = "https://localhost:7101";
         public const string ProductsReadHttpClient_BaseURL = "https://localhost:7245";          // YARP
