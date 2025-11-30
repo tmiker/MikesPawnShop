@@ -76,6 +76,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{A4E905
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IDP", "IDP", "{AB7915D4-21F3-4DCA-94FE-318BF8F30318}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YarpReverseProxy", "YarpReverseProxy\YarpReverseProxy.csproj", "{65C36C59-BB28-4B33-975D-BA3A4EC940D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -166,6 +168,10 @@ Global
 		{4B6B368B-8B50-4653-996D-9933B19FBA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B6B368B-8B50-4653-996D-9933B19FBA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B6B368B-8B50-4653-996D-9933B19FBA1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65C36C59-BB28-4B33-975D-BA3A4EC940D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65C36C59-BB28-4B33-975D-BA3A4EC940D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65C36C59-BB28-4B33-975D-BA3A4EC940D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65C36C59-BB28-4B33-975D-BA3A4EC940D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

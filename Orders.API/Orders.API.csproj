@@ -13,6 +13,8 @@
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.10.3" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+    <PackageReference Include="Yarp.Telemetry.Consumption" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>

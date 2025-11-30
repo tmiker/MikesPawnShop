@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace Carts.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/carts/[controller]")]
     [ApiController]
     public class DevTestsController : ControllerBase
     {

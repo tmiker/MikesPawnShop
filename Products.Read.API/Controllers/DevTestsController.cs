@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace Products.Read.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products/[controller]")]
     [ApiController]
     public class DevTestsController : ControllerBase
     {

@@ -16,7 +16,7 @@ using System.Security.Claims;
 
 namespace Products.Write.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/productsManagement/[controller]")]
     [ApiController]
     public class DevTestsController : ControllerBase
     {

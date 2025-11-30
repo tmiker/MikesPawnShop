@@ -11,7 +11,7 @@ using System.Text.Json;
 
 namespace Orders.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders/[controller]")]
     [ApiController]
     public class DevTestsController : ControllerBase
     {
