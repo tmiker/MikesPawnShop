@@ -56,6 +56,7 @@ builder.Services.AddAuthentication(options =>
     oidcOptions.Scope.Add("ordersapi.fullaccess");
     oidcOptions.CallbackPath = new PathString("/signin-oidc");
     oidcOptions.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
+    // oidcOptions.SignedOutRedirectUri = "https://localhost:7217/";
     oidcOptions.GetClaimsFromUserInfoEndpoint = true;
     oidcOptions.MapInboundClaims = false;
     // Mapped claim args are claim type in incoming token, claim type in users claims list
