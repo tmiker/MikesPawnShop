@@ -3,6 +3,8 @@ Update Secrets Requirements in notes
 
 Return ProblemDetails in clients if header contains "application/problem+json"
 
+Need buttons in consumer client product detail to add to or remove from cart
+
 OpenAPI documentation
 
 MediatR
@@ -14,7 +16,7 @@ YARP: Add health checks for downstream services
 Caching
 	YARP vs API
 
-use Fluent Validation for API Controller DTOs, or use Data Annotations 
+Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
 
 Cancellation token: button to cancel in UI
