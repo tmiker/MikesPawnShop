@@ -62,7 +62,7 @@ namespace Products.Write.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
-        [HttpPost("status")]
+        [HttpPut("status")]
         [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<UpdateStatusResult>> UpdateStatus([FromBody] UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
         {

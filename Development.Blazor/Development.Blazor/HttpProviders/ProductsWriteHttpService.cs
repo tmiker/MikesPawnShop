@@ -72,7 +72,7 @@ namespace Development.Blazor.HttpProviders
             string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/status";
             var client = _httpClientFactory.CreateClient(StaticData.ProductsWriteHttpClient_ClientName);
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, uri);
             // Generate a new Correlation ID and add to headers
             string correlationId = Guid.NewGuid().ToString();
             request.Headers.Add("X-Correlation-ID", correlationId);

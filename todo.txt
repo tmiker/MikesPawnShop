@@ -1,11 +1,22 @@
+
+Update Secrets Requirements in notes
+
+Return ProblemDetails in clients if header contains "application/problem+json"
+
+OpenAPI documentation
+
+MediatR
+
 Logging - Serilog ???
+
+YARP: Add health checks for downstream services
+
+Caching
+	YARP vs API
 
 use Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
 
-Change UpdateStatus action in Products Write controller to a PUT
-
 Cancellation token: button to cancel in UI
 
-COMPLETED
-	Exception Handling:  add Azure RequestFailedException
+
