@@ -1,5 +1,6 @@
 ﻿using Consumer.Blazor.Client.Abstractions;
 using Consumer.Blazor.Client.DTOs.Products;
+using Consumer.Blazor.Client.DTOs.Products.Test;
 using Consumer.Blazor.Client.ErrorHandling;
 using Consumer.Blazor.Client.Paging;
 using Consumer.Blazor.Client.Utility;
@@ -196,6 +197,28 @@ namespace Consumer.Blazor.HttpServices
         }
 
         // Dev Tests
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> ThrowExceptionForTestingAsync(ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
+        {
+            string uri = $"{StaticData.ProductsReadHttpClient_DevTestsPath}/throwExceptionForTesting";
+            var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Content = new StringContent(JsonSerializer.Serialize(throwExceptionDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("The action ThrowExceptionForTestingAsync(ThrowExceptionDTO throwExceptionDTO) returned " +
+                    "HttptatusCode success. It should return Problem Details.");
+                return (true, null);
+            }
+            else
+            {
+                string error = await GetErrorMessageAsync(response);
+                return (false, error);
+            }
+        }
 
         private async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
         {

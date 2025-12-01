@@ -1,4 +1,5 @@
 ﻿using Consumer.Blazor.Client.DTOs.Products;
+using Consumer.Blazor.Client.DTOs.Products.Test;
 using Consumer.Blazor.Client.Paging;
 
 namespace Consumer.Blazor.Client.Abstractions
@@ -12,5 +13,6 @@ namespace Consumer.Blazor.Client.Abstractions
         Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSummariesAsync(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10);
         Task<(bool IsSuccess, ProductDTO? Product, string? ErrorMessage)> GetProductByIdAsync(int id);
         Task<(bool IsSuccess, ProductSummaryDTO? ProductSummary, string? ErrorMessage)> GetProductSummaryByIdAsync(int id);
+        Task<(bool IsSuccess, string? ErrorMessage)> ThrowExceptionForTestingAsync(ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken);
     }
 }
