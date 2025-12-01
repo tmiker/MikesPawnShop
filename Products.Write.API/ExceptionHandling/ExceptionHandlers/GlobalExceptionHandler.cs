@@ -54,7 +54,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             {
                 Status = statusCode,
                 Title = title,
-                Detail = _environment.IsDevelopment() ? exception.Message : detail,
+                Detail = detail,    // _environment.IsDevelopment() ? exception.Message : detail, // exception.Message is message set where occurred, vs mapped message set here
                 Type = errorType,
                 Instance = httpContext.Request.Path
             };
@@ -65,12 +65,13 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             problemDetails.Extensions["requestId"] = httpContext.TraceIdentifier;
             problemDetails.Extensions["machine"] = Environment.MachineName;
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
-            // Add development-only information
-            if (_environment.IsDevelopment())
-            {
-                problemDetails.Extensions["exceptionType"] = exception.GetType().Name;
-                problemDetails.Extensions["stackTrace"] = exception.StackTrace;
-            }
+            
+            //// Add development-only information if desired
+            //if (_environment.IsDevelopment())
+            //{
+            //    problemDetails.Extensions["exceptionType"] = exception.GetType().Name;
+            //    problemDetails.Extensions["stackTrace"] = exception.StackTrace;
+            //}
 
             // Handle validation exceptions specially
             if (exception is ValidationException validationException)

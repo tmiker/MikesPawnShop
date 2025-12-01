@@ -9,6 +9,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Admin.Blazor.Client.ErrorHandling;
 
 namespace Admin.Blazor.HttpServices
 {
@@ -417,14 +419,10 @@ namespace Admin.Blazor.HttpServices
                     "HttptatusCode success. It should return Problem Details.");
                 return (true, null);
             }
-            else if (response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                return (false, $"Access denied.");
-            }
             else
             {
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, $"Expected: Problem Details. Actual: {error}");
+                string error = await GetErrorMessageAsync(response);
+                return (false, error);
             }
         }
 
@@ -467,12 +465,39 @@ namespace Admin.Blazor.HttpServices
 
         private async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
         {
-            string errorMessage = string.Empty;
-            if (!string.IsNullOrEmpty(response.StatusCode.ToString())) errorMessage += $"Status Code: {response.StatusCode.ToString()}; ";
-            if (!string.IsNullOrEmpty(response.ReasonPhrase)) errorMessage += $"Reason Phrase: {response.ReasonPhrase}; ";
-            string responseContent = await response.Content.ReadAsStringAsync();
-            if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"Response Content: {responseContent}; ";
-            return errorMessage;
+            if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                /// Read the ProblemDetails as string
+                // var problemDetailsJson = await response.Content.ReadAsStringAsync();
+
+                /// Deserialize the ProblemDetails JSON - NEED A CUSTOM PROBLEM DETAILS CLASS FOR ERRORS AND EXTENSIONS
+                CustomProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+                string? traceId = problemDetails?.Extensions?["traceId"]?.ToString();
+                string? correlationId = problemDetails?.Extensions?["correlationId"]?.ToString();
+                string? title = problemDetails?.Title;
+                string? detail = problemDetails?.Detail;
+
+                _logger.LogInformation("******* CUSTOM PROBLEM DETAILS RETURNED BY API FOR PROBLEM TYPE {problemDetails.Type}. \nError Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}", 
+                    problemDetails?.Type ,title, detail, traceId, correlationId);
+
+
+                return $"Error Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}";
+
+                // Process the problem details
+                // return problemDetailsJson;
+            }
+            else
+            {
+                string errorMessage = string.Empty;
+                if (!string.IsNullOrEmpty(response.StatusCode.ToString())) errorMessage += $"Status Code: {response.StatusCode.ToString()}; ";
+                if (!string.IsNullOrEmpty(response.ReasonPhrase)) errorMessage += $"Reason Phrase: {response.ReasonPhrase}; ";
+                string responseContent = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"\nResponse Content: {responseContent}; ";
+
+                _logger.LogInformation("####### NON-PROBLEM DETAILS ERROR RESPONSE FROM API: {errorMessage}", errorMessage);
+
+                return errorMessage;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Products.Write.Application.Exceptions;
 
@@ -6,9 +7,11 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
     public class ValidationExceptionHandler : IExceptionHandler
     {
+        private readonly IProblemDetailsService _problemDetailsService;
         private readonly ILogger<ValidationExceptionHandler> _logger;
-        public ValidationExceptionHandler(ILogger<ValidationExceptionHandler> logger)
+        public ValidationExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<ValidationExceptionHandler> logger)
         {
+            _problemDetailsService = problemDetailsService;
             _logger = logger;
         }
 
@@ -34,10 +37,22 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             // Include correlation ID if available
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
 
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //// OPTION 1: HANDLE EXCEPTION AND RETURN PROBLEM DETAILS OBJECT - NOTE WILL NOT HAVE CONTENT TYPE OF `application/problem+json`
+            //httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            //await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //return true; // Exception handled
 
-            return true; // Exception handled
+            // OPTION 2: USE PROBLEM DETAILS SERVICE TO HANDLE EXCEPTION
+            // Ensure response status code is set
+            httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+
+            // Use the Microsoft.AspNetCore.Http IProblemDetailsService to write the response
+            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                ProblemDetails = problemDetails,
+                Exception = exception
+            });
         }
     }
 }

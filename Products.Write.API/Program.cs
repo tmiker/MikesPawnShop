@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Products.Write.API;
+using Products.Write.API.ExceptionHandling.ExceptionHandlers;
 using Products.Write.API.Middleware;
 using Scalar.AspNetCore;
 using System.Security.Claims;
@@ -47,13 +48,19 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+// Register exception handlers in order of specificity (most specific first)
+builder.Services.AddExceptionHandler<ProductEventStoreExceptionHandler>();
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
 
-app.UseMiddleware<CorrelationIdMiddleware>();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-// app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
 
 if (app.Environment.IsDevelopment())
 {

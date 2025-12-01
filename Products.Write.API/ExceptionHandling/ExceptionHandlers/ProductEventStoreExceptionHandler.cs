@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Products.Write.Infrastructure.Exceptions;
 
@@ -6,9 +7,11 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
     public class ProductEventStoreExceptionHandler : IExceptionHandler
     {
+        private readonly IProblemDetailsService _problemDetailsService;
         private readonly ILogger<ProductEventStoreExceptionHandler> _logger;
-        public ProductEventStoreExceptionHandler(ILogger<ProductEventStoreExceptionHandler> logger)
+        public ProductEventStoreExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<ProductEventStoreExceptionHandler> logger)
         {
+            _problemDetailsService = problemDetailsService;
             _logger = logger;
         }
 
@@ -16,12 +19,12 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
         {
             if (exception is not ProductEventStoreException productEventStoreException) return false; // Exception not handled
 
-            _logger.LogWarning("Resource not found: {Message} | RequestId: {RequestId}", productEventStoreException.Message, httpContext.TraceIdentifier);
+            _logger.LogWarning("Product Event Store Exception: {Message} | RequestId: {RequestId}", productEventStoreException.Message, httpContext.TraceIdentifier);
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status404NotFound,
-                Title = "Resource Not Found",
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Product Event Store Error",
                 Detail = productEventStoreException.Message,
                 Instance = httpContext.Request.Path,
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4"
@@ -34,10 +37,22 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             // Include correlation ID if available
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
 
-            httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //// OPTION 1: HANDLE EXCEPTION AND RETURN PROBLEM DETAILS OBJECT - NOTE WILL NOT HAVE CONTENT TYPE OF `application/problem+json`
+            //httpContext.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            //await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //return true; // Exception handled
 
-            return true; // Exception handled
+            // OPTION 2: USE PROBLEM DETAILS SERVICE TO HANDLE EXCEPTION
+            // Ensure response status code is set
+            httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status503ServiceUnavailable;
+
+            // Use the Microsoft.AspNetCore.Http IProblemDetailsService to write the response
+            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                ProblemDetails = problemDetails,
+                Exception = exception
+            });
         }
     }
 }

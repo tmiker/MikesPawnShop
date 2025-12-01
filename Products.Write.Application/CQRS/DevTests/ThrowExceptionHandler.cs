@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+﻿using Azure;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandHandlers;
@@ -7,6 +8,7 @@ using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.Exceptions;
 using Products.Write.Domain.Enumerations;
 using Products.Write.Infrastructure.Abstractions;
+using Products.Write.Infrastructure.Exceptions;
 
 namespace Products.Write.Application.CQRS.DevTests
 {
@@ -32,10 +34,20 @@ namespace Products.Write.Application.CQRS.DevTests
 
             Exception ex = command.ExceptionType.ToLower() switch
             {
-                "validationexception" => throw new ValidationException("This is a test ValidationException thrown from ThrowExceptionHandler."),
+                // handled by exception specific exception handler middleware
+                "producteventstoreexception" => throw new ProductEventStoreException("This is a test ProductEventStoreException thrown from ThrowExceptionHandler."),
+                "validationexception" => throw new ValidationException(
+                    new Dictionary<string, string[]> 
+                    { 
+                        { "Error 1", new string[] { "This is the first error" } }, 
+                        { "Error 2", new string[] { "This is the second error" } } 
+                    }),
+                "notfoundexception" => throw new NotFoundException("This is a test NotFoundException thrown from ThrowExceptionHandler."),
+
+                // handled by global exception handler middleware
+                "requestfailedexception" => throw new RequestFailedException("This is a test Azure RequestFailedException thrown from ThrowExceptionHandler."),
                 "unauthorizedaccessexception" => throw new UnauthorizedAccessException("This is a test UnauthorizedAccessException thrown from ThrowExceptionHandler."),
                 "forbiddenexception" => throw new ForbiddenException("This is a test ForbiddenException thrown from ThrowExceptionHandler."),
-                "notfoundexception" => throw new NotFoundException("This is a test NotFoundException thrown from ThrowExceptionHandler."),
                 "conflictexception" => throw new ConflictException("This is a test ConflictException thrown from ThrowExceptionHandler."),
                 "argumentexception" => throw new ArgumentException("This is a test ArgumentException thrown from ThrowExceptionHandler."),
                 "argumentnullexception" => throw new ArgumentNullException("This is a test ArgumentNullException thrown from ThrowExceptionHandler."),

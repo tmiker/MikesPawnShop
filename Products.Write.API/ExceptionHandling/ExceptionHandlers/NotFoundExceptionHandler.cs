@@ -6,9 +6,11 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
     public class NotFoundExceptionHandler : IExceptionHandler
     {
+        private readonly IProblemDetailsService _problemDetailsService;
         private readonly ILogger<NotFoundExceptionHandler> _logger;
-        public NotFoundExceptionHandler(ILogger<NotFoundExceptionHandler> logger)
+        public NotFoundExceptionHandler(IProblemDetailsService problemDetailsService, ILogger<NotFoundExceptionHandler> logger)
         {
+            _problemDetailsService = problemDetailsService;
             _logger = logger;
         }
 
@@ -34,10 +36,22 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             // Include correlation ID if available
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
 
-            httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //// OPTION 1: HANDLE EXCEPTION AND RETURN PROBLEM DETAILS OBJECT - NOTE WILL NOT HAVE CONTENT TYPE OF `application/problem+json`
+            //httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            //await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+            //return true; // Exception handled
 
-            return true; // Exception handled
+            // OPTION 2: USE PROBLEM DETAILS SERVICE TO HANDLE EXCEPTION
+            // Ensure response status code is set
+            httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+
+            // Use the Microsoft.AspNetCore.Http IProblemDetailsService to write the response
+            return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                ProblemDetails = problemDetails,
+                Exception = exception
+            });
         }
     }
 }
