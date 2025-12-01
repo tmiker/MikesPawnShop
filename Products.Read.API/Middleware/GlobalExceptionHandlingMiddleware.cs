@@ -57,7 +57,7 @@ namespace Products.Read.API.Middleware
             {
                 Status = statusCode,
                 Title = title,
-                Detail = _environment.IsDevelopment() ? exception.Message : detail,
+                Detail = detail,    // _environment.IsDevelopment() ? exception.Message : detail,
                 Instance = context.Request.Path,
                 Type = $"https://httpstatuses.com/{statusCode}",
                 Extensions = new Dictionary<string, object?>

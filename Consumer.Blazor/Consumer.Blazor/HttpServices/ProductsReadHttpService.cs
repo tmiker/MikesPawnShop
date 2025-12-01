@@ -1,5 +1,6 @@
 ﻿using Consumer.Blazor.Client.Abstractions;
 using Consumer.Blazor.Client.DTOs.Products;
+using Consumer.Blazor.Client.ErrorHandling;
 using Consumer.Blazor.Client.Paging;
 using Consumer.Blazor.Client.Utility;
 using System.Text;
@@ -59,8 +60,11 @@ namespace Consumer.Blazor.HttpServices
                     Console.WriteLine(products);
                     return (true, products, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, errorMessage);
+                }
             }
         }
 
@@ -84,9 +88,11 @@ namespace Consumer.Blazor.HttpServices
                     }
                     return (true, productSummaries, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(error);
-                return (false, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, errorMessage);
+                }
             }
         }
 
@@ -107,8 +113,11 @@ namespace Consumer.Blazor.HttpServices
                     Console.WriteLine(pagedProducts);
                     return (true, pagedProducts?.Products, pagedProducts?.PagingData, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, null, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, null, errorMessage);
+                }
             }
         }
 
@@ -129,8 +138,11 @@ namespace Consumer.Blazor.HttpServices
                     Console.WriteLine(pagedProductSummaries);
                     return (true, pagedProductSummaries?.ProductSummaries, pagedProductSummaries?.PagingData, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, null, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, null, errorMessage);
+                }
             }
         }
 
@@ -151,8 +163,11 @@ namespace Consumer.Blazor.HttpServices
                     //Console.WriteLine(product);
                     return (true, product, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, errorMessage);
+                }
             }
         }
 
@@ -172,8 +187,11 @@ namespace Consumer.Blazor.HttpServices
                     Console.WriteLine(productSummary);
                     return (true, productSummary, null);
                 }
-                string error = await response.Content.ReadAsStringAsync();
-                return (false, null, error);
+                else
+                {
+                    string errorMessage = await GetErrorMessageAsync(response);
+                    return (false, null, errorMessage);
+                }
             }
         }
 
@@ -181,12 +199,26 @@ namespace Consumer.Blazor.HttpServices
 
         private async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
         {
-            string errorMessage = string.Empty;
-            if (!string.IsNullOrEmpty(response.StatusCode.ToString())) errorMessage += $"Status Code: {response.StatusCode.ToString()}; ";
-            if (!string.IsNullOrEmpty(response.ReasonPhrase)) errorMessage += $"Reason Phrase: {response.ReasonPhrase}; ";
-            string responseContent = await response.Content.ReadAsStringAsync();
-            if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"Response Content: {responseContent}; ";
-            return errorMessage;
+            if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
+            {
+                CustomProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+                string? traceId = problemDetails?.Extensions?["traceId"]?.ToString();
+                string? correlationId = problemDetails?.Extensions?["correlationId"]?.ToString();
+                string? title = problemDetails?.Title;
+                string? detail = problemDetails?.Detail;
+
+                return problemDetails?.ToString()!;
+            }
+            else
+            {
+                string errorMessage = string.Empty;
+                if (!string.IsNullOrEmpty(response.StatusCode.ToString())) errorMessage += $"Status Code: {response.StatusCode.ToString()}; ";
+                if (!string.IsNullOrEmpty(response.ReasonPhrase)) errorMessage += $"Reason Phrase: {response.ReasonPhrase}; ";
+                string responseContent = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"\nResponse Content: {responseContent}; ";
+
+                return errorMessage;
+            }
         }
     }
 }

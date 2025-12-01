@@ -467,25 +467,13 @@ namespace Admin.Blazor.HttpServices
         {
             if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
             {
-                /// Read the ProblemDetails as string
-                // var problemDetailsJson = await response.Content.ReadAsStringAsync();
-
-                /// Deserialize the ProblemDetails JSON - NEED A CUSTOM PROBLEM DETAILS CLASS FOR ERRORS AND EXTENSIONS
                 CustomProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
                 string? traceId = problemDetails?.Extensions?["traceId"]?.ToString();
                 string? correlationId = problemDetails?.Extensions?["correlationId"]?.ToString();
                 string? title = problemDetails?.Title;
                 string? detail = problemDetails?.Detail;
 
-                _logger.LogInformation("******* CUSTOM PROBLEM DETAILS RETURNED BY API FOR PROBLEM TYPE {problemDetails.Type}. \nError Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}", 
-                    problemDetails?.Type ,title, detail, traceId, correlationId);
-
                 return problemDetails?.ToString()!;
-
-                // return $"Error Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}";
-
-                // Process the problem details
-                // return problemDetailsJson;
             }
             else
             {
@@ -494,8 +482,6 @@ namespace Admin.Blazor.HttpServices
                 if (!string.IsNullOrEmpty(response.ReasonPhrase)) errorMessage += $"Reason Phrase: {response.ReasonPhrase}; ";
                 string responseContent = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(responseContent)) errorMessage += $"\nResponse Content: {responseContent}; ";
-
-                _logger.LogInformation("####### NON-PROBLEM DETAILS ERROR RESPONSE FROM API: {errorMessage}", errorMessage);
 
                 return errorMessage;
             }
