@@ -57,8 +57,7 @@
 <div class="row mt-2">
     <div class="col-12">
         <p class="text-info-alt">
-            The Products Write Side API has exception type specific ExceptionHandler for NotFoundException, ValidationException, and ProductEventStoreException, 
-            while other exceptions are handled by a global ExceptionHandler.
+            The Products Read Side API uses a global ExceptionHandler to handle returning ProblemDetails for all exception types.
         </p>
     </div>
 </div>
