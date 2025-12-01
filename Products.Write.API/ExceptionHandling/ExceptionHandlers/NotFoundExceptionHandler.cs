@@ -24,7 +24,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             {
                 Status = StatusCodes.Status404NotFound,
                 Title = "Resource Not Found",
-                Detail = notFoundException.Message,
+                Detail = "The requested resource was not found.",       // notFoundException.Message,
                 Instance = httpContext.Request.Path,
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4"
             };

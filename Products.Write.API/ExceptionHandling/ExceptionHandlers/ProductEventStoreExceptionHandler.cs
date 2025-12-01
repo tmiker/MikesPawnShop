@@ -25,7 +25,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             {
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Product Event Store Error",
-                Detail = productEventStoreException.Message,
+                Detail = "An error occurred in the Product Event Store.",       // productEventStoreException.Message,
                 Instance = httpContext.Request.Path,
                 Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4"
             };

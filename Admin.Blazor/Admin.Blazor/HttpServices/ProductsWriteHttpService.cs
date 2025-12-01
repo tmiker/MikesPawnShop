@@ -480,8 +480,9 @@ namespace Admin.Blazor.HttpServices
                 _logger.LogInformation("******* CUSTOM PROBLEM DETAILS RETURNED BY API FOR PROBLEM TYPE {problemDetails.Type}. \nError Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}", 
                     problemDetails?.Type ,title, detail, traceId, correlationId);
 
+                return problemDetails?.ToString()!;
 
-                return $"Error Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}";
+                // return $"Error Title: {title}; \nDetail: {detail}; \nTraceId: {traceId}; \nCorrelationId: {correlationId}";
 
                 // Process the problem details
                 // return problemDetailsJson;
