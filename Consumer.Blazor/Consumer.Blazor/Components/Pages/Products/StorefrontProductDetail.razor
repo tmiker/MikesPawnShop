@@ -159,7 +159,7 @@
                     <p>@_product.QuantityAvailable</p>
                 </div>
                 <div class="col-4">
-                    <a class="btn btn-success form-control" @onclick="() => AddToCart(_product.AggregateId)" >Add to Cart</a>
+                    <a class="btn btn-success form-control" @onclick="() => AddToCart(_quantityToAdd)" >Add to Cart</a>
                 </div>
             </div>
         </div>
@@ -298,15 +298,15 @@
     [CascadingParameter(Name = "SelectedProductId")]
     public int SelectedProductId { get; set; }
     [Parameter]
-    public EventCallback<Guid> AddToCartCallback { get; set; }
+    public EventCallback<int> AddToCartWithQuantityCallback { get; set; }
     [Parameter]
     public EventCallback BackToListCallback { get; set; }
 
     private int _quantityToAdd = 1;
 
-    private async Task AddToCart(Guid productId)
+    private async Task AddToCart(int quantityToAdd)
     {
-        if (AddToCartCallback.HasDelegate) await AddToCartCallback.InvokeAsync(productId);
+        if (AddToCartWithQuantityCallback.HasDelegate) await AddToCartWithQuantityCallback.InvokeAsync(_quantityToAdd);
     }
 
     private async Task BackToList()
