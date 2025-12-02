@@ -1,4 +1,9 @@
 
+Cart Button
+	Need to set selected product Id to 0 so goes to cart from detail page
+
+
+
 Update Secrets Requirements in notes
 
 Return ProblemDetails in clients if header contains "application/problem+json"
