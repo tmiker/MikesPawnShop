@@ -1,0 +1,151 @@
+YARP
+
+    YARP Configuration Files Info:  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/config-files?view=aspnetcore-10.0
+
+	Rate Limiting
+		No rate limiting is performed on requests unless 
+
+        	1. using Rate Limiting middleware to apply a default limiter to all routes - this doesn't require any changes to config.
+				e.g. in Program.cs:
+					services.AddRateLimiter(options => options.GlobalLimiter = globalLimiter);
+					app.UseRateLimiter()
+
+			2. enabled in the configuration - either route or application config. 
+            
+                Rate Limiter policies can be specified per route via RouteConfig.RateLimiterPolicy and can be bound from the Routes sections of the config file. 
+                As with other route properties, this can be modified and reloaded without restarting the proxy. Policy names are case insensitive.
+                    e.g. 
+                        ...
+                        "ReverseProxy": {
+                            "Routes": {
+                                "route1" : {
+                                    "ClusterId": "cluster1",
+                                    "RateLimiterPolicy": "customPolicy",
+                                    "Match": {
+                                        "Hosts": [ "localhost" ]
+                                    }
+                                }
+                            },
+                        ...
+                The above configuration specifies a policy per route with the policy specificed by existing ASP.NET Core rate limiting middleware.
+
+                    RateLimiter policies can be configured in services as follows:
+
+                        services.AddRateLimiter(options =>
+                        {
+                            options.AddFixedWindowLimiter("customPolicy", opt =>
+                            {
+                                opt.PermitLimit = 4;
+                                opt.Window = TimeSpan.FromSeconds(12);
+                                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                                opt.QueueLimit = 2;
+                            });
+                        });
+
+                    Then add the RateLimiter middleware.
+
+                        app.UseRateLimiter();
+
+                        app.MapReverseProxy();
+
+                To Disable Rate Limiting Middleware for a specific route:
+
+                    Specifying the value disable in a route's RateLimiterPolicy parameter means the rate limiter middleware will not apply any policies to this route, 
+                    even the default policy.
+
+            Rate Limiting docs: https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-10.0
+                ASP NET CORE Rate Limiting Middleware info generally (not just YARP)
+
+                Examples:
+                    A policy that permits 10 requests per minute by user (identity) or globally:
+
+                        builder.Services.AddRateLimiter(options =>
+                        {
+                            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                                RateLimitPartition.GetFixedWindowLimiter(
+                                    partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                                    factory: partition => new FixedWindowRateLimiterOptions
+                                    {
+                                        AutoReplenishment = true,
+                                        PermitLimit = 10,
+                                        QueueLimit = 0,
+                                        Window = TimeSpan.FromMinutes(1)
+                                    }));
+                        });
+
+                    The following example adds a fixed window limiter policy named "fixed" which we'll add to an endpoint later:
+
+                        var builder = WebApplication.CreateBuilder(args);
+
+                        builder.Services.AddRateLimiter(options =>
+                        {
+                            options.AddFixedWindowLimiter("fixed", opt =>
+                            {
+                                opt.PermitLimit = 4;
+                                opt.Window = TimeSpan.FromSeconds(12);
+                                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                                opt.QueueLimit = 2;
+                            });
+                        });
+
+                        Note: 
+                            To add to an endpoint:
+
+                                1. for YARP
+
+                                    use configuration in Secrets or appsettings.json to specify the RateLimiterPolicy per route as shown above.
+                                
+                                2. for minimal apis
+
+                                    app.MapGet("/api/resource", () => "This endpoint is rate limited")
+                                        .RequireRateLimiting("fixed");                                      // Apply specific policy to an endpoint
+
+                            To apply the named policy to sglobally to all controller endpoints:
+
+                                app.UseEndpoints(endpoints =>
+                                {
+                                    endpoints.MapControllers().RequireRateLimiting("fixed");
+                                });
+
+                IMPORTANT!!!: 
+                    The global limiter applies to all endpoints automatically when it's configured via options.GlobalLimiter.
+                    A Named polices needs to be explicitly applied to the pages or endpoints. 
+
+Retry Policy
+        YARP supports automatic retries for failed requests. 
+        
+        1. This can be configured per route via the RetryPolicy property.
+            e.g.
+                ...
+                "ReverseProxy": {
+                    "Routes": {
+                        "route1" : {
+                            "ClusterId": "cluster1",
+                            "RetryPolicy": {
+                                "RetryCount": 3,
+                                "RetryModes": [ "5xx", "GatewayTimeout", "ConnectFailure" ],
+                                "RetryInterval": "00:00:02"
+                            },
+                            "Match": {
+                                "Hosts": [ "localhost" ]
+                            }
+                        }
+                    },
+                ...
+            RetryCount: number of retry attempts
+            RetryModes: conditions that trigger a retry
+            RetryInterval: time to wait between retries
+
+        2. This can be configured per route via the Retries property.
+
+            "Routes": {
+                "productsRoute": {
+                    "ClusterId": "products",
+                    "Match": { "Path": "/api/products/{**catch-all}" },
+                    "Retries": {
+                        "Count": 3,
+                        "Interval": "00:00:02"
+                    }
+                },
+
+        Retry Policy docs: https://learn.microsoft.com/en-us/aspnet/core/reverse-proxy/retry?view=aspnetcore-10.0
