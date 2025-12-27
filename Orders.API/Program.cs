@@ -1,9 +1,12 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Orders.API.Abstractions;
 using Orders.API.Auth;
+using Orders.API.Health;
 using Orders.API.Infrastructure.Mongo;
 using Orders.API.Services;
 using Scalar.AspNetCore;
@@ -13,9 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddHealthChecks()
+    .AddCheck<MongoDbHealthCheck>(name: "MongoLocalConnectionHealthCheck");
+
 builder.Services.AddCors(setup =>
-{
-    setup.AddPolicy("AllowAnyPolicy", policy =>
+    setup.AddPolicy("AllowAnyPolicy",
+{ policy =>
     {
         policy.AllowAnyOrigin();
         policy.AllowAnyHeader();
@@ -85,5 +91,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// app.MapHealthChecks("/health");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();
