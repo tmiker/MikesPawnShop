@@ -1,8 +1,5 @@
 
-Cart Button
-	Need to set selected product Id to 0 so goes to cart from detail page
-
-
+Cart Button Flow - ensure consumer client flow is as desired
 
 Update Secrets Requirements in notes
 
