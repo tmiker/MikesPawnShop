@@ -5,7 +5,7 @@
 
 <div class="row mt-2">
 
-    <div class="col-8 offset-2 text-center">
+    <div class="col-10">
         <h4><b>My Account</b></h4>
     </div>
 
@@ -172,7 +172,27 @@ else
     </div>
 </div>
 
-@if (string.IsNullOrWhiteSpace(_apiHealthCheckResult))
+@if (_apiHealthCheckResult is null)
+{
+    <br />
+    <div class="row mt-2">
+        <div class="col-3">
+            <a class="btn btn-primary form-control" @onclick="AccountsApiHealthCheck">Check API Health</a>
+        </div>
+    </div>
+}
+else
+{
+    <br />
+    <div class="row mt-2">
+        <div class="col-3">
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear Health Result</a>
+        </div>
+    </div>
+    <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
+}
+
+@* @if (string.IsNullOrWhiteSpace(_apiHealthCheckResult))
 {
     <div class="row mt-2">
         <div class="col-2">
@@ -196,7 +216,7 @@ else
             <textarea rows="2" class="bg-dark text-light form-control">@_apiHealthCheckResult</textarea>
         </div>
     </div>
-}
+} *@
 
 @if (_thinking)
 {
@@ -222,14 +242,14 @@ else
     private string? _errorMessage;
     private void ClearErrorMessage() => _errorMessage = null;
 
-    private string? _apiHealthCheckResult;
+    private HealthCheckResultDTO? _apiHealthCheckResult;
     private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
     private async Task AccountsApiHealthCheck()
     {
         var result = await _accountHttpService.CheckHealthAsync();
         if (result.IsSuccess)
         {
-            _apiHealthCheckResult = result.HealthCheckResult;
+            _apiHealthCheckResult = result.HealthCheckResultDTO;
         }
         else
         {

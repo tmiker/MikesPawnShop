@@ -1,5 +1,6 @@
 ﻿using Admin.Blazor.Client.Abstractions;
 using Admin.Blazor.Client.DTOs.Accounts;
+using Admin.Blazor.Client.DTOs.Health;
 using Admin.Blazor.Client.Utility;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,6 +12,7 @@ namespace Admin.Blazor.HttpServices
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<AccountsHttpService> _logger;
+        private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
         public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> logger)
         {
@@ -18,7 +20,7 @@ namespace Admin.Blazor.HttpServices
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, string? HealthCheckResult, string? ErrorMessage)> CheckHealthAsync(string? token = null)
+        public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
         {
             string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
             // string uri = "https://localhost:7245/health";  // yarp
@@ -29,16 +31,33 @@ namespace Admin.Blazor.HttpServices
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             HttpResponseMessage response = await client.SendAsync(request);
 
-            var result = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return (true, result, null);
+                response.EnsureSuccessStatusCode();
+                var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
+                if (resultDTO is not null)
+                {
+                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() Result: \n{resultDTO}");
+                    return (true, resultDTO, null);
+                }
+                else return (false, null, "Health check result DTO is null.");
             }
-            else
+            catch (Exception ex)
             {
-                return (false, null, "Error retrieving health check response.");
+                _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
+                return (false, null, ex.Message);
             }
+            
+            //// return rsult as a json string 
+            //var result = await response.Content.ReadAsStringAsync();
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    return (true, result, null);
+            //}
+            //else
+            //{
+            //    return (false, null, "Error retrieving health check response.");
+            //}
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablishedAsync(string? token = null)

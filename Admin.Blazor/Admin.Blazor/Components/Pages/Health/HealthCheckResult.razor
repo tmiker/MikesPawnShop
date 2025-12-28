@@ -1,0 +1,55 @@
+﻿<div class="row mt-3">
+    <div class="col-12">
+        <h5><b>Health Check Result:</b></h5>
+    </div>
+</div>
+@if (ApiHealthCheckResult is not null)
+{
+    <div class="row mt-2">
+        <div class="col-3 offset-1">
+            <h5>Overall Status: @ApiHealthCheckResult.Status</h5>
+        </div>
+        <div class="col-6">
+            <h5>Duration: @ApiHealthCheckResult.TotalDuration (ms)</h5>
+        </div>
+    </div>
+    @if (ApiHealthCheckResult.Entries is not null)
+    {
+        @foreach (var kvp in ApiHealthCheckResult.Entries)
+        {
+            <div class="row mt-2">
+                <div class="col-10 offset-1">
+                    <table class="table table-bordered table-dark">
+                        <thead>
+                            <tr>
+                                <th>Entry Key</th>
+                                <th>Description</th>
+                                <th>Duration (ms)</th>
+                                <th>Status</th>
+                                @* <th>Tags</th> *@
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td>@kvp.Key</td>
+                                <td>@kvp.Value.Description</td>
+                                <td>@kvp.Value.Duration</td>
+                                <td>@kvp.Value.Status</td>
+                                @* <td>@string.Join(", ", entry.Tags!)</td> *@
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+
+}
+
+@code {
+
+    [Parameter]
+    public HealthCheckResultDTO? ApiHealthCheckResult { get; set; }
+
+}
