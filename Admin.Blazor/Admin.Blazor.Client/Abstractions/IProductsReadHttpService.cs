@@ -1,4 +1,5 @@
-﻿using Admin.Blazor.Client.DTOs.Products;
+﻿using Admin.Blazor.Client.DTOs.Health;
+using Admin.Blazor.Client.DTOs.Products;
 using Admin.Blazor.Client.DTOs.Products.Test;
 using Admin.Blazor.Client.Paging;
 
@@ -6,6 +7,7 @@ namespace Admin.Blazor.Client.Abstractions
 {
     public interface IProductsReadHttpService
     {
+        Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null);
         IAsyncEnumerable<ProductDTO> StreamProductsAsync();
         Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, string? ErrorMessage)> GetProductsAsync();
         Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? ProductSummaries, string? ErrorMessage)> GetProductSummariesAsync();

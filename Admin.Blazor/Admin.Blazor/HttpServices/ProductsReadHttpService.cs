@@ -1,9 +1,11 @@
 ﻿using Admin.Blazor.Client.Abstractions;
+using Admin.Blazor.Client.DTOs.Health;
 using Admin.Blazor.Client.DTOs.Products;
 using Admin.Blazor.Client.DTOs.Products.Test;
 using Admin.Blazor.Client.ErrorHandling;
 using Admin.Blazor.Client.Paging;
 using Admin.Blazor.Client.Utility;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -13,13 +15,39 @@ namespace Admin.Blazor.HttpServices
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ProductsReadHttpService> _logger;
-
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+        private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
         public ProductsReadHttpService(IHttpClientFactory httpClientFactory, ILogger<ProductsReadHttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+        }
+
+        public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
+                if (resultDTO is not null)
+                {
+                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() Result: \n{resultDTO}");
+                    return (true, resultDTO, null);
+                }
+                else return (false, null, "Health check result DTO is null.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
+                return (false, null, ex.Message);
+            }
         }
 
         public async IAsyncEnumerable<ProductDTO> StreamProductsAsync()
@@ -57,7 +85,7 @@ namespace Admin.Blazor.HttpServices
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
-                    IEnumerable<ProductDTO>? products = JsonSerializer.Deserialize<IEnumerable<ProductDTO>>(result, _jsonOptions);
+                    IEnumerable<ProductDTO>? products = JsonSerializer.Deserialize<IEnumerable<ProductDTO>>(result, _jsonSerializerOptions);
                     Console.WriteLine(products);
                     return (true, products, null);
                 }
@@ -82,7 +110,7 @@ namespace Admin.Blazor.HttpServices
                 {
                     Console.WriteLine($"SUCCESS GETTING PRODUCT SUMMARIES.");
                     string result = await response.Content.ReadAsStringAsync();
-                    IEnumerable<ProductSummaryDTO>? productSummaries = JsonSerializer.Deserialize<IEnumerable<ProductSummaryDTO>>(result, _jsonOptions);
+                    IEnumerable<ProductSummaryDTO>? productSummaries = JsonSerializer.Deserialize<IEnumerable<ProductSummaryDTO>>(result, _jsonSerializerOptions);
                     foreach (var summary in productSummaries!)
                     {
                         Console.WriteLine(summary.Name);
@@ -110,7 +138,7 @@ namespace Admin.Blazor.HttpServices
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
-                    PagedProductsDTO? pagedProducts = JsonSerializer.Deserialize<PagedProductsDTO>(result, _jsonOptions);
+                    PagedProductsDTO? pagedProducts = JsonSerializer.Deserialize<PagedProductsDTO>(result, _jsonSerializerOptions);
                     Console.WriteLine(pagedProducts);
                     return (true, pagedProducts?.Products, pagedProducts?.PagingData, null);
                 }
@@ -135,7 +163,7 @@ namespace Admin.Blazor.HttpServices
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
-                    PagedProductSummariesDTO? pagedProductSummaries = JsonSerializer.Deserialize<PagedProductSummariesDTO>(result, _jsonOptions);
+                    PagedProductSummariesDTO? pagedProductSummaries = JsonSerializer.Deserialize<PagedProductSummariesDTO>(result, _jsonSerializerOptions);
                     Console.WriteLine(pagedProductSummaries);
                     return (true, pagedProductSummaries?.ProductSummaries, pagedProductSummaries?.PagingData, null);
                 }
@@ -184,7 +212,7 @@ namespace Admin.Blazor.HttpServices
                 if (response.IsSuccessStatusCode)
                 {
                     string result = await response.Content.ReadAsStringAsync();
-                    ProductSummaryDTO? productSummary = JsonSerializer.Deserialize<ProductSummaryDTO>(result, _jsonOptions);
+                    ProductSummaryDTO? productSummary = JsonSerializer.Deserialize<ProductSummaryDTO>(result, _jsonSerializerOptions);
                     Console.WriteLine(productSummary);
                     return (true, productSummary, null);
                 }

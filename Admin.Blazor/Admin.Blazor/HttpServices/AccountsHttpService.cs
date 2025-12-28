@@ -23,8 +23,6 @@ namespace Admin.Blazor.HttpServices
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
         {
             string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
-            // string uri = "https://localhost:7245/health";  // yarp
-            // string uri = "https://localhost:7033/health";
             var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -47,17 +45,6 @@ namespace Admin.Blazor.HttpServices
                 _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
                 return (false, null, ex.Message);
             }
-            
-            //// return rsult as a json string 
-            //var result = await response.Content.ReadAsStringAsync();
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    return (true, result, null);
-            //}
-            //else
-            //{
-            //    return (false, null, "Error retrieving health check response.");
-            //}
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablishedAsync(string? token = null)
