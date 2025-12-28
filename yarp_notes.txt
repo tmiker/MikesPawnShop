@@ -1,4 +1,16 @@
 YARP
+    
+    TO DO
+        Added viewing HealthChecks for Accounts only in Blazor Admin UI.
+            Need to add for other APIs - only in Blazor Admin UI as requires role of Admin or Manager.
+        Nothing with respect to HealthChecks is in YARP config.
+            May want to include in YARP config so can be modified without code changes without restarting proxy.
+                From MS: "The proxy can analyze each nodes health and stop sending client traffic to unhealthy ones until they recover. 
+                YARP implements this approach in the form of active and passive destination health checks. 
+                They are independent from each other and stored on the relative properties for each destination."
+                see:  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/dests-health-checks?view=aspnetcore-10.0
+
+    1. YARP (Yet Another Reverse Proxy) is a reverse proxy library for building fast and scalable proxy servers in .NET.
 
     YARP Configuration Files Info:  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/config-files?view=aspnetcore-10.0
 
