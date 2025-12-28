@@ -406,7 +406,7 @@ else
             var accountInfoResult = await _accountsService.GetAccountAsync();
             if (accountInfoResult.IsSuccess) _accountInfo = accountInfoResult.Account;
 
-            var accountResult = await _accountsService.AccountIsEstablished();
+            var accountResult = await _accountsService.AccountIsEstablishedAsync();
             if (accountResult.IsSuccess) _accountEstablished = true;
             this.StateHasChanged();
         }

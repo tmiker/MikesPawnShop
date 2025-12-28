@@ -20,8 +20,8 @@ builder.Services.AddHealthChecks()
     .AddCheck<MongoDbHealthCheck>(name: "MongoLocalConnectionHealthCheck");
 
 builder.Services.AddCors(setup =>
-    setup.AddPolicy("AllowAnyPolicy",
-{ policy =>
+{
+    setup.AddPolicy("AllowAnyPolicy", policy =>
     {
         policy.AllowAnyOrigin();
         policy.AllowAnyHeader();
@@ -93,9 +93,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 // app.MapHealthChecks("/health");
-app.MapHealthChecks("/health", new HealthCheckOptions
+app.MapHealthChecks("/api/orders/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+}).RequireAuthorization("IsAdminOrManager");
 
 app.Run();

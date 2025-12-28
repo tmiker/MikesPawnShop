@@ -95,9 +95,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 // app.MapHealthChecks("/health");
-app.MapHealthChecks("/health", new HealthCheckOptions
+app.MapHealthChecks("/api/accounts/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+}).RequireAuthorization("IsAdminOrManager");
 
 app.Run();

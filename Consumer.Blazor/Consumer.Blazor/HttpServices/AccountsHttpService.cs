@@ -11,12 +11,12 @@ namespace Consumer.Blazor.HttpServices
     public class AccountsHttpService : IAccountsHttpService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<AccountsHttpService> _loggeer;
+        private readonly ILogger<AccountsHttpService> _logger;
 
-        public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> loggeer)
+        public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
-            _loggeer = loggeer;
+            _logger = logger;
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablished(string? token = null)

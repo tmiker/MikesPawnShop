@@ -4,10 +4,11 @@
 @attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
-    
+
     <div class="col-8 offset-2 text-center">
         <h4><b>My Account</b></h4>
     </div>
+
     @if (_accountInfo is null)
     {
         <div class="col-2">
@@ -28,7 +29,7 @@
     </div>
     <div class="row mt-2">
         <div class="col-12 text-center">
-            <textarea rows="2" class="bg-dark text-danger form-control"><b>@_errorMessage</b></textarea>
+            <textarea rows="2" class="bg-dark text-danger form-control">@_errorMessage</textarea>
         </div>
     </div>
 }
@@ -171,6 +172,32 @@ else
     </div>
 </div>
 
+@if (string.IsNullOrWhiteSpace(_apiHealthCheckResult))
+{
+    <div class="row mt-2">
+        <div class="col-2">
+            <a class="btn btn-primary form-control" @onclick="AccountsApiHealthCheck">Check API Health</a>
+        </div>
+    </div>
+}
+else
+{
+    <br />
+    <div class="row mt-2">
+        <div class="col-10">
+            <h5><b>Health Check Result:</b></h5>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear Result</a>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 text-center">
+            <textarea rows="2" class="bg-dark text-light form-control">@_apiHealthCheckResult</textarea>
+        </div>
+    </div>
+}
+
 @if (_thinking)
 {
     <div class="mx-auto text-center mb-3 mt-3">
@@ -194,6 +221,21 @@ else
     private bool _thinking = false;
     private string? _errorMessage;
     private void ClearErrorMessage() => _errorMessage = null;
+
+    private string? _apiHealthCheckResult;
+    private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
+    private async Task AccountsApiHealthCheck()
+    {
+        var result = await _accountHttpService.CheckHealthAsync();
+        if (result.IsSuccess)
+        {
+            _apiHealthCheckResult = result.HealthCheckResult;
+        }
+        else
+        {
+            _errorMessage = $"{result.ErrorMessage}";
+        }
+    }
 
     private AddAccountDTO? _addAccountDTO;
     private void AddAccount() => _addAccountDTO = new AddAccountDTO();

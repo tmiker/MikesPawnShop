@@ -10,15 +10,38 @@ namespace Admin.Blazor.HttpServices
     public class AccountsHttpService : IAccountsHttpService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<AccountsHttpService> _loggeer;
+        private readonly ILogger<AccountsHttpService> _logger;
 
-        public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> loggeer)
+        public AccountsHttpService(IHttpClientFactory httpClientFactory, ILogger<AccountsHttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
-            _loggeer = loggeer;
+            _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablished(string? token = null)
+        public async Task<(bool IsSuccess, string? HealthCheckResult, string? ErrorMessage)> CheckHealthAsync(string? token = null)
+        {
+            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
+            // string uri = "https://localhost:7245/health";  // yarp
+            // string uri = "https://localhost:7033/health";
+            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, result, null);
+            }
+            else
+            {
+                return (false, null, "Error retrieving health check response.");
+            }
+        }
+
+        public async Task<(bool IsSuccess, string? ErrorMessage)> AccountIsEstablishedAsync(string? token = null)
         {
             string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/accountEstablished";
             var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
