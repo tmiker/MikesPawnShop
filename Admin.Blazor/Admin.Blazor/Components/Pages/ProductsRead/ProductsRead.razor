@@ -3,7 +3,26 @@
 @inject IProductsReadHttpService _readProductsClient
 @attribute [Authorize(Policy = "IsAdminOrManager")]
 
-<h4 class="mt-2"><b>READ SIDE PRODUCTS</b></h4>
+<div class="row mt-2">
+    <div class="col-10">
+        <h4><b>READ SIDE PRODUCTS</b></h4>
+    </div>
+    <div class="col-2">
+        @if (_apiHealthCheckResult is null)
+        {
+            <a class="btn btn-primary form-control" @onclick="ApiHealthCheck">Check API Health</a>
+        }
+        else
+        {
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear API Health</a>
+        }
+    </div>
+</div>
+
+@if (_apiHealthCheckResult is not null)
+{
+    <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
+}
 
 @if (!string.IsNullOrWhiteSpace(_errorMessage))
 {
@@ -39,7 +58,7 @@
         <label for="pagesize">Page Size:</label>
         <input id="pagesize" type="number" class="bg-dark text-light form-control" @bind="_pageSize" @bind:after="RefreshData" />
     </div>
-    <div class="col-2">
+    <div class="col-2 offset-2">
         <a class="btn btn-sm btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
     </div>
 </div>
@@ -148,6 +167,26 @@
     }
 </div>
 
+@* @if (_apiHealthCheckResult is null)
+{
+    <br />
+    <div class="row mt-2">
+        <div class="col-3">
+            <a class="btn btn-primary form-control" @onclick="ApiHealthCheck">Check API Health</a>
+        </div>
+    </div>
+}
+else
+{
+    <br />
+    <div class="row mt-2">
+        <div class="col-3">
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear Health Result</a>
+        </div>
+    </div>
+    <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
+} *@
+
 @code {
 
     private List<ProductSummaryDTO>? _productSummaries;
@@ -163,6 +202,21 @@
 
     private string? _errorMessage;
     private void ClearErrorMessage() => _errorMessage = null;
+
+    private HealthCheckResultDTO? _apiHealthCheckResult;
+    private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
+    private async Task ApiHealthCheck()
+    {
+        var result = await _readProductsClient.CheckHealthAsync();
+        if (result.IsSuccess)
+        {
+            _apiHealthCheckResult = result.HealthCheckResultDTO;
+        }
+        else
+        {
+            _errorMessage = $"{result.ErrorMessage}";
+        }
+    }
 
     private async Task ClearFilters()
     {

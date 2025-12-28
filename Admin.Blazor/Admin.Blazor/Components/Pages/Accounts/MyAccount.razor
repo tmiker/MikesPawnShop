@@ -4,11 +4,9 @@
 @attribute [Authorize(Policy = "IsAdminOrManager")]
 
 <div class="row mt-2">
-
     <div class="col-10">
         <h4><b>My Account</b></h4>
     </div>
-
     @if (_accountInfo is null)
     {
         <div class="col-2">
@@ -36,61 +34,62 @@
 
 @if (_accountInfo is not null)
 {
+    <br/>
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="id">Account Id:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control" id="accountId" @bind-Value="@_accountInfo.AccountId" />
         </div>
     </div>
 
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="first">First:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control " id="first" @bind-Value="@_accountInfo.FirstName" />
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="last">Last:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control" id="last" @bind-Value="@_accountInfo.LastName" />
         </div>
     </div>
 
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="email">Email:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control " id="email" @bind-Value="@_accountInfo.Email" />
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="phone">Phone:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control" id="phone" @bind-Value="@_accountInfo.PhoneNumber" />
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="status">Status:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputText inert class="bg-dark text-light form-control " id="status" @bind-Value="@_accountInfo.AccountStatus" />
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-3 text-center">
+        <div class="col-3 offset-1">
             <label for="credit">Credit Limit:</label>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             <InputNumber inert class="bg-dark text-light form-control " id="credit" @bind-Value="@_accountInfo.CreditLimit" />
         </div>
     </div>
@@ -177,7 +176,7 @@ else
     <br />
     <div class="row mt-2">
         <div class="col-3">
-            <a class="btn btn-primary form-control" @onclick="AccountsApiHealthCheck">Check API Health</a>
+            <a class="btn btn-primary form-control" @onclick="ApiHealthCheck">Check API Health</a>
         </div>
     </div>
 }
@@ -186,7 +185,7 @@ else
     <br />
     <div class="row mt-2">
         <div class="col-3">
-            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear Health Result</a>
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear API Health</a>
         </div>
     </div>
     <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
@@ -244,7 +243,7 @@ else
 
     private HealthCheckResultDTO? _apiHealthCheckResult;
     private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
-    private async Task AccountsApiHealthCheck()
+    private async Task ApiHealthCheck()
     {
         var result = await _accountHttpService.CheckHealthAsync();
         if (result.IsSuccess)

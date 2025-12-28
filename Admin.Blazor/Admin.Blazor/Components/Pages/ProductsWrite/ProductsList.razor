@@ -5,8 +5,26 @@
 @inject NavigationManager Nav
 @attribute [Authorize(Policy = "IsAdminOrManager")]
 
-<h4 class="mt-2"><b>WRITE SIDE PRODUCTS</b></h4>
-<h6 class="mt-2"><i>Record Count: @_productsCount</i></h6>
+<div class="row mt-2">
+    <div class="col-10">
+        <h4><b>WRITE SIDE PRODUCTS</b></h4>
+    </div>
+    <div class="col-2">
+        @if (_apiHealthCheckResult is null)
+        {
+            <a class="btn btn-primary form-control" @onclick="ApiHealthCheck">Check API Health</a>
+        }
+        else
+        {
+            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear API Health</a>
+        }
+    </div>
+</div>
+
+@if (_apiHealthCheckResult is not null)
+{
+    <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
+}
 
 @if (!string.IsNullOrWhiteSpace(_errorMessage))
 {
@@ -217,6 +235,21 @@
     {
         _errorMessage = null;
         _successMessage = null;
+    }
+
+    private HealthCheckResultDTO? _apiHealthCheckResult;
+    private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
+    private async Task ApiHealthCheck()
+    {
+        var result = await _writeSideHttpClient.CheckHealthAsync();
+        if (result.IsSuccess)
+        {
+            _apiHealthCheckResult = result.HealthCheckResultDTO;
+        }
+        else
+        {
+            _errorMessage = $"{result.ErrorMessage}";
+        }
     }
 
     private void Detail(string aggregateId) => Nav.NavigateTo($"products/productDetail/{aggregateId}");
