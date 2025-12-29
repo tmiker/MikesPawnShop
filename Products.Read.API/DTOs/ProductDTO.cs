@@ -22,6 +22,7 @@ namespace Products.Read.API.DTOs
         public List<ImageDataDTO>? Images { get; init; }
         public List<DocumentDataDTO>? Documents { get; init; }
 
-        
+        // add fetch time to monitor whether a response is from cache or not
+        public DateTime FetchTime { get; set; } = default;
     }
 }

@@ -54,7 +54,7 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<PagedProductsDTO>> GetPagedAndFilteredProducts(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductsResult result = await _productQueryService.GetPagedAndFilteredProductsAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(new PagedProductsDTO { Products = result.Products, PagingData = result.PaginationMetadata });
+            if (result.IsSuccess) return Ok(new PagedProductsDTO { Products = result.Products, PagingData = result.PaginationMetadata, FetchTime = DateTime.Now });
             return BadRequest(result.ErrorMessage);
         }
 
@@ -63,7 +63,7 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<PagedProductSummariesDTO>> GetPagedAndFilteredProductSummaries(string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             GetPagedAndFilteredProductSummariesResult result = await _productQueryService.GetPagedAndFilteredProductSummariesAsync(filter, category, sortColumn, pageNumber, pageSize);
-            if (result.IsSuccess) return Ok(new PagedProductSummariesDTO { ProductSummaries = result.ProductSummaries, PagingData = result.PaginationMetadata });
+            if (result.IsSuccess) return Ok(new PagedProductSummariesDTO { ProductSummaries = result.ProductSummaries, PagingData = result.PaginationMetadata, FetchTime = DateTime.Now });
             return BadRequest(result.ErrorMessage);
         }
 
@@ -72,7 +72,11 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
             GetProductByIdResult result = await _productQueryService.GetProductByIdAsync(id);
-            if (result.IsSuccess) return Ok(result.Product);
+            if (result.IsSuccess)
+            {
+                if (result.Product is not null) result.Product.FetchTime = DateTime.Now;
+                return Ok(result.Product);
+            }
             return BadRequest(result.ErrorMessage);
         }
 
@@ -81,7 +85,11 @@ namespace Products.Read.API.Controllers
         public async Task<ActionResult<ProductSummaryDTO>> GetProductSummaryById(int id)
         {
             GetProductSummaryByIdResult result = await _productQueryService.GetProductSummaryByIdAsync(id);
-            if (result.IsSuccess) return Ok(result.ProductSummary);
+            if (result.IsSuccess)
+            {
+                if (result.ProductSummary is not null) result.ProductSummary.FetchTime = DateTime.Now;
+                return Ok(result.ProductSummary);
+            }
             return BadRequest(result.ErrorMessage);
         }
     }
