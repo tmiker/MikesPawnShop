@@ -13,17 +13,32 @@
 
 @if (_product is not null)
 {
-    <div class="row">
+    <div class="row mt-1">
         <div class="col-6">
             <!-- COLUMN 1 START-->
             <div class="row">
                 <div class="col-8">
-                    <h4>Storefront Product Detail</h4>
+                    <h4>Product Detail</h4>
                 </div>
                 <div class="col-4">
                     <a class="btn btn-primary form-control" @onclick="BackToList">Back</a>
                 </div>
             </div>
+
+            <br/>
+            <div class="row mt-2">
+                <div class="col-6">
+                    @if (ProductFetchTime.HasValue)
+                    {
+                        <h6 class="text-secondary">Data Fetched: @ProductFetchTime.Value</h6>
+                    }
+                </div>
+                <div class="col-6">
+                    <h6 class="text-secondary">Current Time: @DateTime.Now</h6>
+                </div>
+            </div>
+
+
             <div class="form-group row mt-2">
                 <div class="col-3 ">
                     <label for="id">Id:</label>
@@ -302,6 +317,8 @@
     [Parameter]
     public EventCallback BackToListCallback { get; set; }
 
+    public DateTime? ProductFetchTime { get; set; }
+
     private int _quantityToAdd = 1;
 
     private async Task AddToCart(int quantityToAdd)
@@ -348,6 +365,7 @@
                 _product = result.Product;
                 _productAggregateId = _product?.AggregateId.ToString();
                 if (_product?.Images is not null && _product.Images.Any()) _primaryImage = _product.Images.FirstOrDefault();
+                ProductFetchTime = result.Product?.FetchTime;
             }
             else _errorMessage = result.ErrorMessage;
             this.StateHasChanged();

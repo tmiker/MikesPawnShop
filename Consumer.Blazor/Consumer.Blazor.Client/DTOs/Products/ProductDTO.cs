@@ -22,6 +22,9 @@ namespace Consumer.Blazor.Client.DTOs.Products
         public List<ImageDataDTO>? Images { get; set; }
         public List<DocumentDataDTO>? Documents { get; set; }
 
+        // map fetch time to monitor whether a response is from cache or not
+        public DateTime FetchTime { get; set; }
+
         [JsonIgnore]
         public int QuantityAvailable { get => QuantityOnHand - QuantityAllocated; }
     }

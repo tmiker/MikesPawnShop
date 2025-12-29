@@ -3,5 +3,7 @@ populated with the current server time by the controller when the response is ge
 the controller action will not run, and the property will not be updated and this time will be earlier than the current time.  Dointg it this way avoids 
 setting a property on the actual entity as it is outside of the scope of the domain, and also avoids having to modify services and objects used by the controller.
 
+Note when viewing storefront the list of products is maintained when view the cart or 
+
 
 
