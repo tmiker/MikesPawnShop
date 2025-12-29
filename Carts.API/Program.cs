@@ -87,6 +87,6 @@ app.MapControllers();
 app.MapHealthChecks("/api/carts/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-}).RequireAuthorization("IsAdminOrManager");
+}).AllowAnonymous();        // .RequireAuthorization("IsAdminOrManager");
 
 app.Run();

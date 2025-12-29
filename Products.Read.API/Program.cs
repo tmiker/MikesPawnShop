@@ -91,6 +91,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 //app.MapHealthChecks("/health");
+
 app.MapHealthChecks("/api/products/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

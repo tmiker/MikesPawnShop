@@ -90,6 +90,6 @@ app.MapControllers();
 app.MapHealthChecks("/api/productsManagement/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-}).RequireAuthorization("IsAdminOrManager");
+}).AllowAnonymous();        // .RequireAuthorization("IsAdminOrManager");
 
 app.Run();

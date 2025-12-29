@@ -8,6 +8,9 @@ YARP
                 They are independent from each other and stored on the relative properties for each destination."
                 see:  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/dests-health-checks?view=aspnetcore-10.0
 
+    YARP Products route configured with Active Health Checks:
+        probes destinations if not 200-499 type response it is marked as unhealthy, and returns a 502 response until a probe shows it healthy.
+
     1. YARP (Yet Another Reverse Proxy) is a reverse proxy library for building fast and scalable proxy servers in .NET.
 
     YARP Configuration Files Info:  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/config-files?view=aspnetcore-10.0
