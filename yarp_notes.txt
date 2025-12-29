@@ -1,9 +1,7 @@
 YARP
     
     TO DO
-        Added viewing HealthChecks for Accounts only in Blazor Admin UI.
-            Need to add for other APIs - only in Blazor Admin UI as requires role of Admin or Manager.
-        Nothing with respect to HealthChecks is in YARP config.
+        Only Products API has HealthChecks added in YARP config - add other routes if desired.
             May want to include in YARP config so can be modified without code changes without restarting proxy.
                 From MS: "The proxy can analyze each nodes health and stop sending client traffic to unhealthy ones until they recover. 
                 YARP implements this approach in the form of active and passive destination health checks. 
