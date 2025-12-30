@@ -125,7 +125,7 @@ namespace Admin.Blazor.HttpServices
             }
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductsAsync(
+        public async Task<(bool IsSuccess, IEnumerable<ProductDTO>? Products, PaginationMetadata? PagingData, DateTime? FetchTime, string? ErrorMessage)> GetPagedAndFilteredProductsAsync(
             string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/paged?filter={filter}&category={category}&sortColumn={sortColumn}&pageNumber={pageNumber}&pageSize={pageSize}";
@@ -140,17 +140,17 @@ namespace Admin.Blazor.HttpServices
                     string result = await response.Content.ReadAsStringAsync();
                     PagedProductsDTO? pagedProducts = JsonSerializer.Deserialize<PagedProductsDTO>(result, _jsonSerializerOptions);
                     Console.WriteLine(pagedProducts);
-                    return (true, pagedProducts?.Products, pagedProducts?.PagingData, null);
+                    return (true, pagedProducts?.Products, pagedProducts?.PagingData, pagedProducts?.FetchTime, null);
                 }
                 else
                 {
                     string errorMessage = await GetErrorMessageAsync(response);
-                    return (false, null, null, errorMessage);
+                    return (false, null, null, null, errorMessage);
                 }
             }
         }
 
-        public async Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? Products, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSummariesAsync(
+        public async Task<(bool IsSuccess, IEnumerable<ProductSummaryDTO>? Products, PaginationMetadata? PagingData, DateTime? FetchTime, string? ErrorMessage)> GetPagedAndFilteredProductSummariesAsync(
             string? filter, string? category, string? sortColumn, int pageNumber = 1, int pageSize = 10)
         {
             string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/paged/summaries?filter={filter}&category={category}&sortColumn={sortColumn}&pageNumber={pageNumber}&pageSize={pageSize}";
@@ -165,12 +165,12 @@ namespace Admin.Blazor.HttpServices
                     string result = await response.Content.ReadAsStringAsync();
                     PagedProductSummariesDTO? pagedProductSummaries = JsonSerializer.Deserialize<PagedProductSummariesDTO>(result, _jsonSerializerOptions);
                     Console.WriteLine(pagedProductSummaries);
-                    return (true, pagedProductSummaries?.ProductSummaries, pagedProductSummaries?.PagingData, null);
+                    return (true, pagedProductSummaries?.ProductSummaries, pagedProductSummaries?.PagingData, pagedProductSummaries?.FetchTime, null);
                 }
                 else
                 {
                     string errorMessage = await GetErrorMessageAsync(response);
-                    return (false, null, null, errorMessage);
+                    return (false, null, null, null, errorMessage);
                 }
             }
         }

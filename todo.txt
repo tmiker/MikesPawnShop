@@ -1,22 +1,21 @@
+MediatR in Products.Write.API
 
 Cart Button Flow - ensure consumer client flow is as desired
 
 Update Secrets Requirements in notes
 
-Return ProblemDetails in clients if header contains "application/problem+json"
+// Return ProblemDetails in clients if header contains "application/problem+json"
 
 Need buttons in consumer client product detail to add to or remove from cart
 
 OpenAPI documentation
-
-MediatR
 
 Logging - Serilog ???
 
 YARP: Add health checks for downstream services
 
 Caching
-	YARP vs API
+	YARP for Products Read vs API
 
 Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API

@@ -23,6 +23,9 @@ namespace Admin.Blazor.Client.DTOs.Products
         public int DocumentCount { get; init; }
         public string? DefaultImageUri { get; init; }
 
+        // map fetch time to monitor whether a response is from cache or not
+        public DateTime FetchTime { get; set; }
+
         [JsonIgnore]
         public int QuantityAvailable { get => QuantityOnHand - QuantityAllocated; }
     }

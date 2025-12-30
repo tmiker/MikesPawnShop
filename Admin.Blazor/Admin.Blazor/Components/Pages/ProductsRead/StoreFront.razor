@@ -24,6 +24,28 @@
     </div>
 </div>
 
+<div class="row mt-2">
+    @if (!_showCart && SelectedProductId == 0)
+    {
+        <div class="col-3">
+            @if (ProductsFetchTime.HasValue)
+            {
+                <h6 class="text-secondary">Data Fetched: @ProductsFetchTime.Value</h6>
+            }
+        </div>
+        <div class="col-3">
+            @if (PageRenderTime.HasValue)
+            {
+                <h6 class="text-secondary">Page Rendered: @PageRenderTime.Value</h6>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="col-6"></div>
+    }
+</div>
+
 @if (_apiHealthCheckResult is not null)
 {
     <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
@@ -124,6 +146,9 @@ else
     public ShoppingCartDTO? ShoppingCart { get; set; }
     public int ShoppingCartItemCount { get; set; }
     private bool _showCart = false;
+
+    public DateTime? ProductsFetchTime { get; set; }
+    public DateTime? PageRenderTime { get; set; }
 
     private HealthCheckResultDTO? _apiHealthCheckResult;
     private void ClearHealthCheckResult() => _apiHealthCheckResult = null;
@@ -269,6 +294,8 @@ else
         {
             Products = result.Products?.ToList();
             PagingData = result.PagingData;
+            ProductsFetchTime = result.FetchTime;
+            PageRenderTime = DateTime.Now;
         }
         else
         {

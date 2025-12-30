@@ -57,6 +57,27 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("DomesticDogs", policy => policy.RequireClaim("Genus", "Canis").RequireClaim("Species", "Familiaris"));
 });
 
+/// RESPONSE CACHING
+builder.Services.AddResponseCaching();
+/// OUTPUT CACHING
+//builder.Services.AddOutputCache(options =>
+//{
+//    //options.AddBasePolicy(builder =>
+//    //{
+//    //    builder.Expire(TimeSpan.FromSeconds(30));
+//    //    builder.Tag("products");
+//    //});
+//    options.AddPolicy("SixtySecondsCache", builder =>
+//    {
+//        builder.Expire(TimeSpan.FromSeconds(60));
+//        builder.Tag("products");
+//    });
+//    options.AddPolicy("NoCache", builder =>
+//    {
+//        builder.NoCache();
+//    });
+//});
+
 // Register services from Composition Root
 builder.Services.ComposeApplication();
 
@@ -85,6 +106,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowGetPolicy");
+
+app.UseResponseCaching();  
+// app.UseOutputCache();   // must be called after UseCors and after UseRouting if called
 
 app.UseAuthentication();
 app.UseAuthorization();

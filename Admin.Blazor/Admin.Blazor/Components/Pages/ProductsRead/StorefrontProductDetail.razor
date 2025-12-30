@@ -3,7 +3,7 @@
 @inject IProductsReadHttpService _readSideHttpClient
 @attribute [Authorize(Policy = "IsAdminOrManager")]
 
-<h3>Storefront Product Detail</h3>
+<h3>Product Detail</h3>
 
 @if (!string.IsNullOrWhiteSpace(_errorMessage))
 {
@@ -26,13 +26,24 @@
     <h4 class="text-success"><b>@_successMessage</b></h4>
 }
 
+<div class="row mt-2">
+    <div class="col-3">
+        @if (ProductFetchTime.HasValue)
+        {
+            <h6 class="text-secondary">Data Fetched: @ProductFetchTime.Value</h6>
+        }
+    </div>
+    <div class="col-3">
+        <h6 class="text-secondary">Current Time: @DateTime.Now</h6>
+    </div>
+</div>
+
 @if (_product is not null)
 {
     <div class="row">
         <div class="col-6 text-center">
 
             <!-- COLUMN 1 START-->
-
             <div class="form-group row">
                 <div class="col-3 text-center">
                     <label for="id">Id:</label>
@@ -300,6 +311,8 @@
     [Parameter]
     public EventCallback BackToListCallback { get; set; }
 
+    public DateTime? ProductFetchTime { get; set; }
+
     private async Task BackToList()
     {
         if (BackToListCallback.HasDelegate)
@@ -340,6 +353,7 @@
                 _product = result.Product;
                 _productAggregateId = _product?.AggregateId.ToString();
                 if (_product?.Images is not null && _product.Images.Any()) _primaryImage = _product.Images.FirstOrDefault();
+                ProductFetchTime = result.Product?.FetchTime;
             }
             else _errorMessage = result.ErrorMessage;
             this.StateHasChanged();
