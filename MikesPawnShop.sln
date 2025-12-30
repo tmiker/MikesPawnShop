@@ -10,8 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		architecture_notes.txt = architecture_notes.txt
-		error_handling.txt = error_handling.txt
 		cache_notes.txt = cache_notes.txt
+		error_handling.txt = error_handling.txt
 		event_dispatch.txt = event_dispatch.txt
 		fluent_validation.txt = fluent_validation.txt
 		git_notes.txt = git_notes.txt
@@ -80,6 +80,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IDP", "IDP", "{AB7915D4-21F3-4DCA-94FE-318BF8F30318}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YarpReverseProxy", "YarpReverseProxy\YarpReverseProxy.csproj", "{65C36C59-BB28-4B33-975D-BA3A4EC940D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proxies", "Proxies", "{CAD9AA68-2D23-4BD7-8EC8-8B3AF039FAAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -207,6 +209,7 @@ Global
 		{7F90853F-31F8-4C45-8861-42759B32E6A6} = {5AF11AC4-7CD5-47A7-BF36-7509BE9011FA}
 		{74AE9AF6-DFB4-4B6D-A63D-910303376EDC} = {5AF11AC4-7CD5-47A7-BF36-7509BE9011FA}
 		{A4E90503-7B2B-463D-9E07-7D5DCE097437} = {5AF11AC4-7CD5-47A7-BF36-7509BE9011FA}
+		{65C36C59-BB28-4B33-975D-BA3A4EC940D7} = {CAD9AA68-2D23-4BD7-8EC8-8B3AF039FAAF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7B41C0A-E2DB-4B66-8800-85872EA8AC78}
