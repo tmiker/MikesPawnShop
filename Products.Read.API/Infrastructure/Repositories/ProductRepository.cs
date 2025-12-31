@@ -151,7 +151,7 @@ namespace Products.Read.API.Infrastructure.Repositories
                     if (product.Version == messageVersion - 1) return product;
                     else if (product.Version >= messageVersion)
                     {
-                        // will catch and log this in process as not a show stopper
+                        // will catch and log this in process as not a show stopper - throwing so can break out of method where used above
                         throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
                     }
                     // if (product.Version < messageVersion - 1) continue to retry to see if prior message(s) arrive - i.e. don't break here
