@@ -10,35 +10,13 @@ namespace Products.Read.API
 {
     public class ProductQueryServiceTests
     {
-        [Fact]
-        public async Task GetAllProductSummariesAsync_IncludeImagesAndDocuments_ReturnsCorrectResult()
+        [Theory]
+        [ClassData(typeof(ProductQueryServiceTestsClassData))]
+        public async Task GetAllProductSummariesAsync_IncludeImagesAndDocuments_ReturnsCorrectResult(Product product, ImageData image, DocumentData document)
         {
             // Arrange
-            Guid aggregateId = Guid.NewGuid();
-            string aggregateType = "Product";
-            int aggregateVersion = 0;
-            string correlationId = Guid.NewGuid().ToString();
-            string productName = "Meade LX8";
-            string category = "Astronomy";
-            string description = "Catadioptric Telescope";
-            decimal price = 1299.99m;
-            string currency = "USD";
-            string status = "Active";
-            string imageName = "Telescope";
-            string caption = "Meade LX8";
-            int imageSequenceNumber = 1;
-            string imageUrl = "https://www.docs.imageUrl";
-            string thumbUrl = "https://www.docs.thumbUrl";
             int imageVersion = 1;   // should be aggregateVersion + 1
-            string documentName = "Instructions";
-            string title = "Meade LX8 Instructions";
-            int documentSequenceNumber = 1;
-            string documentUrl = "https://www.docs.documentUrl";
             int documentVersion = 2;    // should be aggregateVersion + 2
-            int quantityOnHand = 1;
-            int quantityAvailable = 1;
-            string uom = "each";
-            int lowStockThreshold = 1;
 
             NullLogger<ProductQueryService> logger = NullLogger<ProductQueryService>.Instance;
             var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
@@ -52,15 +30,10 @@ namespace Products.Read.API
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                Product product = new Product(aggregateId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold, aggregateVersion);
-                ImageData image = new ImageData(imageName, caption, imageSequenceNumber, imageUrl, thumbUrl);
-                DocumentData document = new DocumentData(documentName, title, documentSequenceNumber, documentUrl);
                 context.Products.Add(product);
                 product.AddImage(image, imageVersion);
                 product.AddDocument(document, documentVersion);
                 context.SaveChanges();
-
-                // int productId = product.Id;
 
                 ProductQueryService queryService = new ProductQueryService(context, logger);
 
@@ -79,35 +52,13 @@ namespace Products.Read.API
             }
         }
 
-        [Fact]
-        public async Task GetPagedAndFilteredProductSummariesAsync_IncludeImagesAndDocuments_ReturnsCorrectResult()
+        [Theory]
+        [ClassData(typeof(ProductQueryServiceTestsClassData))]
+        public async Task GetPagedAndFilteredProductSummariesAsync_IncludeImagesAndDocuments_ReturnsCorrectResult(Product product, ImageData image, DocumentData document)
         {
             // Arrange
-            Guid aggregateId = Guid.NewGuid();
-            string aggregateType = "Product";
-            int aggregateVersion = 0;
-            string correlationId = Guid.NewGuid().ToString();
-            string productName = "Meade LX8";
-            string category = "Astronomy";
-            string description = "Catadioptric Telescope";
-            decimal price = 1299.99m;
-            string currency = "USD";
-            string status = "Active";
-            string imageName = "Telescope";
-            string caption = "Meade LX8";
-            int imageSequenceNumber = 1;
-            string imageUrl = "https://www.docs.imageUrl";
-            string thumbUrl = "https://www.docs.thumbUrl";
-            int imageVersion = 1;
-            string documentName = "Instructions";
-            string title = "Meade LX8 Instructions";
-            int documentSequenceNumber = 1;
-            string documentUrl = "https://www.docs.documentUrl";
-            int documentVersion = 2;
-            int quantityOnHand = 1;
-            int quantityAvailable = 1;
-            string uom = "each";
-            int lowStockThreshold = 1;
+            int imageVersion = 1;   // should be aggregateVersion + 1
+            int documentVersion = 2;    // should be aggregateVersion + 2
 
             NullLogger<ProductQueryService> logger = NullLogger<ProductQueryService>.Instance;
             var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
@@ -121,9 +72,6 @@ namespace Products.Read.API
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                Product product = new Product(aggregateId, productName, category, description, price, currency, status, quantityOnHand, quantityAvailable, uom, lowStockThreshold, aggregateVersion);
-                ImageData image = new ImageData(imageName, caption, imageSequenceNumber, imageUrl, thumbUrl);
-                DocumentData document = new DocumentData(documentName, title, documentSequenceNumber, documentUrl);
                 context.Products.Add(product);
                 product.AddImage(image, imageVersion);
                 product.AddDocument(document, documentVersion);
