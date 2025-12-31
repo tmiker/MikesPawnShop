@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit.Monitoring.Performance;
+using Microsoft.EntityFrameworkCore;
 using Products.Read.API.Abstractions;
 using Products.Read.API.Domain.Models;
 using Products.Read.API.Exceptions;
@@ -134,37 +135,37 @@ namespace Products.Read.API.Infrastructure.Repositories
 
         private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId) //, 
         {
-            int intervalSeconds = 5;
+            int intervalSeconds = 2;
             int retryCount = 3;
             int intervalMultiplier = 2;
 
             Product? product = null;
             while (retryCount > 0)
             {
-                _logger.LogInformation("*********** PRODUCTS READ SIDE REPOSITORY ATTEMPTING TO GET CORRECT PRODUCT AND VERSION: ********** \n MESSAGE TYPE: {message_type}, " +
-                "MESSAGE VERSION: {message_version}, AGGREGATE ID: {aggId}, CORRELATION ID: {corrId} RETRY COUNT: {retry} ...", messageType, messageVersion, aggregateId, correlationId, retryCount);
+                //_logger.LogInformation("*********** PRODUCTS READ SIDE REPOSITORY QUERYING DATABASE FOR CORRECT PRODUCT VERSION: ********** \n    MESSAGE TYPE: {message_type}, " +
+                //"MESSAGE VERSION: {message_version}, AGGREGATE ID: {aggId}, CORRELATION ID: {corrId} RETRY COUNT: {retry} ...", messageType, messageVersion, aggregateId, correlationId, retryCount);
 
+                // get product from database
                 product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
 
                 if (product is not null)
                 {
+                    // if correct version found, return it
                     if (product.Version == messageVersion - 1) return product;
-                    else if (product.Version >= messageVersion)
-                    {
-                        // will catch and log this in process as not a show stopper - throwing so can break out of method where used above
-                        throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
-                    }
+                    // if duplicate message, throw to break and clear call stack - will catch in process and log this as not a show stopper
+                    else if (product.Version >= messageVersion) throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
                     // if (product.Version < messageVersion - 1) continue to retry to see if prior message(s) arrive - i.e. don't break here
                 }
 
-                // requery the database if the product is null, or if product is not null but product.Version < (messageVersion - 1)
-                // as need to ensure finding the version that precedes the message version by 1
-                intervalSeconds = intervalSeconds * intervalMultiplier;
+                // requery database after a delay if the product is null or product.Version < (messageVersion - 1) to allow any new messages to be processed 
+                intervalSeconds = intervalSeconds * intervalMultiplier;  // for retryCount = 3, intervalSeconds = 2, and intervalMultiplier = 2, delays will be 4s, then 8s, then 16s for 28s total
                 retryCount--;
                 await Task.Delay(intervalSeconds * 1000);
             }
 
-            if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!); 
+            // handle null product result
+            if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!);
+            // handle missing message version(s)
             else if (product.Version < messageVersion - 1) HandleMissingProductMessageVersionError(messageType, aggregateId, messageVersion, correlationId!);
 
             return product;

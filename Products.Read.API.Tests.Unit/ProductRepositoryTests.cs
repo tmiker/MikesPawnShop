@@ -197,60 +197,75 @@ namespace Products.Read.API
         }
 
 
-        //// DUE TO REFACTORING REPOSITORY TO USE RETRIES, NEED TO REFACTOR THIS TEST TO USE A STUB THAT ALLOWS MULTIPLE CALLS TO REPOSITORY
-        //[Theory]
-        //[MemberData(nameof(ProductRepositoryMemberData.AddProductAndUpdateStatusMissingProductVersionTestData), MemberType = typeof(ProductRepositoryMemberData))]
-        //public async Task UpdateProductStatusAsync_MissingProductVersion_ThrowsDataConsistencyException(ProductAddedMessage productAddedMessage, StatusUpdatedMessage statusUpdatedMessage)
-        //{
-        //    // Arrange
-        //    NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
-        //    var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
-        //        .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        // THIS IS A LONG RUNNING TEST DUE TO THE RETRIES IN THE REPOSITORY METHOD TO ALLOW FOR OUT OF SEQUENCE MESSAGES
+        [Theory]
+        [MemberData(nameof(ProductRepositoryMemberData.AddProductAndUpdateStatusMissingProductVersionTestData), MemberType = typeof(ProductRepositoryMemberData))]
+        public async Task UpdateProductStatusAsync_MissingProductVersion_ThrowsDataConsistencyException(ProductAddedMessage productAddedMessage, StatusUpdatedMessage statusUpdatedMessage)
+        {
+            // Arrange
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-        //    using (var context = new ProductsReadDbContext(dbContextOptions))
-        //    {
-        //        // Act
-        //        context.Database.EnsureDeleted();
-        //        context.Database.EnsureCreated();
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                // Act
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-        //        ProductRepository productRepository = new ProductRepository(context, logger);
+                ProductRepository productRepository = new ProductRepository(context, logger);
 
-        //        await productRepository.AddProductAsync(productAddedMessage);
+                // await productRepository.AddProductAsync(productAddedMessage);
+                context.Products.Add(new Product
+                (
+                    aggregateId: productAddedMessage.AggregateId,
+                    name: productAddedMessage.Name,
+                    category: productAddedMessage.Category,
+                    description: productAddedMessage.Description,
+                    price: productAddedMessage.Price,
+                    currency: productAddedMessage.Currency,
+                    status: productAddedMessage.Status,
+                    quantityOnHand: productAddedMessage.QuantityOnHand,
+                    quantityAllocated: productAddedMessage.QuantityAllocated,
+                    uom: productAddedMessage.UOM,
+                    lowStockThreshold: productAddedMessage.LowStockThreshold,
+                    version: productAddedMessage.AggregateVersion 
+                ));
+                context.SaveChanges();
 
-        //        // Assert
-        //        Product product = context.Products.Single();
-        //        Assert.NotNull(product);
-        //        Assert.Equal(productAddedMessage.AggregateVersion, product.Version);
-        //        Assert.Equal(productAddedMessage.Status, product.Status);
+                // Assert
+                Product product = context.Products.Single();
+                Assert.NotNull(product);
+                Assert.Equal(productAddedMessage.AggregateVersion, product.Version);
+                Assert.Equal(productAddedMessage.Status, product.Status);
 
-        //        // *** the below call will drive the repository method GetCorrectProductAndVersionWithRetriesAsync to make multiple attempts to get the correct version
-        //        await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
-        //    }
-        //}
+                // *** the below call will drive the repository method GetCorrectProductAndVersionWithRetriesAsync to make multiple attempts to get the correct version
+                await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
+            }
+        }
 
-        //// DUE TO REFACTORING REPOSITORY TO USE RETRIES, NEED TO REFACTOR THIS TEST TO USE A STUB THAT ALLOWS MULTIPLE CALLS TO REPOSITORY
-        //[Theory]
-        //[MemberData(nameof(ProductRepositoryMemberData.AddProductAndUpdateStatusProductNotFoundTestData), MemberType = typeof(ProductRepositoryMemberData))]
-        //public async Task UpdateProductStatusAsync_ProductNotFound_ThrowsDataConsistencyException(ProductAddedMessage productAddedMessage, StatusUpdatedMessage statusUpdatedMessage)
-        //{
-        //    // Arrange
-        //    NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
-        //    var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
-        //        .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        // THIS IS A LONG RUNNING TEST DUE TO THE RETRIES IN THE REPOSITORY METHOD TO ALLOW FOR OUT OF SEQUENCE MESSAGES
+        [Theory]
+        [MemberData(nameof(ProductRepositoryMemberData.AddProductAndUpdateStatusProductNotFoundTestData), MemberType = typeof(ProductRepositoryMemberData))]
+        public async Task UpdateProductStatusAsync_ProductNotFound_ThrowsDataConsistencyException(ProductAddedMessage productAddedMessage, StatusUpdatedMessage statusUpdatedMessage)
+        {
+            // Arrange
+            NullLogger<ProductRepository> logger = NullLogger<ProductRepository>.Instance;
+            var dbContextOptions = new DbContextOptionsBuilder<ProductsReadDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
 
-        //    // Act
-        //    using (var context = new ProductsReadDbContext(dbContextOptions))
-        //    {
-        //        context.Database.EnsureDeleted();
-        //        context.Database.EnsureCreated();
+            // Act
+            using (var context = new ProductsReadDbContext(dbContextOptions))
+            {
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-        //        ProductRepository productRepository = new ProductRepository(context, logger);
-        //        await productRepository.AddProductAsync(productAddedMessage);
+                ProductRepository productRepository = new ProductRepository(context, logger);
+                await productRepository.AddProductAsync(productAddedMessage);
 
-        //        // Assert
-        //        // *** the below call will drive the repository method GetCorrectProductAndVersionWithRetriesAsync to make multiple attempts to get a product with correct aggregateId
-        //        await Assert.ThrowsAnyAsync<Exception>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
-        //    }
-        //}
+                // Assert
+                await Assert.ThrowsAsync<DataConsistencyException>(async () => await productRepository.UpdateProductStatusAsync(statusUpdatedMessage));
+            }
+        }
     }
 }
