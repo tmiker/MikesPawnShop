@@ -142,9 +142,6 @@ namespace Products.Read.API.Infrastructure.Repositories
             Product? product = null;
             while (retryCount > 0)
             {
-                //_logger.LogInformation("*********** PRODUCTS READ SIDE REPOSITORY QUERYING DATABASE FOR CORRECT PRODUCT VERSION: ********** \n    MESSAGE TYPE: {message_type}, " +
-                //"MESSAGE VERSION: {message_version}, AGGREGATE ID: {aggId}, CORRELATION ID: {corrId} RETRY COUNT: {retry} ...", messageType, messageVersion, aggregateId, correlationId, retryCount);
-
                 // get product from database
                 product = await _db.Products.Include(p => p.Images).Include(p => p.Documents).AsSplitQuery().FirstOrDefaultAsync(p => p.AggregateId == aggregateId);
 
@@ -158,7 +155,8 @@ namespace Products.Read.API.Infrastructure.Repositories
                 }
 
                 // requery database after a delay if the product is null or product.Version < (messageVersion - 1) to allow any new messages to be processed 
-                intervalSeconds = intervalSeconds * intervalMultiplier;  // for retryCount = 3, intervalSeconds = 2, and intervalMultiplier = 2, delays will be 4s, then 8s, then 16s for 28s total
+                // for retryCount = 3, intervalSeconds = 2, and intervalMultiplier = 2, delays will be 4s, then 8s, then 16s for a total of 28s
+                intervalSeconds = intervalSeconds * intervalMultiplier;   
                 retryCount--;
                 await Task.Delay(intervalSeconds * 1000);
             }
