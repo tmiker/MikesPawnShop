@@ -1,0 +1,28 @@
+in Read API ProductRepository
+	changed
+
+        private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId) //, 
+        {
+             ...
+
+   	            if (product is not null)
+                {
+                    if (product.Version == messageVersion - 1) return product;
+                    if (product.Version >= messageVersion)
+                    {
+                        // will catch and log this in process, then return as not a show stopper
+                        throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
+                    }
+                }
+    to
+
+	            if (product is not null)
+                {
+                    if (product.Version == messageVersion - 1) return product;
+                    else if (product.Version >= messageVersion)
+                    {
+                        // will catch and log this in process, then return as not a show stopper
+                        throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
+                    }
+                    else break;  // product.Version < messageVersion - 1, so break to handle missing message versions below
+                }

@@ -29,12 +29,12 @@ namespace Products.Read.API
             int imageSequenceNumber = 1;
             string imageUrl = "https://www.docs.imageUrl";
             string thumbUrl = "https://www.docs.thumbUrl";
-            int imageVersion = 1;
+            int imageVersion = 1;   // should be aggregateVersion + 1
             string documentName = "Instructions";
             string title = "Meade LX8 Instructions";
             int documentSequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
-            int documentVersion = 1;
+            int documentVersion = 2;    // should be aggregateVersion + 2
             int quantityOnHand = 1;
             int quantityAvailable = 1;
             string uom = "each";
@@ -103,7 +103,7 @@ namespace Products.Read.API
             string title = "Meade LX8 Instructions";
             int documentSequenceNumber = 1;
             string documentUrl = "https://www.docs.documentUrl";
-            int documentVersion = 1;
+            int documentVersion = 2;
             int quantityOnHand = 1;
             int quantityAvailable = 1;
             string uom = "each";

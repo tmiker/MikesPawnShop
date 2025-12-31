@@ -58,7 +58,6 @@ namespace Products.Read.API.Infrastructure.Repositories
                 Product? product = await GetCorrectProductAndVersionWithRetriesAsync(
                     message.GetType().Name, message.AggregateId, message.AggregateVersion, message.CorrelationId);
 
-                // UPDATE EVEN IF STATUS THE SAME - STILL NEED TO PROCESS THE EVENT AND UPDATE THE VERSION
                 product!.UpdateStatus(message.Status, message.AggregateVersion);
                 bool success = await _db.SaveChangesAsync() > 0;
 
@@ -67,6 +66,7 @@ namespace Products.Read.API.Infrastructure.Repositories
             }
             catch (DuplicateProductMessageException dupEx)
             {
+                // would be thrown in call to GetCorrectProductAndVersionWithRetriesAsync() above
                 // just log for info
                 _logger.LogInformation(dupEx.Message);
             }
@@ -113,9 +113,9 @@ namespace Products.Read.API.Infrastructure.Repositories
 
                 DocumentData document = new DocumentData(message.Name!, message.Title!, message.SequenceNumber, message.DocumentUrl!);
                 product!.AddDocument(document, message.AggregateVersion);
-                Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD BEFORE SAVE CHANGES: {product.Documents!.Count}");
+                // Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD BEFORE SAVE CHANGES: {product.Documents!.Count}");
                 bool success = await _db.SaveChangesAsync() > 0;
-                Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD AND AFTER SAVE CHANGES: {product.Documents!.Count}");
+                // Console.WriteLine($"PRODUCT DOCUMENT COUNT AFTER ADD AND AFTER SAVE CHANGES: {product.Documents!.Count}");
 
                 // handle update error with no exception thrown
                 if (!success) HandleProductStateSynchronizationError(message.GetType().Name, message.AggregateId, message.CorrelationId!, null);
@@ -134,7 +134,7 @@ namespace Products.Read.API.Infrastructure.Repositories
 
         private async Task<Product?> GetCorrectProductAndVersionWithRetriesAsync(string messageType, Guid aggregateId, int messageVersion, string? correlationId) //, 
         {
-            int intervalSeconds = 5; 
+            int intervalSeconds = 5;
             int retryCount = 3;
             int intervalMultiplier = 2;
 
@@ -149,11 +149,12 @@ namespace Products.Read.API.Infrastructure.Repositories
                 if (product is not null)
                 {
                     if (product.Version == messageVersion - 1) return product;
-                    if (product.Version >= messageVersion)
+                    else if (product.Version >= messageVersion)
                     {
-                        // will catch and log this in process, then return as not a show stopper
+                        // will catch and log this in process as not a show stopper
                         throw new DuplicateProductMessageException($"Duplicate message: Version {messageVersion}, AggregateId: {aggregateId}");
                     }
+                    // if (product.Version < messageVersion - 1) continue to retry to see if prior message(s) arrive - i.e. don't break here
                 }
 
                 // requery the database if the product is null, or if product is not null but product.Version < (messageVersion - 1)
@@ -163,7 +164,7 @@ namespace Products.Read.API.Infrastructure.Repositories
                 await Task.Delay(intervalSeconds * 1000);
             }
 
-            if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!);
+            if (product is null) HandleProductIsNullSynchronizationError(messageType, aggregateId, correlationId!); 
             else if (product.Version < messageVersion - 1) HandleMissingProductMessageVersionError(messageType, aggregateId, messageVersion, correlationId!);
 
             return product;
@@ -197,7 +198,7 @@ namespace Products.Read.API.Infrastructure.Repositories
 
         public async Task<bool> PurgeAsync()
         {
-            var images = await _db.ImageData.ToListAsync(); 
+            var images = await _db.ImageData.ToListAsync();
             var documents = await _db.DocumentData.ToListAsync();
             var products = await _db.Products.ToListAsync();
             var messageRecords = await _db.ProductMessageRecords.ToListAsync();

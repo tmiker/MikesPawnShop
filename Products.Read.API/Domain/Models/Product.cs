@@ -54,6 +54,7 @@ namespace Products.Read.API.Domain.Models
 
         public void AddImage(ImageData image, int version)
         {
+            if (version > Version + 1) return;                              // reject out of order message 
             if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Images is null) Images = new List<ImageData>();
             Images.Add(image);
@@ -63,6 +64,7 @@ namespace Products.Read.API.Domain.Models
 
         public void AddDocument(DocumentData document, int version)
         {
+            if (version > Version + 1) return;                              // reject out of order message 
             if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Documents is null) Documents = new List<DocumentData>();
             Documents.Add(document);
@@ -72,6 +74,7 @@ namespace Products.Read.API.Domain.Models
 
         public void DeleteDocument(string fileName, int version)
         {
+            if (version > Version + 1) return;                              // reject out of order message 
             if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Documents is null || !Documents.Any()) return;
             DocumentData? document = Documents.FirstOrDefault(d => d.Name == fileName);
@@ -85,6 +88,7 @@ namespace Products.Read.API.Domain.Models
 
         public void DeleteImage(string fileName, int version)
         {
+            if (version > Version + 1) return;                              // reject out of order message 
             if (version <= Version) return;                                 // duplicate message - idempotency 
             if (Images is null || !Images.Any()) return;
             ImageData? image = Images.FirstOrDefault(d => d.Name == fileName);
@@ -98,6 +102,7 @@ namespace Products.Read.API.Domain.Models
 
         public void UpdateStatus(string status, int version)
         {
+            if (version > Version + 1) return;                              // reject out of order message  
             if (version <= Version) return;                                 // duplicate message - idempotency 3
             Status = status;
             Version = version;
