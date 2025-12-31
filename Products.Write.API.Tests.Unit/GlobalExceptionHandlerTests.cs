@@ -28,6 +28,7 @@ namespace Products.Write.API
             _httpContext.Request.Path = "/test";
             _httpContext.Request.Method = "GET";
         }
+
         [Fact]
         public async Task TryHandleAsync_WithValidationException_ReturnsTrue()
         {
@@ -50,6 +51,7 @@ namespace Products.Write.API
                     exception,
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
         }
+
         [Fact]
         public async Task TryHandleAsync_WithNotFoundException_Returns404()
         {
