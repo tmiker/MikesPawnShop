@@ -7,13 +7,13 @@ Logging - Serilog ???
 
 Update Secrets Requirements in notes
 
-OpenAPI documentation
-
 Need buttons in consumer client product detail to add to or remove from cart
 
 Cart Button Flow - ensure consumer client flow is as desired
 
 Cancellation token: button to cancel in UI
+
+OpenAPI documentation
 
 
 // MediatR in Products.Write.API
