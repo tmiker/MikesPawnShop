@@ -1,8 +1,12 @@
-MediatR in Products.Write.API
+
+
+Fluent Validation
+
+Update Secrets Requirements in notes
 
 Cart Button Flow - ensure consumer client flow is as desired
 
-Update Secrets Requirements in notes
+// MediatR in Products.Write.API
 
 // YARP: Add health checks for downstream services
 
