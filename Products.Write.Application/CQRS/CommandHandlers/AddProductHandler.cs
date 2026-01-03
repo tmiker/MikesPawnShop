@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -8,7 +9,7 @@ using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class AddProductHandler : ICommandHandler<AddProduct, AddProductResult>
+    public class AddProductHandler : IRequestHandler<AddProduct, AddProductResult> // : ICommandHandler<AddProduct, AddProductResult>  // 
     {
         private readonly IProductRepository _productRepository;
         private readonly IEventAggregator _eventAggregator;
@@ -21,7 +22,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<AddProductResult> HandleAsync(AddProduct command, CancellationToken cancellationToken)
+        public async Task<AddProductResult> Handle(AddProduct command, CancellationToken cancellationToken) // HandleAsync(AddProduct command, CancellationToken cancellationToken)
         {
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
             CategoryEnum categoryEnum = (CategoryEnum)Enum.Parse(typeof(CategoryEnum), command.Category, ignoreCase: true);

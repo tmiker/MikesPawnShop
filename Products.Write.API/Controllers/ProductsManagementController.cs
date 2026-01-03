@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Products.Write.Application.Abstractions;
@@ -14,12 +15,14 @@ namespace Products.Write.API.Controllers
     public class ProductsManagementController : ControllerBase
     {
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ISender _sender;
         private readonly IOptions<AzureSettings> _azureSettings;
         private readonly ILogger<ProductsManagementController> _logger;
 
-        public ProductsManagementController(ICommandDispatcher commandDispatcher, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger)
+        public ProductsManagementController(ICommandDispatcher commandDispatcher, ISender sender, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger)
         {
             _commandDispatcher = commandDispatcher;
+            _sender = sender;
             _azureSettings = azureSettings;
             _logger = logger;
         }
@@ -33,8 +36,10 @@ namespace Products.Write.API.Controllers
             // (https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.ihttpcontextaccessor?view=aspnetcore-9.0).
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddProduct command = new AddProduct(addProductDTO, correlationId);
-            // AddProductResult result = await _commandManagementService.ExecuteCommandAsync<AddProduct, AddProductResult>(command, cancellationToken);
-            AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
+
+            // AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
+            AddProductResult result = await _sender.Send(command);  
+
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }

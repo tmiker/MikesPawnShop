@@ -14,9 +14,9 @@ namespace Products.Write.Infrastructure.Data
         public string EventType { get; set; }
         public string EventJson { get; set; }
         public DateTime OccurredAt { get; set; }
-        public string CorrelationId { get; set; }
+        public string? CorrelationId { get; set; }
 
-        public EventRecord(Guid aggregateId, string aggregateType, int aggregateVersion, string eventType, string eventJson, DateTime occurredAt, string correlationId)
+        public EventRecord(Guid aggregateId, string aggregateType, int aggregateVersion, string eventType, string eventJson, DateTime occurredAt, string? correlationId)
         {
             AggregateId = aggregateId;
             AggregateType = aggregateType;

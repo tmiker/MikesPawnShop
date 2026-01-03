@@ -66,7 +66,7 @@ namespace Products.Write.Application
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
             // Register Command Handlers
-            services.AddScoped<ICommandHandler<AddProduct, AddProductResult>, AddProductHandler>();
+            // services.AddScoped<ICommandHandler<AddProduct, AddProductResult>, AddProductHandler>();      // converted to mediatr request handler
             services.AddScoped<ICommandHandler<UpdateStatus, UpdateStatusResult>, UpdateStatusHandler>();
             services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
             services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();

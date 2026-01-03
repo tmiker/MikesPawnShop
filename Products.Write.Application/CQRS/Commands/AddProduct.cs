@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using MediatR;
+using Microsoft.Extensions.Primitives;
+using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.DTOs;
-using System.ComponentModel.DataAnnotations;
 
 namespace Products.Write.Application.CQRS.Commands
 {
-    public class AddProduct
+    public class AddProduct : IRequest<AddProductResult>
     {
         public string Name { get; init; } = default!;
         public string Category { get; init; } = default!;

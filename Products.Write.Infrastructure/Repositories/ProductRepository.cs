@@ -27,9 +27,9 @@ namespace Products.Write.Infrastructure.Repositories
 
             if (product.DomainEvents != null && product.DomainEvents.Any())
             {
-                // determine if need a snapshot if take every 10 versions
-                int maxEventVersion = product.DomainEvents.Max(e => e.AggregateVersion);
-                if (product.DomainEvents.Count() >= 10 || maxEventVersion % 10 > (maxEventVersion - product.DomainEvents.Count()) % 10) needsSnapshotUpdate = true;
+                //// determine if need a snapshot if take every 10 versions
+                //int maxEventVersion = product.DomainEvents.Max(e => e.AggregateVersion);
+                //if (product.DomainEvents.Count() >= 10 || maxEventVersion % 10 > (maxEventVersion - product.DomainEvents.Count()) % 10) needsSnapshotUpdate = true;
 
                 // save as event records
                 bool success = await _eventStore.SaveEventRecordsAsync(product.DomainEvents);
