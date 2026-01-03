@@ -1,7 +1,10 @@
-﻿namespace Admin.Blazor.Client.DTOs.Products.Write
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Admin.Blazor.Client.DTOs.Products.Write
 {
     public class DeleteDocumentDTO
     {
+        [Required]
         public string ProductId { get; init; }
         public string FileName { get; init; } = default!;
         public string? CorrelationId { get; set; }

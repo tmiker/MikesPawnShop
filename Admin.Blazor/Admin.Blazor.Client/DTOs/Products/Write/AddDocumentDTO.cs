@@ -5,12 +5,17 @@ namespace Admin.Blazor.Client.DTOs.Products.Write
 {
     public class AddDocumentDTO
     {
+        [Required]
         public string ProductId { get; set; } = default!;
+        [Required]
         public string Name { get; set; } = default!;
+        [Required]
         public string Title { get; set; } = default!;
 
         // public int SequenceNumber { get; set; }
-        public IBrowserFile? DocumentBlob { get; set; } 
+        [Required]
+        public IBrowserFile? DocumentBlob { get; set; }
+        [Required]
         public string? BlobFileName { get; set; }
 
 

@@ -1,4 +1,5 @@
 ﻿using Admin.Blazor.Client.DTOs.Accounts;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Admin.Blazor.Client.DTOs.Orders
@@ -6,8 +7,11 @@ namespace Admin.Blazor.Client.DTOs.Orders
     public class AddOrderDTO
     {
         // public string? OrderId { get; set; }
+        [Required]
         public List<AddOrderItemDTO> Items { get; set; } = new List<AddOrderItemDTO>();
+        [Required]
         public AddressDTO? ShippingAddress { get; set; }
+        [Required]
         public AddressDTO? BillingAddress { get; set; }
 
         [JsonIgnore]

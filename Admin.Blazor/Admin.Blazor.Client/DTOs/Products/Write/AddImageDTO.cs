@@ -5,12 +5,17 @@ namespace Admin.Blazor.Client.DTOs.Products.Write
 {
     public class AddImageDTO
     {
+        [Required]
         public string ProductId { get; set; } = default!;
+        [Required]
         public string Name { get; set; } = default!;
+        [Required]
         public string Caption { get; set; } = default!;
 
         // public int SequenceNumber { get; set; }
+        [Required]
         public IBrowserFile? ImageBlob { get; set; }
+        [Required]
         public string? BlobFileName { get; set; }
 
 
