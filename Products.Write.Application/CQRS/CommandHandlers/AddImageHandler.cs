@@ -1,4 +1,5 @@
 ﻿using Azure;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class AddImageHandler : ICommandHandler<AddImage, AddImageResult>
+    public class AddImageHandler : IRequestHandler<AddImage, AddImageResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IAzureStorageService _azureStorageService;
@@ -24,7 +25,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<AddImageResult> HandleAsync(AddImage command, CancellationToken cancellationToken)
+        public async Task<AddImageResult> Handle(AddImage command, CancellationToken cancellationToken)
         {
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
 

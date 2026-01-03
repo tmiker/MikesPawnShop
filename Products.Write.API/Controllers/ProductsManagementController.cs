@@ -38,7 +38,7 @@ namespace Products.Write.API.Controllers
             AddProduct command = new AddProduct(addProductDTO, correlationId);
 
             // AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
-            AddProductResult result = await _sender.Send(command);  
+            AddProductResult result = await _sender.Send(command, cancellationToken);  
 
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
@@ -50,7 +50,7 @@ namespace Products.Write.API.Controllers
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddImage command = new AddImage(addImageDTO, correlationId);
-            AddImageResult result = await _commandDispatcher.DispatchAsync<AddImage, AddImageResult>(command, cancellationToken);
+            AddImageResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
@@ -62,7 +62,8 @@ namespace Products.Write.API.Controllers
             if (addDocumentDTO.DocumentBlob is null) Console.WriteLine($"The Document Blob is null.");
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddDocument command = new AddDocument(addDocumentDTO, correlationId);
-            AddDocumentResult result = await _commandDispatcher.DispatchAsync<AddDocument, AddDocumentResult>(command, cancellationToken);
+            // AddDocumentResult result = await _commandDispatcher.DispatchAsync<AddDocument, AddDocumentResult>(command, cancellationToken);
+            AddDocumentResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
@@ -73,7 +74,7 @@ namespace Products.Write.API.Controllers
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             UpdateStatus command = new UpdateStatus(updateStatusDTO, correlationId);
-            UpdateStatusResult result = await _commandDispatcher.DispatchAsync<UpdateStatus, UpdateStatusResult>(command, cancellationToken);
+            UpdateStatusResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
@@ -85,7 +86,7 @@ namespace Products.Write.API.Controllers
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
 
             DeleteImage command = new DeleteImage(deleteImageDTO, correlationId);
-            DeleteImageResult result = await _commandDispatcher.DispatchAsync<DeleteImage, DeleteImageResult>(command, cancellationToken);
+            DeleteImageResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
@@ -95,7 +96,7 @@ namespace Products.Write.API.Controllers
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             DeleteDocument command = new DeleteDocument(deleteDocumentDTO, correlationId);
-            DeleteDocumentResult result = await _commandDispatcher.DispatchAsync<DeleteDocument, DeleteDocumentResult>(command, cancellationToken);
+            DeleteDocumentResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }

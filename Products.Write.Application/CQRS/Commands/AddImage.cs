@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.DTOs;
 using System.Text;
 
 namespace Products.Write.Application.CQRS.Commands
 {
-    public class AddImage
+    public class AddImage : IRequest<AddImageResult>
     {
         public Guid ProductId { get; init; }
         public string Name { get; private set; } = default!;       // virtual directory plus filename

@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using MediatR;
+using Microsoft.Extensions.Primitives;
 
 namespace Products.Write.Application.CQRS.DevTests
 {
-    public class ThrowException
+    public class ThrowException : IRequest<ThrowExceptionResult>
     {
         public string ExceptionType { get; init; } = default!;
         public string? CorrelationId { get; set; } = default!;

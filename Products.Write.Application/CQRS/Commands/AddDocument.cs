@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.DTOs;
 using System.Text;
 
 namespace Products.Write.Application.CQRS.Commands
 {
-    public class AddDocument
+    public class AddDocument : IRequest<AddDocumentResult>
     {
         public Guid ProductId { get; init; }
         public string Name { get; private set; } = default!;          // for Azure blob storage, virtual directory plus filename

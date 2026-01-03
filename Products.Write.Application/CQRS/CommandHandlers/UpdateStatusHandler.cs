@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -8,7 +9,7 @@ using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class UpdateStatusHandler : ICommandHandler<UpdateStatus, UpdateStatusResult>
+    public class UpdateStatusHandler : IRequestHandler<UpdateStatus, UpdateStatusResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IEventAggregator _eventAggregator;
@@ -21,7 +22,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<UpdateStatusResult> HandleAsync(UpdateStatus command, CancellationToken cancellationToken)
+        public async Task<UpdateStatusResult> Handle(UpdateStatus command, CancellationToken cancellationToken)
         {
             Console.WriteLine($"UpdateStatusHandler method HandleAsync called for Aggregate Id: {command.ProductId.ToString()} ...");
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();

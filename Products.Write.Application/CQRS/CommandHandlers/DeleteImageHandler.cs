@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -8,7 +9,7 @@ using static MassTransit.ValidationResultExtensions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class DeleteImageHandler : ICommandHandler<DeleteImage, DeleteImageResult>
+    public class DeleteImageHandler : IRequestHandler<DeleteImage, DeleteImageResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IAzureStorageService _azureStorageService;
@@ -23,7 +24,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<DeleteImageResult> HandleAsync(DeleteImage command, CancellationToken cancellationToken)
+        public async Task<DeleteImageResult> Handle(DeleteImage command, CancellationToken cancellationToken)
         {
             Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
 

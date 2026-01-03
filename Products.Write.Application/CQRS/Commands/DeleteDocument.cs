@@ -1,8 +1,10 @@
-﻿using Products.Write.Application.DTOs;
+﻿using MediatR;
+using Products.Write.Application.CQRS.CommandResults;
+using Products.Write.Application.DTOs;
 
 namespace Products.Write.Application.CQRS.Commands
 {
-    public class DeleteDocument
+    public class DeleteDocument : IRequest<DeleteDocumentResult>
     {
         public Guid ProductId { get; init; }
         public string FileName { get; init; } = default!;

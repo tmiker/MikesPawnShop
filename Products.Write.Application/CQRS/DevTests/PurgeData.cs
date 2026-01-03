@@ -1,9 +1,10 @@
-﻿using System.ComponentModel;
+﻿using MediatR;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Products.Write.Application.CQRS.DevTests
 {
-    public class PurgeData
+    public class PurgeData : IRequest<PurgeDataResult>
     {
         [Required]
         [DisplayName("Pin Number")]

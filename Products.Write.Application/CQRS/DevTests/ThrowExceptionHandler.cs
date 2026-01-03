@@ -1,4 +1,5 @@
 ﻿using Azure;
+using MediatR;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
@@ -12,7 +13,7 @@ using Products.Write.Infrastructure.Exceptions;
 
 namespace Products.Write.Application.CQRS.DevTests
 {
-    public class ThrowExceptionHandler : ICommandHandler<ThrowException, ThrowExceptionResult>
+    public class ThrowExceptionHandler : IRequestHandler<ThrowException, ThrowExceptionResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IEventAggregator _eventAggregator;
@@ -25,7 +26,7 @@ namespace Products.Write.Application.CQRS.DevTests
             _logger = logger;
         }
 
-        public async Task<ThrowExceptionResult> HandleAsync(ThrowException command, CancellationToken cancellationToken)
+        public async Task<ThrowExceptionResult> Handle(ThrowException command, CancellationToken cancellationToken)
         {
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
 

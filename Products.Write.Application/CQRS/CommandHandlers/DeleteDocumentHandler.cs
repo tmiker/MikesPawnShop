@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
@@ -7,7 +8,7 @@ using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class DeleteDocumentHandler : ICommandHandler<DeleteDocument, DeleteDocumentResult>
+    public class DeleteDocumentHandler : IRequestHandler<DeleteDocument, DeleteDocumentResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IAzureStorageService _azureStorageService;
@@ -22,7 +23,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<DeleteDocumentResult> HandleAsync(DeleteDocument command, CancellationToken cancellationToken)
+        public async Task<DeleteDocumentResult> Handle(DeleteDocument command, CancellationToken cancellationToken)
         {
             Product product = await _productRepository.GetProductByIdAsync(command.ProductId);
 

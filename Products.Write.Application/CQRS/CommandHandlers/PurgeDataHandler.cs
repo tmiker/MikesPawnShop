@@ -1,18 +1,14 @@
 ﻿using MassTransit;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Products.Shared.Messages;
-using Products.Write.Application.Abstractions;
-using Products.Write.Application.CQRS.CommandResults;
-using Products.Write.Application.CQRS.Commands;
 using Products.Write.Application.CQRS.DevTests;
-using Products.Write.Application.DTOs;
-using Products.Write.Domain.Enumerations;
 using Products.Write.Infrastructure.Abstractions;
 
 namespace Products.Write.Application.CQRS.CommandHandlers
 {
-    public class PurgeDataHandler : ICommandHandler<PurgeData, PurgeDataResult>
+    public class PurgeDataHandler : IRequestHandler<PurgeData, PurgeDataResult>
     {
         private readonly IProductRepository _productRepository;
         private readonly IPublishEndpoint _publishEndpoint;
@@ -27,7 +23,7 @@ namespace Products.Write.Application.CQRS.CommandHandlers
             _logger = logger;
         }
 
-        public async Task<PurgeDataResult> HandleAsync(PurgeData command, CancellationToken cancellationToken)
+        public async Task<PurgeDataResult> Handle(PurgeData command, CancellationToken cancellationToken)
         {
             string? pinString = _configuration["PurgeDataPinNumber"] ?? throw new InvalidOperationException("Pin Number is null");
             int pin = Int32.Parse(pinString);

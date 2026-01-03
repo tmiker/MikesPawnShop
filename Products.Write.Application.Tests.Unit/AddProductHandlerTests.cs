@@ -10,8 +10,6 @@ namespace Products.Write.Application.Tests.Unit
 {
     public class AddProductHandlerTests
     {
-
-
         [Fact]
         public async Task HandleAsync_ValidCommand_CallsRepositorySaveAndRaisesEvent()
         {
@@ -43,7 +41,7 @@ namespace Products.Write.Application.Tests.Unit
             
             
             // Act
-            var result = await _handler.HandleAsync(addProductCommand, CancellationToken.None);
+            var result = await _handler.Handle(addProductCommand, CancellationToken.None);
             // Assert
             Assert.True(result.IsSuccess);
             Assert.NotEqual(Guid.Empty, result.ProductId);

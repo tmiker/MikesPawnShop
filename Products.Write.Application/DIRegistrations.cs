@@ -65,19 +65,19 @@ namespace Products.Write.Application
             // Register Dispatchers
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
-            // Register Command Handlers
-            // services.AddScoped<ICommandHandler<AddProduct, AddProductResult>, AddProductHandler>();      // converted to mediatr request handler
-            services.AddScoped<ICommandHandler<UpdateStatus, UpdateStatusResult>, UpdateStatusHandler>();
-            services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
-            services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();
-            services.AddScoped<ICommandHandler<PurgeData, PurgeDataResult>, PurgeDataHandler>();
-            services.AddScoped<ICommandHandler<DeleteImage, DeleteImageResult>, DeleteImageHandler>();
-            services.AddScoped<ICommandHandler<DeleteDocument, DeleteDocumentResult>, DeleteDocumentHandler>();
+            // Register Command Handlers - converted to mediatr request handlers
+            // services.AddScoped<ICommandHandler<AddProduct, AddProductResult>, AddProductHandler>();      
+            // services.AddScoped<ICommandHandler<UpdateStatus, UpdateStatusResult>, UpdateStatusHandler>();
+            // services.AddScoped<ICommandHandler<AddDocument, AddDocumentResult>, AddDocumentHandler>();
+            // services.AddScoped<ICommandHandler<AddImage, AddImageResult>, AddImageHandler>();
+            // services.AddScoped<ICommandHandler<DeleteImage, DeleteImageResult>, DeleteImageHandler>();
+            // services.AddScoped<ICommandHandler<DeleteDocument, DeleteDocumentResult>, DeleteDocumentHandler>();
 
             // Register Query Handlers
 
-            // Register Dev Test Handlers and Services
-            services.AddScoped<ICommandHandler<ThrowException, ThrowExceptionResult>, ThrowExceptionHandler>();
+            // Register Dev Test Handlers and Services - converted to mediatr request handlers
+            // services.AddScoped<ICommandHandler<ThrowException, ThrowExceptionResult>, ThrowExceptionHandler>();
+            // services.AddScoped<ICommandHandler<PurgeData, PurgeDataResult>, PurgeDataHandler>();
 
             services.AddScoped<IDevQueryService, DevQueryService>();
 

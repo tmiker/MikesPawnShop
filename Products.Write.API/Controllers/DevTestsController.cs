@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,17 @@ namespace Products.Write.API.Controllers
     public class DevTestsController : ControllerBase
     {
         private readonly IDevQueryService _devQueryService;
-        private readonly ICommandDispatcher _commandDispatcher;
+        // private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ISender _sender;
         private readonly ITokenDecoder _tokenDecoder;
         private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
         private readonly ILogger<DevTestsController> _logger;
 
-        public DevTestsController(IDevQueryService devQueryService , ICommandDispatcher commandDispatcher, ITokenDecoder tokenDecoder, 
+        public DevTestsController(IDevQueryService devQueryService, ISender sender, ITokenDecoder tokenDecoder, 
             IOptions<CloudAMQPSettings> cloudAmqpSettings, ILogger<DevTestsController> logger)
         {
             _devQueryService = devQueryService;
-            _commandDispatcher = commandDispatcher;
+            _sender = sender;
             _tokenDecoder = tokenDecoder;
             _cloudAmqpSettings = cloudAmqpSettings;
             _logger = logger;
@@ -195,7 +197,7 @@ namespace Products.Write.API.Controllers
 
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             ThrowException command = new ThrowException(throwExceptionDTO, correlationId);
-            ThrowExceptionResult result = await _commandDispatcher.DispatchAsync<ThrowException, ThrowExceptionResult>(command, cancellationToken);
+            ThrowExceptionResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
         }
@@ -216,7 +218,7 @@ namespace Products.Write.API.Controllers
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             PurgeData command = new PurgeData(purgeDataDTO.PinNumber, correlationId);
-            PurgeDataResult result = await _commandDispatcher.DispatchAsync<PurgeData, PurgeDataResult>(command, cancellationToken);
+            PurgeDataResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok();
             return BadRequest(result.ErrorMessage);
         }
