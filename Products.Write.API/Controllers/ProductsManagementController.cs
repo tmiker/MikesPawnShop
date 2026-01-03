@@ -14,14 +14,12 @@ namespace Products.Write.API.Controllers
     [ApiController]
     public class ProductsManagementController : ControllerBase
     {
-        private readonly ICommandDispatcher _commandDispatcher;
         private readonly ISender _sender;
         private readonly IOptions<AzureSettings> _azureSettings;
         private readonly ILogger<ProductsManagementController> _logger;
 
-        public ProductsManagementController(ICommandDispatcher commandDispatcher, ISender sender, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger)
+        public ProductsManagementController(ISender sender, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger)
         {
-            _commandDispatcher = commandDispatcher;
             _sender = sender;
             _azureSettings = azureSettings;
             _logger = logger;
@@ -37,7 +35,6 @@ namespace Products.Write.API.Controllers
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddProduct command = new AddProduct(addProductDTO, correlationId);
 
-            // AddProductResult result = await _commandDispatcher.DispatchAsync<AddProduct, AddProductResult>(command, cancellationToken);
             AddProductResult result = await _sender.Send(command, cancellationToken);  
 
             if (result.IsSuccess) return Ok(result);
@@ -62,7 +59,6 @@ namespace Products.Write.API.Controllers
             if (addDocumentDTO.DocumentBlob is null) Console.WriteLine($"The Document Blob is null.");
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             AddDocument command = new AddDocument(addDocumentDTO, correlationId);
-            // AddDocumentResult result = await _commandDispatcher.DispatchAsync<AddDocument, AddDocumentResult>(command, cancellationToken);
             AddDocumentResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);

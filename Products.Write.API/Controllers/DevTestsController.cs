@@ -22,7 +22,6 @@ namespace Products.Write.API.Controllers
     public class DevTestsController : ControllerBase
     {
         private readonly IDevQueryService _devQueryService;
-        // private readonly ICommandDispatcher _commandDispatcher;
         private readonly ISender _sender;
         private readonly ITokenDecoder _tokenDecoder;
         private readonly IOptions<CloudAMQPSettings> _cloudAmqpSettings;
