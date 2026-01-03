@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -14,6 +15,7 @@ using Products.Write.Application.DTOs;
 using Products.Write.Auth;
 using Products.Write.Domain.Snapshots;
 using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace Products.Write.API.Controllers
 {

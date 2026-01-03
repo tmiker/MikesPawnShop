@@ -20,6 +20,8 @@ namespace Admin.Blazor.Client.Abstractions
         Task<(bool IsSuccess, string? ErrorMessage)> DeleteProductImageAsync(DeleteImageDTO deleteImageDTO);
         Task<(bool IsSuccess, string? ErrorMessage)> DeleteProductDocumentAsync(DeleteDocumentDTO deleteDocumentDTO);
 
+        Task<(bool IsSuccess, string? ErrorMessage)> CheckAzureStorageStatusAsync();
+
         // Dev Tests
         Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
             string? aggregateId,

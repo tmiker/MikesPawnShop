@@ -274,6 +274,22 @@ namespace Admin.Blazor.HttpServices
             }
         }
 
+        public async Task<(bool IsSuccess, string? ErrorMessage)> CheckAzureStorageStatusAsync()
+        {
+            string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/azureBlobStoragePingTest";
+            var client = _httpClientFactory.CreateClient(StaticData.ProductsWriteHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode) return (true, null);
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return (false, errorMessage);
+            }
+        }
+
         // Dev Tests
         public async Task<(bool IsSuccess, IEnumerable<ProductSnapshotDTO>? ProductSnapshots, PaginationMetadata? PagingData, string? ErrorMessage)> GetPagedAndFilteredProductSnapshotsAsync(
             string? aggregateId,

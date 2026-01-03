@@ -1,0 +1,3 @@
+Default Data Endpoints
+	Default Image: https://pawnshopimages.blob.core.windows.net/product-default-data/imgs/image_pending.png
+	Ping Test:  https://pawnshopimages.blob.core.windows.net/product-default-data/ping_test/ping-test.txt

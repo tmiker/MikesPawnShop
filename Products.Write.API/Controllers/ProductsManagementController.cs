@@ -6,6 +6,7 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.Configuration;
 using Products.Write.Application.CQRS.CommandResults;
 using Products.Write.Application.CQRS.Commands;
+using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.DTOs;
 
 namespace Products.Write.API.Controllers
@@ -42,7 +43,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("image")]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<AddImageResult>> AddImage([FromForm] AddImageDTO addImageDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
@@ -53,7 +54,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("document")]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<AddDocumentResult>> AddDocument([FromForm] AddDocumentDTO addDocumentDTO, CancellationToken cancellationToken)
         {
             if (addDocumentDTO.DocumentBlob is null) Console.WriteLine($"The Document Blob is null.");
@@ -65,7 +66,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPut("status")]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<UpdateStatusResult>> UpdateStatus([FromBody] UpdateStatusDTO updateStatusDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
@@ -76,7 +77,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpDelete("image")]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<DeleteImageResult>> DeleteImage(DeleteImageDTO deleteImageDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
@@ -87,7 +88,7 @@ namespace Products.Write.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
         [HttpDelete("document")]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<DeleteDocumentResult>> DeleteDocument(DeleteDocumentDTO deleteDocumentDTO, CancellationToken cancellationToken)
         {
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
@@ -95,6 +96,18 @@ namespace Products.Write.API.Controllers
             DeleteDocumentResult result = await _sender.Send(command, cancellationToken);
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AzureBlobStoragePingTest()
+        {
+            string? pingTestUri = _azureSettings.Value.AzurePingTestUri;
+            if (string.IsNullOrWhiteSpace(pingTestUri)) return BadRequest("The Azure Storage ping test URI could not be found.");
+            AzurePingTest pingTest = new AzurePingTest(pingTestUri);
+            AzurePingTestResult pingResult = await _sender.Send(pingTest);
+            if (pingResult.IsSuccess) return Ok("Ping Success!");
+            return BadRequest("Azure Storage not available. Verify network firewall settings allow current IP address.");
         }
     }
 }

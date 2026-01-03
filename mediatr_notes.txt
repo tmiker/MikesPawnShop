@@ -1,0 +1,11 @@
+Products.Write.API
+	MediatR Requests (CQRS Commands)
+		AddProduct
+		AddImage
+		AddDocument
+		UpdateStatus
+		DeleteImage
+		DeleteDocument
+		AzurePingTest
+		PurgeData
+		ThrowException

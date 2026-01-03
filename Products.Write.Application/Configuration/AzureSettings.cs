@@ -4,5 +4,6 @@
     {
         public const string SectionName = "AzureSettings";
         public string? BlobStorageConnectionString { get; init; }
+        public string? AzurePingTestUri { get; init; }
     }
 }

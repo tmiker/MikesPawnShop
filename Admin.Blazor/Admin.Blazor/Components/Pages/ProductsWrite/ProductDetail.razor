@@ -25,8 +25,18 @@
 }
 
 <div class="row mt-2">
-    <div class="col-12">
+    <div class="col-9">
         <h3><b>Product Detail</b></h3>
+    </div>
+    <div class="col-3 text-end">
+        @if (_azureStorageStatus)
+        {
+            <h5 class="text-secondary">Azure Storage Status: @_azureStorageStatus</h5>
+        }
+        else
+        {
+            <h5 class="text-secondary">Azure Storage Status: @_azureStorageStatus</h5>
+        }
     </div>
 </div>
 
@@ -332,6 +342,8 @@
     private int _imageCount;
     private int _documentCount;
 
+    private bool _azureStorageStatus;
+
     private string? _errorMessage;
     private void ClearErrorMessage() => _errorMessage = null;
     private string? _successMessage;
@@ -457,6 +469,17 @@
         else _errorMessage = result.ErrorMessage;
     }
 
+    private async Task CheckAzureStorageStatus()
+    {
+        var pingResult = await _writeSideHttpClient.CheckAzureStorageStatusAsync();
+        if (pingResult.IsSuccess) _azureStorageStatus = true;
+        else
+        {
+            _azureStorageStatus = false;
+            _errorMessage = pingResult.ErrorMessage;
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool isFirstRender)
     {
         if (isFirstRender)
@@ -478,6 +501,7 @@
                         _documentCount = _product.Documents.Count;
                     }
                 }
+                await CheckAzureStorageStatus();
             }
             else _errorMessage = result.ErrorMessage;
             this.StateHasChanged();
