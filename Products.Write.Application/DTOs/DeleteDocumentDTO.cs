@@ -1,16 +1,18 @@
-﻿namespace Products.Write.Application.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Products.Write.Application.DTOs
 {
     public class DeleteDocumentDTO
     {
+        [Required]
         public string ProductId { get; init; }
-        public string FileName { get; init; } = default!;
-        public string? CorrelationId { get; set; }
+        [Required]
+        public string FileName { get; init; } 
 
-        public DeleteDocumentDTO(string productId, string fileName, string? correlationId)
+        public DeleteDocumentDTO(string productId, string fileName)
         {
             ProductId = productId;
             FileName = fileName;
-            CorrelationId = correlationId;
         }
     }
 }

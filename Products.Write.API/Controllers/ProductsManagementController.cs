@@ -25,7 +25,7 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "IsAdminOrManager")]
+        // [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<AddProductResult>> AddProduct([FromBody] AddProductDTO addProductDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends

@@ -20,7 +20,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("************* THE GLOBAL EXCEPTION HANDLER WAS CALLED *****************");
+            _logger.LogInformation("************* THE GLOBAL EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
             // Log the exception with structured logging
             _logger.LogError(exception,
                 "Exception occurred: {Message} | RequestId: {RequestId} | Path: {Path} | Method: {Method}",
@@ -111,7 +111,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
                     "https://tools.ietf.org/html/rfc7231#section-6.5.8"),
                 ArgumentException => (StatusCodes.Status400BadRequest,
                     "Bad Request",
-                    "The request contains invalid arguments.",
+                    "YO DUDE! The request contains invalid arguments.",
                     "https://tools.ietf.org/html/rfc7231#section-6.5.1"),
                 InvalidOperationException => (StatusCodes.Status400BadRequest,
                     "Invalid Operation",

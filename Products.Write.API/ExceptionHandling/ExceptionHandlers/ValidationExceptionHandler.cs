@@ -17,6 +17,8 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("************* THE VALIDATION EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
+
             if (exception is not ValidationException validationException) return false;   // Exception not handled
 
             _logger.LogWarning("Validation failed: {Message} | RequestId: {RequestId}", validationException.Message, httpContext.TraceIdentifier);
@@ -36,6 +38,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             problemDetails.Extensions["machine"] = Environment.MachineName;
             // Include correlation ID if available
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
+            problemDetails.Extensions["errors"] = validationException.Errors;
 
             //// OPTION 1: HANDLE EXCEPTION AND RETURN PROBLEM DETAILS OBJECT - NOTE WILL NOT HAVE CONTENT TYPE OF `application/problem+json`
             //httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;

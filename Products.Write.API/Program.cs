@@ -1,9 +1,11 @@
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Products.Write.API;
+using Products.Write.API.ExceptionHandling;
 using Products.Write.API.ExceptionHandling.ExceptionHandlers;
 using Products.Write.API.Middleware;
 using Scalar.AspNetCore;

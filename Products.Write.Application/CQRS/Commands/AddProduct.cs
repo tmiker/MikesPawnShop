@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Products.Write.Application.DTOs;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace Products.Write.Application.CQRS.Commands
 {
     public class AddProduct
     {
         public string Name { get; init; } = default!;
-        public string Category { get; init; }
+        public string Category { get; init; } = default!;
         public string Description { get; init; } = default!;
         public decimal Price { get; init; }
         public string Currency { get; init; } = default!;
@@ -15,7 +15,7 @@ namespace Products.Write.Application.CQRS.Commands
         public int QuantityOnHand { get; init; }
         public string UOM { get; init; } = default!;
         public int LowStockThreshold { get; init; }
-        public string? CorrelationId { get; set; } // = default!;
+        public string? CorrelationId { get; set; } 
 
         public AddProduct(string name, string category, string description, decimal price, string currency, string status,
             int quantityOnHand, string uom, int lowStockThreshold, string? correlationId)

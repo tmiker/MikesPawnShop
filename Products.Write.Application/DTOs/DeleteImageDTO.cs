@@ -1,16 +1,18 @@
-﻿namespace Products.Write.Application.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Products.Write.Application.DTOs
 {
     public class DeleteImageDTO
     {
+        [Required]
         public string ProductId { get; init; }
-        public string FileName { get; init; } = default!;
-        public string? CorrelationId { get; set; }
+        [Required]
+        public string FileName { get; init; }
 
-        public DeleteImageDTO(string productId, string fileName, string? correlationId)
+        public DeleteImageDTO(string productId, string fileName)
         {
             ProductId = productId;
             FileName = fileName;
-            CorrelationId = correlationId;
         }
     }
 }

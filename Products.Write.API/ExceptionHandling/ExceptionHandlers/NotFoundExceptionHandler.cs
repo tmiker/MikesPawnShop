@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
@@ -16,6 +17,8 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("************* THE NOT FOUND EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
+
             if (exception is not NotFoundException notFoundException) return false; // Exception not handled
 
             _logger.LogWarning("Resource not found: {Message} | RequestId: {RequestId}", notFoundException.Message, httpContext.TraceIdentifier);
