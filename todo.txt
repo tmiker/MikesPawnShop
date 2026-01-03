@@ -1,10 +1,20 @@
 
 
-Fluent Validation
+Add Fluent Validation for API Controller DTOs, or use Data Annotations 
+	Products.Write.API
+
+Logging - Serilog ???
 
 Update Secrets Requirements in notes
 
+OpenAPI documentation
+
+Need buttons in consumer client product detail to add to or remove from cart
+
 Cart Button Flow - ensure consumer client flow is as desired
+
+Cancellation token: button to cancel in UI
+
 
 // MediatR in Products.Write.API
 
@@ -14,29 +24,9 @@ Cart Button Flow - ensure consumer client flow is as desired
 
 // Caching - YARP for Products Read vs API
 
-Need buttons in consumer client product detail to add to or remove from cart
 
-OpenAPI documentation
 
-Logging - Serilog ???
 
-Add Fluent Validation for API Controller DTOs, or use Data Annotations 
-	Products.Write.API
 
-Cancellation token: button to cancel in UI
 
-Products.Read.API 
-	Repository:
-		checks message versioning, but can / should???? also be in domain
-			e.g. if (version <= Version || version > Version + 1) return;
-        In method
-        private void HandleMissingProductMessageVersionError(string messageType, Guid aggregateId, int messageVersion, string correlationId)
-        {
-            _logger.LogError("Missing Product Message Version {missingMessageVersion}. Unable to process {messageType} message " +
-                "for AggregateId {aggregateId}, Version {messageVersion}, CorrelationId {correlationId} as the previous message " +
-                "is missing.", messageVersion - 1, messageType, aggregateId, messageVersion, correlationId);
-            throw new DataConsistencyException($"Error synchronizing product state from write side message. " +
-                $"Message Type: {messageType}, AggregageId: {aggregateId}, CorrelationId: {correlationId}");
-        }
-        do i really want to throw here??? or just log and return???
 
