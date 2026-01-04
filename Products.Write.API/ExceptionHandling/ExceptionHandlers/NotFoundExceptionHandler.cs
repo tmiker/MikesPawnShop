@@ -17,11 +17,9 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("************* THE NOT FOUND EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
-
             if (exception is not NotFoundException notFoundException) return false; // Exception not handled
 
-            _logger.LogWarning("Resource not found: {Message} | RequestId: {RequestId}", notFoundException.Message, httpContext.TraceIdentifier);
+            _logger.LogWarning("Resource not found: Exception Type: {Type} | {Message} | RequestId: {RequestId}", exception.GetType().FullName,  notFoundException.Message, httpContext.TraceIdentifier);
 
             var problemDetails = new ProblemDetails
             {

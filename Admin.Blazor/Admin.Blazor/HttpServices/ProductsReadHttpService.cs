@@ -30,6 +30,11 @@ namespace Admin.Blazor.HttpServices
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
+
             HttpResponseMessage response = await client.SendAsync(request);
 
             try
@@ -57,6 +62,10 @@ namespace Admin.Blazor.HttpServices
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
+
             using (HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
             {
                 response.EnsureSuccessStatusCode();
@@ -79,6 +88,10 @@ namespace Admin.Blazor.HttpServices
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
 
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
@@ -103,6 +116,10 @@ namespace Admin.Blazor.HttpServices
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
 
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
@@ -133,6 +150,10 @@ namespace Admin.Blazor.HttpServices
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
+
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
                 if (response.IsSuccessStatusCode)
@@ -158,6 +179,10 @@ namespace Admin.Blazor.HttpServices
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
+
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
                 if (response.IsSuccessStatusCode)
@@ -181,6 +206,10 @@ namespace Admin.Blazor.HttpServices
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
 
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
@@ -206,6 +235,10 @@ namespace Admin.Blazor.HttpServices
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
 
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
@@ -233,6 +266,10 @@ namespace Admin.Blazor.HttpServices
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
             request.Content = new StringContent(JsonSerializer.Serialize(throwExceptionDTO), Encoding.UTF8, "application/json");
 
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
+
             using (HttpResponseMessage response = await client.SendAsync(request))
             {
                 if (response.IsSuccessStatusCode)
@@ -255,6 +292,10 @@ namespace Admin.Blazor.HttpServices
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            // Generate a new Correlation ID and add to headers
+            string correlationId = Guid.NewGuid().ToString();
+            request.Headers.Add("X-Correlation-ID", correlationId);
 
             using (HttpResponseMessage response = await client.SendAsync(request))
             {

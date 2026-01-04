@@ -1,9 +1,18 @@
 
+Logging - Serilog 
+	Products.Write.API
+	Other
+	Need to log Client Http Client calls to log method and CorrelationId assigned by client for correlation with API logs.
 
 Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
 
-Logging - Serilog ???
+Update Admin and Consumer Client pages to show which client
+
+Add HealthChecks to Products Write Side API ??? Have for read side API for both Consumer and Admin clients
+	yarp
+	logging - skip CorrelationIdMiddleware if health check
+	HttpClient method on Admin Client
 
 Update Secrets Requirements in notes
 

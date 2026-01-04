@@ -20,10 +20,10 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("************* THE GLOBAL EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
             // Log the exception with structured logging
             _logger.LogError(exception,
-                "Exception occurred: {Message} | RequestId: {RequestId} | Path: {Path} | Method: {Method}",
+                "Exception occurred: Type {Type} | {Message} | RequestId: {RequestId} | Path: {Path} | Method: {Method}",
+                exception.GetType().FullName,
                 exception.Message,
                 httpContext.TraceIdentifier,
                 httpContext.Request.Path.Value,

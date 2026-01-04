@@ -16,12 +16,10 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
         }
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("************* THE PRODUCT EVENT STORE EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
-            
+        {            
             if (exception is not ProductEventStoreException productEventStoreException) return false; // Exception not handled
 
-            _logger.LogWarning("Product Event Store Exception: {Message} | RequestId: {RequestId}", productEventStoreException.Message, httpContext.TraceIdentifier);
+            _logger.LogWarning("Product Event Store Exception: Exception Type: {Type} | {Message} | RequestId: {RequestId}", exception.GetType().FullName, productEventStoreException.Message, httpContext.TraceIdentifier);
 
             var problemDetails = new ProblemDetails
             {

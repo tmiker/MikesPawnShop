@@ -5,3 +5,20 @@ Products.Write
 
 Products.Read
 	Messages
+
+
+
+USING EXCEPTION HANDLERS:
+
+	Plain old Data Annotations:  
+		Controller logic is circumvented - returns a list of validation errors, but does not throw an exception - behaviors don't run.
+		There is no way to throw an exception in the controller action logic as it does not run.
+	Remove Data Annotations:
+		Fluent Validation:  Throws FluentValidation.ValidationException
+			Register validators
+			Manually validate in controller action using the validator's Validate() method.
+			Behaviors don't run on throw - WTF???
+		My Validation:	Throws MyValidationException
+			Add custom manual validation that throws an exception in controller action if applicable
+				e.g. on the validated entity, add a Validate() method that builds a Dictionary<string, string[]> used by constructor of MyValidationException
+			Behaviors don't run on throw - WTF???

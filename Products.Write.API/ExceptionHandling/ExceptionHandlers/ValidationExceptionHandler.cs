@@ -17,11 +17,9 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("************* THE VALIDATION EXCEPTION HANDLER IS HANDLING EXCEPTION TYPE {exType} *****************", exception.GetType().FullName);
-
             if (exception is not ValidationException validationException) return false;   // Exception not handled
 
-            _logger.LogWarning("Validation failed: {Message} | RequestId: {RequestId}", validationException.Message, httpContext.TraceIdentifier);
+            _logger.LogWarning("Validation failed: Exception Type: {Type} | {Message} | RequestId: {RequestId}", exception.GetType().FullName, validationException.Message, httpContext.TraceIdentifier);
 
             var problemDetails = new ValidationProblemDetails(validationException.Errors)
             {

@@ -1,0 +1,19 @@
+Nugets
+	Serilog ??? Is only Serilog.AspNetCore required?
+	Serilog.AspNetCore
+	Serilog.Sinks.Seq
+	Serilog.Extensions.Hosting
+	Serilog.Exceptions
+
+
+
+
+
+
+Notes:
+Preserving Object Structure
+	There are many places where, given the capability, it makes sense to serialise a log event property as a structured object. DTOs (data transfer objects), messages, events and models are often best logged by breaking them down into properties with values.
+	For this task, Serilog provides the @ destructuring operator.
+		var sensorInput = new { Latitude = 25, Longitude = 134 };
+		Log.Information("Processing {@SensorInput}", sensorInput);
+

@@ -10,8 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		architecture_notes.txt = architecture_notes.txt
-		cache_notes.txt = cache_notes.txt
 		azure_notes.txt = azure_notes.txt
+		cache_notes.txt = cache_notes.txt
 		error_handling.txt = error_handling.txt
 		event_dispatch.txt = event_dispatch.txt
 		fluent_validation.txt = fluent_validation.txt
@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{02EA681E
 		mediatr_notes.txt = mediatr_notes.txt
 		problem_details.txt = problem_details.txt
 		scratchpad.txt = scratchpad.txt
+		serilog_notes.txt = serilog_notes.txt
 		significant_notes.txt = significant_notes.txt
 		todo.txt = todo.txt
 		user_secrets_required.txt = user_secrets_required.txt

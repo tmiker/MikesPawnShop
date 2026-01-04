@@ -1,47 +1,39 @@
-﻿namespace Products.Write.API.Middleware
+﻿using Products.Write.Application.Extensions;
+
+namespace Products.Write.API.Middleware
 {
     public class CorrelationIdMiddleware
     {
         private readonly RequestDelegate _next;
-        private const string CorrelationIdHeader = "X-Correlation-ID";
+        private readonly ILogger<CorrelationIdMiddleware> _logger;
+        // private const string CorrelationIdHeader = "X-Correlation-ID";
 
-        public CorrelationIdMiddleware(RequestDelegate next)
+        public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
-
-        //public async Task InvokeAsync(HttpContext context)
-        //{
-        //    Console.WriteLine("************ CORRELATION ID MIDDLEWARE WAS CALLED **************");
-
-        //    if (!context.Request.Headers.TryGetValue(CorrelationIdHeader, out var correlationId))
-        //    {
-        //        correlationId = Guid.NewGuid().ToString();
-        //    }
-
-        //    context.Response.OnStarting(() =>
-        //    {
-        //        context.Response.Headers.Append(CorrelationIdHeader, correlationId.ToString());
-        //        return Task.CompletedTask;
-        //    });
-
-        //    await _next(context);
-        //}
 
         public async Task InvokeAsync(HttpContext context)
         {
-            Console.WriteLine("************ CORRELATION ID MIDDLEWARE WAS CALLED **************");
+            //// if implement products write side api health checks to prevent chattiness
+            // if (context.Request.Path == "/api/productsManagement/health") return; 
 
             // Check if Correlation ID exists in the request header
+            bool presentInRequestHeader = true;
+
             if (!context.Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId))
             {
                 // Generate a new Correlation ID if not present
+                presentInRequestHeader = false;
                 correlationId = Guid.NewGuid().ToString();
                 context.Request.Headers["X-Correlation-ID"] = correlationId;
             }
 
             // Add Correlation ID to the response header
             context.Response.Headers["X-Correlation-ID"] = correlationId;
+
+            _logger.CorrelationIdMiddlewareExecuted(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader); //, DateTime.Now);
 
             // Proceed to the next middleware
             await _next(context);
