@@ -28,15 +28,14 @@ namespace Products.Read.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred. RequestId: {RequestId}, Path: {Path}",
-                context.TraceIdentifier, context.Request.Path);
+                _logger.LogError(ex, "An unhandled exception occurred. Exception Type: {Type}, RequestId: {RequestId}, Path: {Path}",
+                    ex.GetType().FullName, context.TraceIdentifier, context.Request.Path);
                 await HandleExceptionAsync(context, ex);
             }
         }
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            Console.WriteLine($"***************** GlobalExceptionHandlingMiddleware is handling the Exception. *****************");
             context.Response.ContentType = "application/problem+json";
             var problemDetails = CreateProblemDetails(context, exception);
 
@@ -51,7 +50,6 @@ namespace Products.Read.API.Middleware
 
         private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception)
         {
-            Console.WriteLine($"***************** GlobalExceptionHandlingMiddleware private helper method CreateProblemDetails was called. *****************");
             var (statusCode, title, detail) = MapException(exception);
             return new ProblemDetails
             {
