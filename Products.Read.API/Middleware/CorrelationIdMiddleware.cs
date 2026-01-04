@@ -6,7 +6,6 @@ namespace Products.Read.API.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<CorrelationIdMiddleware> _logger;
-        // private const string CorrelationIdHeader = "X-Correlation-ID";
 
         public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
         {

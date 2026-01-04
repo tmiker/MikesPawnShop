@@ -6,7 +6,6 @@ namespace Products.Write.API.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<CorrelationIdMiddleware> _logger;
-        // private const string CorrelationIdHeader = "X-Correlation-ID";
 
         public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
         {
@@ -16,8 +15,8 @@ namespace Products.Write.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            //// if implement products write side api health checks to prevent chattiness
-            // if (context.Request.Path == "/api/productsManagement/health") return; 
+            // if implement products write side api health checks to prevent chattiness
+            if (context.Request.Path == "/api/productsManagement/health") return; 
 
             // Check if Correlation ID exists in the request header
             bool presentInRequestHeader = true;
