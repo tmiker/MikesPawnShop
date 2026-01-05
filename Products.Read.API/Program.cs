@@ -147,27 +147,11 @@ app.MapHealthChecks("/api/products/health", new HealthCheckOptions
 // Client healthcheck endpoint
 app.MapHealthChecks("/api/products/healthcheck", new HealthCheckOptions
 {
-    // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json; charset=utf-8";
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
-
-        ////var response = new
-        ////{
-        ////    status = report.Status.ToString(),
-        ////    checks = report.Entries.Select(entry => new
-        ////    {
-        ////        name = entry.Key,
-        ////        status = entry.Value.Status.ToString(),
-        ////        description = entry.Value.Description,
-        ////        duration = entry.Value.Duration.TotalMilliseconds + "ms"
-        ////    }),
-        ////    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
-        ////};
-        ////await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
 
         HealthCheckResultDTO dto = new HealthCheckResultDTO()
         {

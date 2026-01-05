@@ -133,20 +133,6 @@ app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOption
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
-        //    ////var response = new
-        //    ////{
-        //    ////    status = report.Status.ToString(),
-        //    ////    checks = report.Entries.Select(entry => new
-        //    ////    {
-        //    ////        name = entry.Key,
-        //    ////        status = entry.Value.Status.ToString(),
-        //    ////        description = entry.Value.Description,
-        //    ////        duration = entry.Value.Duration.TotalMilliseconds + "ms"
-        //    ////    }),
-        //    ////    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
-        //    ////};
-        //    //// await context.Response.WriteAsync(JsonSerializer.Serialize(response));
-
         HealthCheckResultDTO dto = new HealthCheckResultDTO()
         {
             Status = report.Status.ToString(),
