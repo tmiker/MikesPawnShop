@@ -127,15 +127,8 @@ app.MapHealthChecks("/api/productsManagement/health", new HealthCheckOptions
 // Client healthcheck endpoint
 app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOptions
 {
-    // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse  // this works for mongo apis
-
     ResponseWriter = async (context, report) =>
     {
-        //    app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        //    await context.Response.WriteAsync(report.Status.ToString());
-
-        //    //Console.WriteLine($"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% HEALTH CHECK IS RUNNING. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
         context.Response.ContentType = "application/json; charset=utf-8";
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
@@ -167,18 +160,20 @@ app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOption
                 dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
             }
         }
+
+        if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        //// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
+        //else
+        //{
+        //    string jsonResult = JsonSerializer.Serialize(dto);
+        //    app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+        //}
+
+        //// dev purposes only
+        // string jsonResult = JsonSerializer.Serialize(dto);
+        // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
+
         await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
-
-        //    //string jsonResult = JsonSerializer.Serialize(dto);
-
-        //    //if (report.Status == HealthStatus.Healthy) Console.WriteLine($"Health Status: {dto.Status}");        // app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        //    //////// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
-        //    ////else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
-
-        //    ////// dev purposes only
-        //    //// app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
-
-        //    // await context.Response.WriteAsync(jsonResult);
     }
 
 }).RequireAuthorization("IsAdminOrManager");            

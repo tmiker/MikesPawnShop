@@ -183,13 +183,16 @@ app.MapHealthChecks("/api/products/healthcheck", new HealthCheckOptions
             }
         }
 
-        ////string jsonResult = JsonSerializer.Serialize(dto);
-
-        // if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
         //// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
-        // else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+        //else
+        //{
+        //    string jsonResult = JsonSerializer.Serialize(dto);
+        //    app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+        //}
 
         //// dev purposes only
+        // string jsonResult = JsonSerializer.Serialize(dto);
         // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
