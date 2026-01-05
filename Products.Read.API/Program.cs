@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Products.Read.API;
 using Products.Read.API.DTOs;
 using Products.Read.API.Extensions;
+using Products.Read.API.Health;
 using Products.Read.API.Middleware;
 using Scalar.AspNetCore;
 using System.Security.Claims;
@@ -29,6 +30,14 @@ builder.Services.AddHealthChecks()
         timeout: TimeSpan.FromSeconds(5),
         tags: new[] { "db", "sql", "sqlserver" }
     );
+
+//builder.Services.AddHealthChecks()
+//    // Add a health check for a SQL Server database
+//    .AddCheck(
+//        name: "SqlServer",
+//        instance: new SqlServerHealthCheck(builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!),
+//        failureStatus: HealthStatus.Unhealthy,
+//        tags: new string[] { "sql", "sqlserver" });
 
 builder.Services.AddCors(setup =>
 {
@@ -129,35 +138,36 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//app.MapHealthChecks("/health");
+// YARP healthcheck endpoint
 app.MapHealthChecks("/api/products/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+}).AllowAnonymous();    //.RequireAuthorization("IsAdminOrManager");
+
+// Client healthcheck endpoint
+app.MapHealthChecks("/api/products/healthcheck", new HealthCheckOptions
 {
     // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 
     ResponseWriter = async (context, report) =>
     {
-        //    app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        //    await context.Response.WriteAsync(report.Status.ToString());
-
-        //    //Console.WriteLine($"%%%%%%%%%%%%%%%%%%%%%%%%%%%% HEALTH CHECK IS RUNNING. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
         context.Response.ContentType = "application/json; charset=utf-8";
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
-        //    ////var response = new
-        //    ////{
-        //    ////    status = report.Status.ToString(),
-        //    ////    checks = report.Entries.Select(entry => new
-        //    ////    {
-        //    ////        name = entry.Key,
-        //    ////        status = entry.Value.Status.ToString(),
-        //    ////        description = entry.Value.Description,
-        //    ////        duration = entry.Value.Duration.TotalMilliseconds + "ms"
-        //    ////    }),
-        //    ////    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
-        //    ////};
-        //    //// await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        ////var response = new
+        ////{
+        ////    status = report.Status.ToString(),
+        ////    checks = report.Entries.Select(entry => new
+        ////    {
+        ////        name = entry.Key,
+        ////        status = entry.Value.Status.ToString(),
+        ////        description = entry.Value.Description,
+        ////        duration = entry.Value.Duration.TotalMilliseconds + "ms"
+        ////    }),
+        ////    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
+        ////};
+        ////await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
 
         HealthCheckResultDTO dto = new HealthCheckResultDTO()
         {
@@ -172,18 +182,17 @@ app.MapHealthChecks("/api/products/health", new HealthCheckOptions
                 dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
             }
         }
+
+        ////string jsonResult = JsonSerializer.Serialize(dto);
+
+        // if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        //// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
+        // else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+
+        //// dev purposes only
+        // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
+
         await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
-
-        //    //string jsonResult = JsonSerializer.Serialize(dto);
-
-        //    //if (report.Status == HealthStatus.Healthy) Console.WriteLine($"Health Status: {dto.Status}");        // app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        //    //////// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
-        //    ////else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
-
-        //    ////// dev purposes only
-        //    //// app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
-
-        //    //await context.Response.WriteAsync(jsonResult);
     }
 
 }).AllowAnonymous();

@@ -15,7 +15,7 @@ namespace Products.Write.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // uncomment to prevent log chattiness
+            //// uncomment to prevent log chattiness
             if (context.Request.Path == "/api/productsManagement/health") return; 
 
             // Check if Correlation ID exists in the request header

@@ -25,8 +25,14 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync()
         {
-            string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/health";
+            string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/healthcheck";
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
+
+            //HttpClient client = new HttpClient();
+            //string uri = $"https://localhost:7101/api/products/health"; // 7101
+
+            //string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
+            //var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -43,9 +49,9 @@ namespace Admin.Blazor.HttpServices
             {
                 response.EnsureSuccessStatusCode();
 
-                string json = await response.Content.ReadAsStringAsync();
-                if (string.IsNullOrWhiteSpace(json)) return (false, null, $"The API returned no content.");
-                _logger.LogInformation("JSON HEALTH CHECK: {json}", json);
+                //string json = await response.Content.ReadAsStringAsync();
+                //if (string.IsNullOrWhiteSpace(json)) return (false, null, $"The API returned no content.");
+                //_logger.LogInformation("JSON HEALTH CHECK: {json}", json);
 
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)

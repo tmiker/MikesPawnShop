@@ -118,8 +118,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// app.MapHealthChecks("/health");
+// YARP healthcheck endpoint
 app.MapHealthChecks("/api/productsManagement/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+}).AllowAnonymous();    //.RequireAuthorization("IsAdminOrManager");
+
+// Client healthcheck endpoint
+app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOptions
 {
     // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse  // this works for mongo apis
 
