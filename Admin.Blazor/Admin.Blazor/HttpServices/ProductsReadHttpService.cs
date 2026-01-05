@@ -31,6 +31,9 @@ namespace Admin.Blazor.HttpServices
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
+            //string uriDirect = "https://localhost:7101/api/products/health";
+            //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uriDirect);
+
             // Generate a new Correlation ID and add to headers
             string correlationId = Guid.NewGuid().ToString();
             request.Headers.Add("X-Correlation-ID", correlationId);
@@ -40,7 +43,10 @@ namespace Admin.Blazor.HttpServices
             try
             {
                 response.EnsureSuccessStatusCode();
-                // string? resultString = await response.Content.ReadAsStringAsync();
+
+                string resultString = await response.Content.ReadAsStringAsync();
+                if (resultString is null || resultString.Length == 0) return (false, null, "WTF! The result is null or empty.");
+
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)
                 {
