@@ -41,15 +41,6 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
 
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    string json = await response.Content.ReadAsStringAsync();
-            //    Console.WriteLine($"$$$$$$$$$$$$$$$$$$$$  HealthCheckResultDTO $$$$$$$$$$$$$$$$$$$$$ \n {json}");
-            //}
-
-            //HealthCheckResultDTO dto = new HealthCheckResultDTO() ;
-            //return (true, dto, null);
-
             try
             {
                 response.EnsureSuccessStatusCode();

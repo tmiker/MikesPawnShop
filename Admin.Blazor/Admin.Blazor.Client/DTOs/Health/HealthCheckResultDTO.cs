@@ -5,6 +5,5 @@
         public string? Status { get; set; }
         public string? TotalDuration { get; set; }
         public Dictionary<string, HealthCheckResultEntriesDTO>? Entries { get; set; }
-        // public Dictionary<string, HealthCheckResultEntriesDTO>? Checks { get; set; }
     }
 }
