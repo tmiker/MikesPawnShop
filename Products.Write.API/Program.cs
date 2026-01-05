@@ -122,7 +122,7 @@ app.MapControllers();
 app.MapHealthChecks("/api/productsManagement/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-}).AllowAnonymous();    //.RequireAuthorization("IsAdminOrManager");
+}).RequireAuthorization("IsAdminOrManager");        // .AllowAnonymous();    //
 
 // Client healthcheck endpoint
 app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOptions
@@ -181,6 +181,6 @@ app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOption
         //    // await context.Response.WriteAsync(jsonResult);
     }
 
-}).AllowAnonymous();        //.RequireAuthorization("IsAdminOrManager");            
+}).RequireAuthorization("IsAdminOrManager");            
 
 app.Run();

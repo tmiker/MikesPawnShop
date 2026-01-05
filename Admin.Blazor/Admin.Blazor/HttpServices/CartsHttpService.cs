@@ -22,7 +22,7 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
         {
-            string uri = $"{StaticData.CartsHttpClient_CartsPath}/health";
+            string uri = $"{StaticData.CartsHttpClient_CartsPath}/healthcheck";
             var client = _httpClientFactory.CreateClient(StaticData.CartsHttpClient_ClientName);
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

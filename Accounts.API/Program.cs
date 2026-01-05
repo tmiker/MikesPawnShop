@@ -94,9 +94,16 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHealthChecks("/api/accounts/health", new HealthCheckOptions
+//// YARP healthcheck endpoint - uncomment if configure YARP HealthChecks for Accounts - use this URL in YARP
+//app.MapHealthChecks("/api/accounts/health", new HealthCheckOptions
+//{
+//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+//}).RequireAuthorization();
+
+// Client healthcheck endpoint
+app.MapHealthChecks("/api/accounts/healthcheck", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-}).AllowAnonymous();        
+}).RequireAuthorization();        
 
 app.Run();

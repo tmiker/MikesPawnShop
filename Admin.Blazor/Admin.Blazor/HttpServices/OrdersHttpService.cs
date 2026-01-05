@@ -26,7 +26,7 @@ namespace Admin.Blazor.HttpServices
         {
             //string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
             //var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
-            string uri = $"{StaticData.OrdersHttpClient_OrdersPath}/health";
+            string uri = $"{StaticData.OrdersHttpClient_OrdersPath}/healthcheck";
             var client = _httpClientFactory.CreateClient(StaticData.OrdersHttpClient_ClientName);
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
