@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Admin.Blazor\Admin.Blazor.Client\Admin.Blazor.Client.csproj" />
     <ProjectReference Include="..\Products.Shared\Products.Shared.csproj" />
     <ProjectReference Include="..\Products.Write.Application\Products.Write.Application.csproj" />
     <ProjectReference Include="..\Products.Write.Domain\Products.Write.Domain.csproj" />

@@ -29,9 +29,9 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
         {
-            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
-            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
-            if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/health";
+            var client = _httpClientFactory.CreateClient(StaticData.ProductsWriteHttpClient_ClientName);
+            // if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -41,20 +41,29 @@ namespace Admin.Blazor.HttpServices
 
             HttpResponseMessage response = await client.SendAsync(request);
 
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    string json = await response.Content.ReadAsStringAsync();
+            //    Console.WriteLine($"$$$$$$$$$$$$$$$$$$$$  HealthCheckResultDTO $$$$$$$$$$$$$$$$$$$$$ \n {json}");
+            //}
+
+            //HealthCheckResultDTO dto = new HealthCheckResultDTO() ;
+            //return (true, dto, null);
+
             try
             {
                 response.EnsureSuccessStatusCode();
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)
                 {
-                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() Result: \n{resultDTO}");
+                    _logger.LogInformation($"ProductsWriteHttpService CheckHealthAsync() at path '{request.RequestUri}' Result: \n{JsonSerializer.Serialize(resultDTO)}");
                     return (true, resultDTO, null);
                 }
                 else return (false, null, "Health check result DTO is null.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
+                _logger.LogError($"ProductsWriteHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
                 return (false, null, ex.Message);
             }
         }

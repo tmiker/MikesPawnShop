@@ -15,7 +15,7 @@ namespace Products.Write.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // if implement products write side api health checks to prevent chattiness
+            // uncomment to prevent log chattiness
             if (context.Request.Path == "/api/productsManagement/health") return; 
 
             // Check if Correlation ID exists in the request header
@@ -32,7 +32,7 @@ namespace Products.Write.API.Middleware
             // Add Correlation ID to the response header
             context.Response.Headers["X-Correlation-ID"] = correlationId;
 
-            _logger.CorrelationIdMiddlewareExecuted(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader); //, DateTime.Now);
+            _logger.LogCorrelationIdMiddleware(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader); //, DateTime.Now);
 
             // Proceed to the next middleware
             await _next(context);

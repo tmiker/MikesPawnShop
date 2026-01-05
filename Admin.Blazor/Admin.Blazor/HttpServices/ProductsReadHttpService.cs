@@ -25,8 +25,8 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
         {
-            string uri = $"{StaticData.AccountsHttpClient_AccountsPath}/health";
-            var client = _httpClientFactory.CreateClient(StaticData.AccountsHttpClient_ClientName);
+            string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/health";
+            var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
             if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -40,17 +40,18 @@ namespace Admin.Blazor.HttpServices
             try
             {
                 response.EnsureSuccessStatusCode();
+                // string? resultString = await response.Content.ReadAsStringAsync();
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)
                 {
-                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() Result: \n{resultDTO}");
+                    _logger.LogInformation($"ProductsReadHttpService CheckHealthAsync() at path \'{request.RequestUri}\' Result: \n{JsonSerializer.Serialize(resultDTO)}");
                     return (true, resultDTO, null);
                 }
                 else return (false, null, "Health check result DTO is null.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
+                _logger.LogError($"ProductsReadHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
                 return (false, null, ex.Message);
             }
         }

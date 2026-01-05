@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using Products.Write.Application.Abstractions;
 using Products.Write.Application.Configuration;
@@ -18,13 +19,49 @@ namespace Products.Write.API.Controllers
         private readonly ISender _sender;
         private readonly IOptions<AzureSettings> _azureSettings;
         private readonly ILogger<ProductsManagementController> _logger;
+        private readonly IConfiguration _config;
 
-        public ProductsManagementController(ISender sender, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger)
+        public ProductsManagementController(ISender sender, IOptions<AzureSettings> azureSettings, ILogger<ProductsManagementController> logger, IConfiguration config)
         {
             _sender = sender;
             _azureSettings = azureSettings;
             _logger = logger;
+            _config = config;
         }
+
+        ///// <summary>
+        ///// Health check endpoint to verify API and dependencies.
+        ///// </summary>
+        //[HttpGet("health")]
+        //public async Task<IActionResult> Get()
+        //{
+        //    try
+        //    {
+        //        // Example: Check database connectivity
+        //        using (var connection = new SqlConnection(_config.GetConnectionString("LocalDevelopmentConnectionString")))
+        //        {
+        //            await connection.OpenAsync();
+        //        }
+
+        //        // If all checks pass
+        //        return Ok(new
+        //        {
+        //            status = "Healthy",
+        //            timestamp = DateTime.UtcNow
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Health check failed");
+
+        //        return StatusCode(503, new
+        //        {
+        //            status = "Unhealthy",
+        //            error = ex.Message,
+        //            timestamp = DateTime.UtcNow
+        //        });
+        //    }
+        //}
 
         [HttpPost]
         [Authorize(Policy = "IsAdminOrManager")]

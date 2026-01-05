@@ -1,0 +1,7 @@
+All Microservices APIs have a HealthChecks configured, with the HealthCheck endpoint implmented as a minimal api endpoint in Program.cs.
+	The endpoint logs the status if healthy using HighPerformanceLoggingExtensions LogHealthCheckStatus, and the DefaultHealthCheckService 
+	automatically logs Unhealthy results.
+The Blazor Admin Client has HttpClient actions to call each of the Microservice's HealthCheck endpoint and display overall status as well as 
+	the status of sql server, mongo db, amqp, or mass-transit as applicable.
+YARP has HealthChecks endpoint monitoring configured for the Products.Read.API and Products.Write.API health check endpoints. Calls are made 
+	at 30s intervals and a 10s timeout, using  ConsecutiveFailures policy with the Threshold set to 3. 

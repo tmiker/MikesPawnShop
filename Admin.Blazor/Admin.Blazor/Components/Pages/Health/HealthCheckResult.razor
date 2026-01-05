@@ -15,22 +15,22 @@
     </div>
     @if (ApiHealthCheckResult.Entries is not null)
     {
-        @foreach (var kvp in ApiHealthCheckResult.Entries)
-        {
-            <div class="row mt-2">
-                <div class="col-10 offset-1">
-                    <table class="table table-bordered table-dark">
-                        <thead>
-                            <tr>
-                                <th>Entry Key</th>
-                                <th>Description</th>
-                                <th>Duration (ms)</th>
-                                <th>Status</th>
-                                @* <th>Tags</th> *@
-                            </tr>
-                        </thead>
-                        <tbody>
 
+        <div class="row mt-2">
+            <div class="col-10 offset-1">
+                <table class="table table-bordered table-dark">
+                    <thead>
+                        <tr>
+                            <th>Entry Key</th>
+                            <th>Description</th>
+                            <th>Duration (ms)</th>
+                            <th>Status</th>
+                            @* <th>Tags</th> *@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var kvp in ApiHealthCheckResult.Entries)
+                        {
                             <tr>
                                 <td>@kvp.Key</td>
                                 <td>@kvp.Value.Description</td>
@@ -38,12 +38,15 @@
                                 <td>@kvp.Value.Status</td>
                                 @* <td>@string.Join(", ", entry.Tags!)</td> *@
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                </table>
             </div>
-        }
+        </div>
+
     }
+
+
 
 }
 

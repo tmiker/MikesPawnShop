@@ -15,6 +15,7 @@ namespace Products.Read.API.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // uncomment to prevent log chattiness
             if (context.Request.Path == "/api/products/health") return; 
             
             // Check if Correlation ID exists in the request header
@@ -31,7 +32,7 @@ namespace Products.Read.API.Middleware
             // Add Correlation ID to the response header
             context.Response.Headers["X-Correlation-ID"] = correlationId;
 
-            _logger.CorrelationIdMiddlewareExecuted(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader); //, DateTime.Now);
+            _logger.LogCorrelationIdMiddleware(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader); //, DateTime.Now);
 
             // Proceed to the next middleware
             await _next(context);

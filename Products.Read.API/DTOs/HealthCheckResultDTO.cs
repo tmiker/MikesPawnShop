@@ -1,10 +1,9 @@
-﻿namespace Admin.Blazor.Client.DTOs.Health
+﻿namespace Products.Read.API.DTOs
 {
     public class HealthCheckResultDTO
     {
         public string? Status { get; set; }
         public string? TotalDuration { get; set; }
         public Dictionary<string, HealthCheckResultEntriesDTO>? Entries { get; set; }
-        // public Dictionary<string, HealthCheckResultEntriesDTO>? Checks { get; set; }
     }
 }

@@ -5,16 +5,29 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Products.Read.API;
+using Products.Read.API.DTOs;
 using Products.Read.API.Middleware;
 using Scalar.AspNetCore;
 using System.Security.Claims;
+using System.Text.Json;
+using Products.Read.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+//builder.Services.AddHealthChecks()
+//    .AddSqlServer(builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!);
+
+// Add HealthChecks with SQL Server check
 builder.Services.AddHealthChecks()
-    .AddSqlServer(builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!);
+    .AddSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!,
+        name: "sqlserver",
+        failureStatus: HealthStatus.Unhealthy,
+        timeout: TimeSpan.FromSeconds(5),
+        tags: new[] { "db", "sql", "sqlserver" }
+    );
 
 builder.Services.AddCors(setup =>
 {
@@ -119,7 +132,50 @@ app.MapControllers();
 
 app.MapHealthChecks("/api/products/health", new HealthCheckOptions
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+
+        //var response = new
+        //{
+        //    status = report.Status.ToString(),
+        //    checks = report.Entries.Select(entry => new
+        //    {
+        //        name = entry.Key,
+        //        status = entry.Value.Status.ToString(),
+        //        description = entry.Value.Description,
+        //        duration = entry.Value.Duration.TotalMilliseconds + "ms"
+        //    }),
+        //    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
+        //};
+        //await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+
+        HealthCheckResultDTO dto = new HealthCheckResultDTO()
+        {
+            Status = report.Status.ToString(),
+            TotalDuration = report.TotalDuration.TotalMilliseconds + "ms"
+        };
+
+        if (report.Entries is not null && report.Entries.Any())
+        {
+            dto.Entries = new Dictionary<string, HealthCheckResultEntriesDTO>();
+            foreach (var entry in report.Entries)
+            {
+                dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
+            }
+        }
+
+        string jsonResult = JsonSerializer.Serialize(dto);
+
+        if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        //// DefaultHealthCheckService automatically logs Unhealthy result
+        // else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+
+        await context.Response.WriteAsync(jsonResult);
+    }
+
 }).AllowAnonymous();     
 
 app.Run();

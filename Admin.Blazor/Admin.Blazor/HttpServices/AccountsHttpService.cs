@@ -35,14 +35,14 @@ namespace Admin.Blazor.HttpServices
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)
                 {
-                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() Result: \n{resultDTO}");
+                    _logger.LogInformation($"AccountsHttpService CheckHealthAsync() at path '{request.RequestUri}' Result: \n{JsonSerializer.Serialize(resultDTO)}");
                     return (true, resultDTO, null);
                 }
                 else return (false, null, "Health check result DTO is null.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"AccountsHttpService CheckHealthAsync() Exception: {ex.Message}");
+                _logger.LogError($"AccountsHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
                 return (false, null, ex.Message);
             }
         }
