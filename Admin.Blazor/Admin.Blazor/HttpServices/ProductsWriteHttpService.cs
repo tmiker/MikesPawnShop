@@ -27,11 +27,10 @@ namespace Admin.Blazor.HttpServices
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null)
+        public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync()
         {
             string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/health";
             var client = _httpClientFactory.CreateClient(StaticData.ProductsWriteHttpClient_ClientName);
-            // if (!string.IsNullOrWhiteSpace(token)) client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -48,9 +47,10 @@ namespace Admin.Blazor.HttpServices
             {
                 response.EnsureSuccessStatusCode();
 
-                string resultString = await response.Content.ReadAsStringAsync();
-                if (resultString is null || resultString.Length == 0) return (false, null, "WTF! The result is null or empty.");
-                
+                string json = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(json)) return (false, null, $"The API returned no content.");
+                _logger.LogInformation("JSON HEALTH CHECK: {json}", json);
+
                 var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
                 if (resultDTO is not null)
                 {
@@ -62,8 +62,29 @@ namespace Admin.Blazor.HttpServices
             catch (Exception ex)
             {
                 _logger.LogError($"ProductsWriteHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
-                return (false, null, ex.Message);
+                return (false, null, $"Exception: {ex.Message}");
+
             }
+            //try
+            //{
+            //    response.EnsureSuccessStatusCode();
+
+            //    string resultString = await response.Content.ReadAsStringAsync();
+            //    if (resultString is null || resultString.Length == 0) return (false, null, "WTF! The result is null or empty.");
+                
+            //    var resultDTO = await response.Content.ReadFromJsonAsync<HealthCheckResultDTO>(_jsonSerializerOptions);
+            //    if (resultDTO is not null)
+            //    {
+            //        _logger.LogInformation($"ProductsWriteHttpService CheckHealthAsync() at path '{request.RequestUri}' Result: \n{JsonSerializer.Serialize(resultDTO)}");
+            //        return (true, resultDTO, null);
+            //    }
+            //    else return (false, null, "Health check result DTO is null.");
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError($"ProductsWriteHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
+            //    return (false, null, ex.Message);
+            //}
         }
 
         public async Task<(bool IsSuccess, ApiUserInfoDTO? ApiUserInfo, string? ErrorMessage)> GetProductsWriteApiUserInfoAsync(string? token = null)

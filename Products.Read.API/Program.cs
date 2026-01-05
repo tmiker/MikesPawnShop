@@ -130,37 +130,40 @@ app.UseAuthorization();
 app.MapControllers();
 
 //app.MapHealthChecks("/health");
-
 app.MapHealthChecks("/api/products/health", new HealthCheckOptions
 {
     // ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 
     ResponseWriter = async (context, report) =>
     {
-        Console.WriteLine($"%%%%%%%%%%%%%%%%%%%%%%%%%%%% HEALTH CHECK IS RUNNING. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        //    app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        //    await context.Response.WriteAsync(report.Status.ToString());
+
+        //    //Console.WriteLine($"%%%%%%%%%%%%%%%%%%%%%%%%%%%% HEALTH CHECK IS RUNNING. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
         context.Response.ContentType = "application/json; charset=utf-8";
 
-        //var response = new
-        //{
-        //    status = report.Status.ToString(),
-        //    checks = report.Entries.Select(entry => new
-        //    {
-        //        name = entry.Key,
-        //        status = entry.Value.Status.ToString(),
-        //        description = entry.Value.Description,
-        //        duration = entry.Value.Duration.TotalMilliseconds + "ms"
-        //    }),
-        //    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
-        //};
-        // await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
+
+        //    ////var response = new
+        //    ////{
+        //    ////    status = report.Status.ToString(),
+        //    ////    checks = report.Entries.Select(entry => new
+        //    ////    {
+        //    ////        name = entry.Key,
+        //    ////        status = entry.Value.Status.ToString(),
+        //    ////        description = entry.Value.Description,
+        //    ////        duration = entry.Value.Duration.TotalMilliseconds + "ms"
+        //    ////    }),
+        //    ////    totalDuration = report.TotalDuration.TotalMilliseconds + "ms"
+        //    ////};
+        //    //// await context.Response.WriteAsync(JsonSerializer.Serialize(response));
 
         HealthCheckResultDTO dto = new HealthCheckResultDTO()
         {
             Status = report.Status.ToString(),
             TotalDuration = report.TotalDuration.TotalMilliseconds + "ms"
         };
-
         if (report.Entries is not null && report.Entries.Any())
         {
             dto.Entries = new Dictionary<string, HealthCheckResultEntriesDTO>();
@@ -169,19 +172,20 @@ app.MapHealthChecks("/api/products/health", new HealthCheckOptions
                 dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
             }
         }
+        await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
 
-        string jsonResult = JsonSerializer.Serialize(dto);
+        //    //string jsonResult = JsonSerializer.Serialize(dto);
 
-        if (report.Status == HealthStatus.Healthy) Console.WriteLine($"Health Status: {dto.Status}");        // app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        ////// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
-        //else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+        //    //if (report.Status == HealthStatus.Healthy) Console.WriteLine($"Health Status: {dto.Status}");        // app.Logger.LogHealthCheckStatus(report.Status.ToString());
+        //    //////// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
+        //    ////else app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
 
-        //// dev purposes only
-        // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
+        //    ////// dev purposes only
+        //    //// app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
 
-        await context.Response.WriteAsync(jsonResult);
+        //    //await context.Response.WriteAsync(jsonResult);
     }
 
-}).AllowAnonymous();     
+}).AllowAnonymous();
 
 app.Run();

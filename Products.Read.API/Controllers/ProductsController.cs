@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Products.Read.API.Abstractions;
 using Products.Read.API.Domain.Models;
 using Products.Read.API.DTOs;
 using Products.Read.API.Paging;
 using Products.Read.API.QueryResponses;
+using System;
 
 namespace Products.Read.API.Controllers
 {
