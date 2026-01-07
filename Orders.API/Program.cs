@@ -96,7 +96,7 @@ try
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-
+    app.UseMiddleware<CorrelationIdMiddleware>();
     app.UseMiddleware<SerilogMiddleware>();
 
     if (app.Environment.IsDevelopment())

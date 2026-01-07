@@ -1,4 +1,7 @@
-
+CorrelationId Middleware is double logging http method and path
+	_logger.LogCorrelationIdMiddleware(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader);
+	remove method and path - update hi performance log extensions if applicable
+	all microservices
 
 Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
