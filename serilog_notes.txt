@@ -1,14 +1,23 @@
-Nugets
-	Serilog ??? Is only Serilog.AspNetCore required?
+NUGETS:
+
 	Serilog.AspNetCore
-	Serilog.Sinks.Seq
-	Serilog.Extensions.Hosting
+	Serilog.Enrichers.Thread
+	Serilog.Enrichers.Process
+	Serilog.Enrichers.Environment
 	Serilog.Exceptions
+	Serilog.Expressions
+	Serilog.Sinks.Console
+	Serilog.Sinks.File
+	Serilog.Sinks.Seq
+	Serilog.Settings.Configuration
+	----------------------------
+	Serilog.Sinks.Elasticsearch
+	Serilog.Sinks.Grafana.Loki
+	Serilog.Sinks.MSSqlServer
+	
 
-
-
-
-
+Products.Read.API and Products.Write.API
+	full Serilog config
 
 Notes:
 Preserving Object Structure
@@ -17,3 +26,23 @@ Preserving Object Structure
 		var sensorInput = new { Latitude = 25, Longitude = 134 };
 		Log.Information("Processing {@SensorInput}", sensorInput);
 
+{
+  "Serilog": {
+    "Using":  [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+    "MinimumLevel": "Debug",
+    "WriteTo": [
+      { "Name": "Console" },
+      { "Name": "File", "Args": { "path": "Logs/log.txt" } }
+    ],
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+    "Destructure": [
+      { "Name": "With", "Args": { "policy": "Sample.CustomPolicy, Sample" } },
+      { "Name": "ToMaximumDepth", "Args": { "maximumDestructuringDepth": 4 } },
+      { "Name": "ToMaximumStringLength", "Args": { "maximumStringLength": 100 } },
+      { "Name": "ToMaximumCollectionCount", "Args": { "maximumCollectionCount": 10 } }
+    ],
+    "Properties": {
+        "Application": "Sample"
+    }
+  }
+}

@@ -12,6 +12,7 @@ namespace Accounts.API.Mappers
             if (account == null) return null!;
             AccountDTO accountDTO = new AccountDTO
             {
+                Id = account.Id,
                 AccountId = account.AccountId,
                 FirstName = account.FirstName,
                 LastName = account.LastName,

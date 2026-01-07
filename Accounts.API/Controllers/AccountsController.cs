@@ -48,7 +48,7 @@ namespace Accounts.API.Controllers
             if (result.Account is not null)
             {
                 string jsonAccount = JsonSerializer.Serialize(result.Account);
-                Console.WriteLine($"\n************\nExternalAccountsController GetByOwnerId() result: \n{jsonAccount}\n************\n");
+                _logger.LogInformation("Account Retrieved: {@result.Account}", result.Account);
             }
 
             if (result.IsSuccess) return Ok(result.Account);

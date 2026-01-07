@@ -14,19 +14,38 @@ using Products.Write.Application.DTOs;
 using Products.Write.Application.Extensions;
 using Products.Write.Domain.Enumerations;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Events;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+// Configure static logger early for capturing startup issues
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// Add services to the container.
+try
+{
+    Log.Information("Starting application ...");
 
-//builder.Services.AddHealthChecks()
-//    .AddSqlServer(connectionString: builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!);
+    var builder = WebApplication.CreateBuilder(args);
 
-// Add HealthChecks with SQL Server check
-builder.Services.AddHealthChecks()
+    // Example: Log startup details
+    Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+    Log.Information("Content Root: {ContentRoot}", builder.Environment.ContentRootPath);
+
+    // Configure Serilog
+    builder.Logging.ClearProviders();
+    builder.Host.UseSerilog((ctx, lc) => lc
+           .ReadFrom.Configuration(ctx.Configuration));
+
+    // Add HealthChecks with SQL Server check
+    builder.Services.AddHealthChecks()
     .AddSqlServer(
         connectionString: builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!,
         name: "sqlserver",
@@ -35,133 +54,143 @@ builder.Services.AddHealthChecks()
         tags: new[] { "db", "sql", "sqlserver" }
     );
 
-builder.Services.AddProblemDetails(); // Registers the ProblemDetails service - configured in ExceptionHandlers using ExceptionHandlerExtensions 
+    builder.Services.AddProblemDetails(); // Registers the ProblemDetails service - configured in ExceptionHandlers using ExceptionHandlerExtensions 
 
-// Configure Auth
-JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Note: As configured, Roles are not populated by HttpContext.User.Claims without this
-builder.Services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://localhost:5001";
-        options.Audience = "productswriteapi";
-        options.TokenValidationParameters = new TokenValidationParameters()
+    // Configure Auth
+    JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear(); // Note: As configured, Roles are not populated by HttpContext.User.Claims without this
+    builder.Services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
         {
-            NameClaimType = "given_name",       // should have the same mapping as in client app
-            RoleClaimType = "role",             // should have the same mapping as in our client mvc app
-            ValidTypes = new[] { "at+jwt" }     // says the only valid token type is 'at + jwt' 
-            //ValidateIssuer = true,
-            //ValidateAudience = true,
-            //ValidateLifetime = true
-        };
-
-    });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("IsAdmin", policy => policy.RequireClaim("role", "Admin"));                          // (ClaimTypes.Role, "Admin")); does not work
-    options.AddPolicy("IsManager", policy => policy.RequireClaim("role", "Manager"));                      // (ClaimTypes.Role, "Manager")); does not work
-    options.AddPolicy("IsAdminOrManager", policy => policy.RequireClaim("role", "Admin", "Manager"));      // (ClaimTypes.Role, "Admin", "Manager"));does not work
-    options.AddPolicy("MarlowAndWendy", policy => policy.RequireClaim(ClaimTypes.Name, "Wendy Davenport", "Marlow Bean"));
-    options.AddPolicy("DomesticDogs", policy => policy.RequireClaim("Genus", "Canis").RequireClaim("Species", "Familiaris"));
-});
-
-// CONFIGURE MEDIATR AND PIPELINE BEHAVIORS
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.LicenseKey = builder.Configuration.GetValue<string>("MediatRSettings:LicenseKey");
-    cfg.RegisterServicesFromAssembly(typeof(Products.Write.Application.DIRegistrations).Assembly);
-    // Register pipeline behaviors in order
-    // 1. Logging - use Serilog
-    // 2. Validation - FluentValidation - change ValidationExceptionHandler to use FluentValidation.ValidationException
-    // 3. Handle exceptions - use ExceptionHandlers
-    // 4. Monitor performance - Serilog Request Logging
-    // 5. Manage transactions
-});
-
-// Register services from Composition Root
-builder.Services.ComposeApplication();
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-// Register exception handlers in order of specificity (most specific first)
-builder.Services.AddExceptionHandler<ProductEventStoreExceptionHandler>();
-builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-
-app.UseMiddleware<CorrelationIdMiddleware>();
-
-app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference(options =>
-    {
-        options.WithTitle($"Pawn Shop Products Write Side API");
-        options.WithTheme(ScalarTheme.Mars);
-        options.EnableDarkMode();
-    });
-    // app.UsePathBase("/scalar/v1");
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-// YARP healthcheck endpoint
-app.MapHealthChecks("/api/productsManagement/health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-}).RequireAuthorization("IsAdminOrManager");        // .AllowAnonymous();    //
-
-// Client healthcheck endpoint
-app.MapHealthChecks("/api/productsManagement/healthcheck", new HealthCheckOptions
-{
-    ResponseWriter = async (context, report) =>
-    {
-        context.Response.ContentType = "application/json; charset=utf-8";
-
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
-
-        HealthCheckResultDTO dto = new HealthCheckResultDTO()
-        {
-            Status = report.Status.ToString(),
-            TotalDuration = report.TotalDuration.TotalMilliseconds + "ms"
-        };
-        if (report.Entries is not null && report.Entries.Any())
-        {
-            dto.Entries = new Dictionary<string, HealthCheckResultEntriesDTO>();
-            foreach (var entry in report.Entries)
+            options.Authority = "https://localhost:5001";
+            options.Audience = "productswriteapi";
+            options.TokenValidationParameters = new TokenValidationParameters()
             {
-                dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
-            }
-        }
+                NameClaimType = "given_name",       // should have the same mapping as in client app
+                RoleClaimType = "role",             // should have the same mapping as in our client mvc app
+                ValidTypes = new[] { "at+jwt" }     // says the only valid token type is 'at + jwt' 
+                                                    //ValidateIssuer = true,
+                                                    //ValidateAudience = true,
+                                                    //ValidateLifetime = true
+            };
 
-        if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
-        //// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
-        //else
-        //{
-        //    string jsonResult = JsonSerializer.Serialize(dto);
-        //    app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
-        //}
+        });
 
-        //// dev purposes only
-        // string jsonResult = JsonSerializer.Serialize(dto);
-        // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("IsAdmin", policy => policy.RequireClaim("role", "Admin"));                          // (ClaimTypes.Role, "Admin")); does not work
+        options.AddPolicy("IsManager", policy => policy.RequireClaim("role", "Manager"));                      // (ClaimTypes.Role, "Manager")); does not work
+        options.AddPolicy("IsAdminOrManager", policy => policy.RequireClaim("role", "Admin", "Manager"));      // (ClaimTypes.Role, "Admin", "Manager"));does not work
+        options.AddPolicy("MarlowAndWendy", policy => policy.RequireClaim(ClaimTypes.Name, "Wendy Davenport", "Marlow Bean"));
+        options.AddPolicy("DomesticDogs", policy => policy.RequireClaim("Genus", "Canis").RequireClaim("Species", "Familiaris"));
+    });
 
-        await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
+    // CONFIGURE MEDIATR AND PIPELINE BEHAVIORS
+    builder.Services.AddMediatR(cfg =>
+    {
+        cfg.LicenseKey = builder.Configuration.GetValue<string>("MediatRSettings:LicenseKey");
+        cfg.RegisterServicesFromAssembly(typeof(Products.Write.Application.DIRegistrations).Assembly);
+        // Register pipeline behaviors in order
+        // 1. Logging - use Serilog
+        // 2. Validation - FluentValidation - change ValidationExceptionHandler to use FluentValidation.ValidationException
+        // 3. Handle exceptions - use ExceptionHandlers
+        // 4. Monitor performance - Serilog Request Logging
+        // 5. Manage transactions
+    });
+
+    // Register services from Composition Root
+    builder.Services.ComposeApplication();
+
+    builder.Services.AddControllers();
+    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+    builder.Services.AddOpenApi();
+
+    // Register exception handlers in order of specificity (most specific first)
+    builder.Services.AddExceptionHandler<ProductEventStoreExceptionHandler>();
+    builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+    builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Backup handler
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    app.UseMiddleware<SerilogMiddleware>();
+    app.UseMiddleware<CorrelationIdMiddleware>();
+
+    app.UseExceptionHandler(); // Enables the middleware to use the registered IExceptionHandler above
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+        app.MapScalarApiReference(options =>
+        {
+            options.WithTitle($"Pawn Shop Products Write Side API");
+            options.WithTheme(ScalarTheme.Mars);
+            options.EnableDarkMode();
+        });
     }
 
-}).RequireAuthorization("IsAdminOrManager");            
+    app.UseHttpsRedirection();
 
-app.Run();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    // YARP healthcheck endpoint
+    app.MapHealthChecks("/api/productsManagement/healthYarp", new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    }).AllowAnonymous();    //.RequireAuthorization("IsAdminOrManager");     
+
+    // Client healthcheck endpoint
+    app.MapHealthChecks("/api/productsManagement/healthClient", new HealthCheckOptions
+    {
+        ResponseWriter = async (context, report) =>
+        {
+            context.Response.ContentType = "application/json; charset=utf-8";
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
+
+            HealthCheckResultDTO dto = new HealthCheckResultDTO()
+            {
+                Status = report.Status.ToString(),
+                TotalDuration = report.TotalDuration.TotalMilliseconds + "ms"
+            };
+            if (report.Entries is not null && report.Entries.Any())
+            {
+                dto.Entries = new Dictionary<string, HealthCheckResultEntriesDTO>();
+                foreach (var entry in report.Entries)
+                {
+                    dto.Entries.Add(entry.Key, new HealthCheckResultEntriesDTO() { Status = entry.Value.Status.ToString(), Description = entry.Value.Description, Duration = entry.Value.Duration.ToString() });
+                }
+            }
+
+            if (report.Status == HealthStatus.Healthy) app.Logger.LogHealthCheckStatus(report.Status.ToString());
+            //// DefaultHealthCheckService automatically logs Unhealthy result already, so no need to log error
+            //else
+            //{
+            //    string jsonResult = JsonSerializer.Serialize(dto);
+            //    app.Logger.LogError("Health Check Result: {jsonResult}", jsonResult);
+            //}
+
+            //// dev purposes only
+            // string jsonResult = JsonSerializer.Serialize(dto);
+            // app.Logger.LogInformation("Health Check Result: {jsonResult}", jsonResult);
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(dto, options));
+        }
+
+    }).RequireAuthorization("IsAdminOrManager");
+
+    app.Run();
+
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}

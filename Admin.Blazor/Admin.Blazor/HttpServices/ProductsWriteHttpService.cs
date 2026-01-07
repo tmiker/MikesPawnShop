@@ -29,7 +29,7 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync()
         {
-            string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/healthcheck";
+            string uri = $"{StaticData.ProductsWriteHttpClient_ProductsPath}/healthClient";
             var client = _httpClientFactory.CreateClient(StaticData.ProductsWriteHttpClient_ClientName);
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);

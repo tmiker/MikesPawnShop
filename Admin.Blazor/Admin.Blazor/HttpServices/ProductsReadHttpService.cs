@@ -25,7 +25,7 @@ namespace Admin.Blazor.HttpServices
 
         public async Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync()
         {
-            string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/healthcheck";
+            string uri = $"{StaticData.ProductsReadHttpClient_ProductsPath}/healthClient";
             var client = _httpClientFactory.CreateClient(StaticData.ProductsReadHttpClient_ClientName);
 
             //HttpClient client = new HttpClient();

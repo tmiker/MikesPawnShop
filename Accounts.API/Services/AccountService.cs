@@ -68,7 +68,7 @@ namespace Accounts.API.Services
         public async Task<(bool IsSuccess, string? ErrorMessage)> AddAddressAsync(string ownerId, AddAddressDTO addAddressDTO)
         {
             Account account = await _accounts.Find(a => a.OwnerId == ownerId).FirstOrDefaultAsync();
-            Address address = new Address()     // _mapper.Map<Address>(addAddressDTO.Address);
+            Address address = new Address()     
             {
                 Street1 = addAddressDTO.Street1,
                 Street2 = addAddressDTO.Street2,
@@ -78,7 +78,7 @@ namespace Accounts.API.Services
                 IsPrimaryBilling = addAddressDTO.IsPrimaryBilling,
                 IsPrimaryShipping = addAddressDTO.IsPrimaryShipping
             };
-            // account.Addresses.Add(address);
+
             bool changed = account.AddAddress(address);
             if (changed)
             {

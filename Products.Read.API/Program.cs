@@ -10,19 +10,41 @@ using Products.Read.API.Extensions;
 using Products.Read.API.Health;
 using Products.Read.API.Middleware;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Events;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
+// Configure static logger early for capturing startup issues
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// Add services to the container.
+try
+{
+    Log.Information("Starting application ...");
 
-//builder.Services.AddHealthChecks()
-//    .AddSqlServer(builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!);
+    var builder = WebApplication.CreateBuilder(args);
 
-// Add HealthChecks with SQL Server check
-builder.Services.AddHealthChecks()
+    // Example: Log startup details
+    Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+    Log.Information("Content Root: {ContentRoot}", builder.Environment.ContentRootPath);
+
+    // Configure Serilog
+    builder.Logging.ClearProviders();
+    builder.Host.UseSerilog((ctx, lc) => lc
+           .ReadFrom.Configuration(ctx.Configuration));
+
+    //builder.Services.AddHealthChecks()
+    //    .AddSqlServer(builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!);
+
+    // Add HealthChecks with SQL Server check
+    builder.Services.AddHealthChecks()
     .AddSqlServer(
         connectionString: builder.Configuration.GetConnectionString("LocalDevelopmentConnectionString")!,
         name: "sqlserver",
@@ -110,6 +132,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseMiddleware<SerilogMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
@@ -123,7 +146,6 @@ if (app.Environment.IsDevelopment())
         options.WithTheme(ScalarTheme.DeepSpace);
         options.EnableDarkMode();
     });
-    // app.UsePathBase("/scalar/v1");
 }
 
 app.UseHttpsRedirection();
@@ -139,13 +161,13 @@ app.UseAuthorization();
 app.MapControllers();
 
 // YARP healthcheck endpoint
-app.MapHealthChecks("/api/products/health", new HealthCheckOptions
+app.MapHealthChecks("/api/products/healthYarp", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 }).AllowAnonymous();    //.RequireAuthorization("IsAdminOrManager");
 
 // Client healthcheck endpoint
-app.MapHealthChecks("/api/products/healthcheck", new HealthCheckOptions
+app.MapHealthChecks("/api/products/healthClient", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
     {
@@ -185,3 +207,14 @@ app.MapHealthChecks("/api/products/healthcheck", new HealthCheckOptions
 }).AllowAnonymous();
 
 app.Run();
+
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
+}
