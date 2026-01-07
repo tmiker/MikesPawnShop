@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Products.Write.Application.Exceptions;
+using FluentValidation;
 
 namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
 {
@@ -20,8 +19,16 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             if (exception is not ValidationException validationException) return false;   // Exception not handled
 
             _logger.LogWarning("Validation failed: Exception Type: {Type} | {Message} | RequestId: {RequestId}", exception.GetType().FullName, validationException.Message, httpContext.TraceIdentifier);
+            _logger.LogWarning("FluentValidation error occurred with {ErrorCount} errors", validationException.Errors.Count());
 
-            var problemDetails = new ValidationProblemDetails(validationException.Errors)
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            var problemDetails = new ValidationProblemDetails(errors)
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Validation Error",
@@ -36,7 +43,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             problemDetails.Extensions["machine"] = Environment.MachineName;
             // Include correlation ID if available
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
-            problemDetails.Extensions["errors"] = validationException.Errors;
+            problemDetails.Extensions["errors"] = errors;       // validationException.Errors;
 
             //// OPTION 1: HANDLE EXCEPTION AND RETURN PROBLEM DETAILS OBJECT - NOTE WILL NOT HAVE CONTENT TYPE OF `application/problem+json`
             //httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;

@@ -1,4 +1,5 @@
-﻿namespace Products.Read.API.DTOs.DevTests
+﻿
+namespace Products.Read.API.DTOs.DevTests
 {
     public class ThrowExceptionDTO
     {

@@ -1,4 +1,5 @@
 ﻿using Azure;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Products.Write.Application.Exceptions;
@@ -66,6 +67,19 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             problemDetails.Extensions["machine"] = Environment.MachineName;
             problemDetails.Extensions["correlationId"] = httpContext.Request.Headers["X-Correlation-ID"].FirstOrDefault();
             
+            // Handle validation exceptions 
+            if (exception is ValidationException validationException)
+            {
+                var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                problemDetails.Extensions["errors"] = errors;
+            }
+
             //// Add development-only information if desired
             //if (_environment.IsDevelopment())
             //{
@@ -73,11 +87,6 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             //    problemDetails.Extensions["stackTrace"] = exception.StackTrace;
             //}
 
-            // Handle validation exceptions specially
-            if (exception is ValidationException validationException)
-            {
-                problemDetails.Extensions["errors"] = validationException.Errors;
-            }
             return problemDetails;
         }
 

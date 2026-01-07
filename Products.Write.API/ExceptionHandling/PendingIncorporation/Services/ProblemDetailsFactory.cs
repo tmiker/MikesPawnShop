@@ -1,4 +1,5 @@
-﻿using Products.Write.API.ExceptionHandling.PendingIncorporation.Models;
+﻿using FluentValidation;
+using Products.Write.API.ExceptionHandling.PendingIncorporation.Models;
 using Products.Write.Application.Exceptions;
 
 namespace Products.Write.API.ExceptionHandling.PendingIncorporation.Services
@@ -32,15 +33,16 @@ namespace Products.Write.API.ExceptionHandling.PendingIncorporation.Services
                 ["userAgent"] = context.Request.Headers["User-Agent"].FirstOrDefault() ?? string.Empty
             };
             // Handle validation exceptions
-            if (exception is ValidationException validationEx)
+            if (exception is ValidationException validationException)
             {
-                problemDetails.Errors = validationEx.Errors.SelectMany(kvp =>
-                    kvp.Value.Select(error => new ApiError
-                    {
-                        Code = "VALIDATION_ERROR",
-                        Description = error,
-                        Field = kvp.Key
-                    })).ToList();
+                var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                problemDetails.Extensions["errors"] = validationException.Errors;
             }
             // Add development information
             if (isDevelopment)

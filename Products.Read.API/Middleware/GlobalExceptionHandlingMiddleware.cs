@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Products.Read.API.Exceptions;
 using System.Text.Json;
@@ -51,7 +52,7 @@ namespace Products.Read.API.Middleware
         private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception)
         {
             var (statusCode, title, detail) = MapException(exception);
-            return new ProblemDetails
+            ProblemDetails problemDetails = new ProblemDetails
             {
                 Status = statusCode,
                 Title = title,
@@ -68,6 +69,20 @@ namespace Products.Read.API.Middleware
                     ["correlationId"] = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
                 }
             };
+
+            if (exception is ValidationException validationException)
+            {
+                var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                problemDetails.Extensions["errors"] = errors;
+            }
+
+            return problemDetails;
         }
 
         private static (int statusCode, string title, string detail) MapException(Exception exception)

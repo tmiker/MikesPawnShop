@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -82,7 +84,13 @@ namespace Products.Read.API.Controllers
 
             Exception ex = throwExceptionDTO.ExceptionType.ToLower() switch
             {
-                "validationexception" => throw new ValidationException("This is a test ValidationException thrown from ThrowExceptionHandler."),
+                "validationexception" => throw new ValidationException(        //"This is a test FluentValidation.ValidationException thrown from ThrowExceptionHandler"),
+                        "This is a test FluentValidation.ValidationException thrown from ThrowExceptionHandler and should enumerate two validation errors.",
+                        new List<ValidationFailure>()
+                        {
+                            new ValidationFailure("Error 1", "This is the first error"),
+                            new ValidationFailure("Error 2", "This is the second error")
+                        }),
                 "unauthorizedaccessexception" => throw new UnauthorizedAccessException("This is a test UnauthorizedAccessException thrown from ThrowExceptionHandler."),
                 "forbiddenexception" => throw new ForbiddenException("This is a test ForbiddenException thrown from ThrowExceptionHandler."),
                 "notfoundexception" => throw new NotFoundException("This is a test NotFoundException thrown from ThrowExceptionHandler."),

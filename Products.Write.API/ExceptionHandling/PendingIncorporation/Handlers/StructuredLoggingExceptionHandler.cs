@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
 using Products.Write.API.ExceptionHandling.PendingIncorporation.Services;
 using Products.Write.Application.Exceptions;
 
