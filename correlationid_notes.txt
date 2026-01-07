@@ -1,0 +1,13 @@
+Blazor clients 
+	Since no reliable HttpContext not set via middleware ...
+	Commands - use a command property CorrelationId, therefore API can check if available there
+		could change to use headers, probably easier as consistent with APIs
+	Queries - ???
+		see if and how implemented
+
+APIs
+	Checks headers in controller ???
+	If in header, set in Request to other APIs ???
+	If in header, set and passed to command handlers ???
+	If NOT in header, set and passed to command handlers ???
+	
