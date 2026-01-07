@@ -1,19 +1,13 @@
-Http Responses need a using block
 
-Logging - Serilog 
-	Products.Write.API
-	Other
-	Need to log Client Http Client calls to log method and CorrelationId assigned by client for correlation with API logs.
 
 Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
 
-Update Admin and Consumer Client pages to show which client
+Change buttons to custom buttons if fit ok
 
-Add HealthChecks to Products Write Side API ??? Have for read side API for both Consumer and Admin clients
-	yarp
-	logging - skip CorrelationIdMiddleware if health check
-	HttpClient method on Admin Client
+Http Responses need a using block
+
+Check all Client Http Client calls log a CorrelationId assigned by client and picked up by API logs.
 
 Update Secrets Requirements in notes
 
@@ -25,6 +19,10 @@ Cancellation token: button to cancel in UI
 
 OpenAPI documentation
 
+
+// Logging - Serilog 
+
+// Add HealthChecks 
 
 // MediatR in Products.Write.API
 
