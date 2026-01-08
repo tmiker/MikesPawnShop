@@ -12,7 +12,7 @@
             <h5 class="text-danger"><b>Error:</b></h5>
         </div>
         <div class="col-2">
-            <a class="btn btn-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
+            <a class="btn btn-outline-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
         </div>
     </div>
     <div class="row mt-2">
@@ -157,24 +157,24 @@
             <br />
             <div class="row">
                 <div class="col-5 offset-5">
-                    <a class="btn btn-primary form-control" @onclick="BackToList">Back</a>
+                    <a class="btn button-custom-primary form-control" @onclick="BackToList">Back</a>
                 </div>
             </div>
         </div>
         <div class="col-6 text-center">
             <!-- COLUMN 2 START -->
 
-            <div class="row mt-2">
+            <div class="row ">
                 @if (_showDocuments)
                 {
                     <div class="col-4">
-                        <a class="btn btn-primary form-control" @onclick="ToogleShowDocuments">Show Images</a>
+                        <a class="btn button-custom-primary form-control" @onclick="ToogleShowDocuments">Show Images</a>
                     </div>
                 }
                 else
                 {
                     <div class="col-4">
-                        <a class="btn btn-primary form-control" @onclick="ToogleShowDocuments">Show Documents</a>
+                        <a class="btn button-custom-primary form-control" @onclick="ToogleShowDocuments">Show Documents</a>
                     </div>
                 }
             </div>
@@ -191,7 +191,7 @@
                         </div>
                     </div>
 
-                    <table class="table table-bordered mt-2">
+                    <table class="table table-dark table-bordered mt-2">
                         <thead>
                             <tr>
                                 <th>Seq. No.</th>
@@ -209,10 +209,10 @@
                                     <td>@doc.Name</td>
                                     <td>@doc.Title</td>
                                     <td>
-                                        <a class="btn btn-primary">View</a>
+                                        <a class="btn btn-primary" style="width:80px;">View</a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-danger">Delete</a>
+                                        <a class="btn btn-danger" style="width:80px;">Delete</a>
                                     </td>
                                 </tr>
                             }

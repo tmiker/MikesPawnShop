@@ -55,12 +55,6 @@
 
 <div class="row mt-2">
     <div class="col-12">
-        @* @if (SelectedProductId > 0)
-        {
-            <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
-                <StorefrontProductDetail AddToCartCallback="AddToCart" BackToListCallback="BackToList" />
-            </CascadingValue>
-        } *@
         @if (_showCart)
         {
             <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
@@ -69,12 +63,6 @@
         }
         else
         {
-            @* @if (_showCart)
-            {
-                <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                    <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
-                </CascadingValue>
-            } *@
             @if (SelectedProductId > 0)
             {
                 <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
@@ -202,10 +190,6 @@
     {
         SelectedProductId = 0;
     }
-    // private void BackToCart()
-    // {
-    //     _showCart = true;
-    // }
 
     private string? _cartButtonText = "Cart";
     private async Task ShowCart()

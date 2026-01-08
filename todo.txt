@@ -23,6 +23,8 @@ Update Secrets Requirements in notes
 Need buttons in consumer client product detail to add to or remove from cart
 
 Cart Button Flow - ensure consumer client flow is as desired
+	Admin client ProductStore Detail page Cart button doesn't work like Consumer client - updated logic to mimic
+		check Dev client if applicable
 
 Cancellation token: button to cancel in UI
 

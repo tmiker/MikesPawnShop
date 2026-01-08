@@ -12,15 +12,15 @@
     <div class="col-2">
         @if (_apiHealthCheckResult is null)
         {
-            <a class="btn btn-primary form-control" @onclick="CartsApiHealthCheck">Carts API Health</a>
+            <a class="btn button-custom-primary form-control" @onclick="CartsApiHealthCheck">Carts API Health</a>
         }
         else
         {
-            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear API Health</a>
+            <a class="btn button-custom-primary form-control" @onclick="ClearHealthCheckResult">Clear API Health</a>
         }
     </div>
     <div class="col-2">
-        <a class="btn btn-warning form-control" @onclick="ToggleShowCart">@_cartButtonText</a>
+        <a class="btn button-custom-warning form-control" @onclick="ToggleShowCart">@_cartButtonText</a>
     </div>
 </div>
 
@@ -53,18 +53,18 @@
 
 <div class="row mt-2">
     <div class="col-12">
-        @if (SelectedProductId > 0)
+        @if (_showCart)
         {
-            <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
-                <StorefrontProductDetail BackToListCallback="BackToList" />
+            <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
+                <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
             </CascadingValue>
         }
         else
         {
-            @if (_showCart)
+            @if (SelectedProductId > 0)
             {
-                <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                    <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
+                <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
+                    <StorefrontProductDetail BackToListCallback="BackToList" />
                 </CascadingValue>
             }
             else
@@ -101,7 +101,7 @@
                             <input class="bg-dark text-light form-control" id="pagesize" type="number" @bind="_pageSize" @bind:after="RefreshData" />
                         </div>
                         <div class="col-2">
-                            <a class="btn btn-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
+                            <a class="btn btn-outline-warning form-control mt-4" @onclick="ClearFilters">Reset</a>
                         </div>
 
                     </div>
@@ -117,26 +117,6 @@
         }
     </div>
 </div>
-
-@* @if (_apiHealthCheckResult is null)
-{
-    <br />
-    <div class="row mt-2">
-        <div class="col-3">
-            <a class="btn btn-primary form-control" @onclick="CartsApiHealthCheck">Check Cart API Health</a>
-        </div>
-    </div>
-}
-else
-{
-    <br />
-    <div class="row mt-2">
-        <div class="col-3">
-            <a class="btn btn-primary form-control" @onclick="ClearHealthCheckResult">Clear Cart Health Result</a>
-        </div>
-    </div>
-    <HealthCheckResult ApiHealthCheckResult="@_apiHealthCheckResult" />
-} *@
 
 @code {
 
@@ -224,10 +204,6 @@ else
     {
         SelectedProductId = 0;
     }
-    // private void BackToCart()
-    // {
-    //     _showCart = true;
-    // }
 
     private string? _cartButtonText = "Cart";
     private async Task ShowCart()
@@ -249,7 +225,7 @@ else
     {
         _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCartItemCount})";
         // if desired to always return to the product list, even if accessed cart from product detail page, also set the SelectedProductId to 0
-        SelectedProductId = 0;
+        // SelectedProductId = 0;
         _showCart = false;
     }
     private async Task ToggleShowCart()
