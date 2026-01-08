@@ -24,18 +24,18 @@
     <div class="card-body">
         <div class="row">
             <div class="col-12">
-                @if (SelectedProductId > 0)
+                @if (_showCart)
                 {
-                    <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
-                        <StorefrontProductDetail BackToListCallback="BackToList" />
+                    <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
+                        <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
                     </CascadingValue>
                 }
                 else
                 {
-                    @if (_showCart)
+                    @if (SelectedProductId > 0)
                     {
-                        <CascadingValue Name="ShoppingCart" Value="@ShoppingCart">
-                            <StorefrontShoppingCart DetailCallback="Detail" CartItemQuantityChangedCallback="CartItemQuantityChanged" />
+                        <CascadingValue Name="SelectedProductId" Value="@SelectedProductId">
+                            <StorefrontProductDetail BackToListCallback="BackToList" />
                         </CascadingValue>
                     }
                     else
@@ -87,13 +87,10 @@
                 }
             </div>
         </div>
-
     </div>
-
     <div class="card-body text-center bg-primary text-light">
         <h5><b><i>Be good to your pets!</i></b></h5>
     </div>
-
 </div>
 
 @code {
@@ -150,16 +147,11 @@
     private void Detail(int id) 
     {
         SelectedProductId = id;
-        // HideCart();
     }
     private void BackToList() 
     {
         SelectedProductId = 0;
     }
-    // private void BackToCart() 
-    // {
-    //     _showCart = true;
-    // }
 
     private string? _cartButtonText = "Cart";
     private async Task ShowCart()
@@ -180,8 +172,6 @@
     private void HideCart()
     {
         _cartButtonText = ShoppingCart is null ? "Cart" : $"Cart ({ShoppingCartItemCount})";
-        // if desired to always return to the product list, even if accessed cart from product detail page, also set the SelectedProductId to 0
-        SelectedProductId = 0;
         _showCart = false;
     }
     private async Task ToggleShowCart()

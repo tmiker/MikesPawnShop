@@ -1,5 +1,7 @@
 Check Auth in Controllers is uncommented
 
+Add MediatR Behaviors for validation success ??? and any others desired ???
+
 CorrelationId Middleware 
 	is double logging http method and path on some calls, e.g. health from client call ???
 		_logger.LogCorrelationIdMiddleware(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader);
@@ -10,7 +12,7 @@ CorrelationId Middleware
 
 Check layaout Admin Cient
 
-Add MediatR Behaviors for validation success ??? and any others desired ???
+
 
 Change buttons to custom buttons if fit ok
 
@@ -22,13 +24,11 @@ Update Secrets Requirements in notes
 
 Need buttons in consumer client product detail to add to or remove from cart
 
-Cart Button Flow - ensure consumer client flow is as desired
-	Admin client ProductStore Detail page Cart button doesn't work like Consumer client - updated logic to mimic
-		check Dev client if applicable
-
 Cancellation token: button to cancel in UI
 
 OpenAPI documentation
+
+// Storefront Cart Button Flow - ensure flow is as desired for products list > detail > cart for Admin, Consumer, and Dev Cients
 
 // Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
