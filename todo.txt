@@ -10,7 +10,25 @@ CorrelationId Middleware
 
 Check layaout Admin Cient
 
-Add Fluent Validation for API Controller DTOs, or use Data Annotations 
+Add MediatR Behaviors for validation success ??? and any others desired ???
+
+Change buttons to custom buttons if fit ok
+
+Http Responses need a using block
+
+Check all Client Http Client calls log a CorrelationId assigned by client and picked up by API logs.
+
+Update Secrets Requirements in notes
+
+Need buttons in consumer client product detail to add to or remove from cart
+
+Cart Button Flow - ensure consumer client flow is as desired
+
+Cancellation token: button to cancel in UI
+
+OpenAPI documentation
+
+// Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
 		installed nugets
 		updated ValidationExceptionHandler
@@ -30,26 +48,6 @@ Add Fluent Validation for API Controller DTOs, or use Data Annotations
 		Registered validators
 		Updated DTOs to remove data annotations
 		Added manual validation in controllers
-
-
-Add MediatR Behaviors for validation success ??? and any others desired ???
-
-Change buttons to custom buttons if fit ok
-
-Http Responses need a using block
-
-Check all Client Http Client calls log a CorrelationId assigned by client and picked up by API logs.
-
-Update Secrets Requirements in notes
-
-Need buttons in consumer client product detail to add to or remove from cart
-
-Cart Button Flow - ensure consumer client flow is as desired
-
-Cancellation token: button to cancel in UI
-
-OpenAPI documentation
-
 
 // Logging - Serilog 
 
