@@ -76,7 +76,7 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpPost("throwExceptionForTesting")]
-        // [Authorize(Policy = "IsAdmin")]
+        [Authorize(Policy = "IsAdmin")]
         public IActionResult ThrowExceptionForTesting([FromBody] ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends
