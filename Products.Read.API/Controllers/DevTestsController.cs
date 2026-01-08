@@ -10,6 +10,7 @@ using Products.Read.API.Auth;
 using Products.Read.API.Configuration;
 using Products.Read.API.DTOs.DevTests;
 using Products.Read.API.Exceptions;
+using Products.Read.Validators;
 using System.Security.Claims;
 
 namespace Products.Read.API.Controllers
@@ -75,12 +76,15 @@ namespace Products.Read.API.Controllers
         }
 
         [HttpPost("throwExceptionForTesting")]
-        [Authorize(Policy = "IsAdmin")]
+        // [Authorize(Policy = "IsAdmin")]
         public IActionResult ThrowExceptionForTesting([FromBody] ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends
             // caution using IHttpContextAccessor to get http context if want to pull header in handlers
             // (https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.ihttpcontextaccessor?view=aspnetcore-9.0).
+
+            var validator = new ThrowExceptionDtoValidator();
+            validator.ValidateAndThrow(throwExceptionDTO);
 
             Exception ex = throwExceptionDTO.ExceptionType.ToLower() switch
             {

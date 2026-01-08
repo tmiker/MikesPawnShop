@@ -8,7 +8,7 @@ namespace Products.Write.Application.Validators
         public PurgeDataDtoValidator()
         {
             RuleFor(x => x.PinNumber)
-                .NotEmpty().WithMessage("A pin number must be provided.");
+                .LessThanOrEqualTo(9999).GreaterThan(999).WithMessage("A valid 4-digit pin number must be provided.");
         }
     }
 }

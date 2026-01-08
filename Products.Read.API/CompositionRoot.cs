@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Products.R.Application.Validators;
 using Products.Read.API.Abstractions;
 using Products.Read.API.Auth;
 using Products.Read.API.Configuration;
@@ -26,7 +25,6 @@ namespace Products.Read.API
             {
                 options.UseSqlServer(configuration.GetConnectionString("LocalDevelopmentConnectionString"));
                 // options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
-                
             });
 
             // Register FluentValidation validators

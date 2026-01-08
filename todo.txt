@@ -1,3 +1,5 @@
+Check Auth in Controllers is uncommented
+
 CorrelationId Middleware 
 	is double logging http method and path on some calls, e.g. health from client call ???
 		_logger.LogCorrelationIdMiddleware(context.Request.Method, context.Request.Path, correlationId, presentInRequestHeader);
@@ -5,6 +7,8 @@ CorrelationId Middleware
 		all microservices
 	check overall flow from client to apis for both commands and queries
 	see and update correlationid_notes.txt
+
+Check layaout Admin Cient
 
 Add Fluent Validation for API Controller DTOs, or use Data Annotations 
 	Products.Write.API
@@ -16,14 +20,17 @@ Add Fluent Validation for API Controller DTOs, or use Data Annotations
 		updated ProblemDetailsFactory and StructuredLoggingExceptionHandler (NOT USED FOLDER)
 		Added validators for commands 
 		Registered validators
-		--- NEED TO CHECK VALIDATION IN CONTROLLERS
+		Updated DTOs to remove data annotations
+		Added manual validation in controllers
 	Products.Read.API
 		installed nugets
 		updated GlobalExceptionHandlingMiddleware
 		updated logic in DevTestsController to throw FluentValidation.ValidationException with two errors enumerated.
 		Added validators for commands (ThrowExceptionDtoValidator only)
 		Registered validators
-		--- NEED TO CHECK VALIDATION IN CONTROLLERS
+		Updated DTOs to remove data annotations
+		Added manual validation in controllers
+
 
 Add MediatR Behaviors for validation success ??? and any others desired ???
 

@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Products.Write.Application.DTOs
 {
     public class PurgeDataDTO
     {
-        [DisplayName("Pin Number")]
+        // [DisplayName("Pin Number")]
         public int PinNumber { get; init; }
     }
 }

@@ -2,13 +2,13 @@
 {
     public class UpdateStatusDTO
     {
-        public Guid ProductId { get; set; }
-        public string Status { get; set; } = default!;
+        public string? ProductId { get; set; }
+        public string? Status { get; set; } 
 
-        public UpdateStatusDTO(Guid productId, string status)
-        {
-            ProductId = productId;
-            Status = status;
-        }
+        //public UpdateStatusDTO(Guid productId, string status)
+        //{
+        //    ProductId = productId;
+        //    Status = status;
+        //}
     }
 }

@@ -8,7 +8,7 @@ namespace Products.Write.Application.Validators
         public UpdateStatusDtoValidator()
         {
             RuleFor(x => x.ProductId)
-                .NotEmpty().WithMessage("A product Id must be provided.");
+                .NotNull().WithMessage("A product Id must be provided.");
             RuleFor(x => x.Status)
                 .NotEmpty().WithMessage($"A status must be provided.");
         }

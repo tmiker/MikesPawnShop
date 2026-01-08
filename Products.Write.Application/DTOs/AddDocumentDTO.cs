@@ -4,11 +4,11 @@ namespace Products.Write.Application.DTOs
 {
     public class AddDocumentDTO
     {
-        public string ProductId { get; init; } = default!;
-        public string Name { get; init; } = default!;
-        public string Title { get; init; } = default!;
+        public string? ProductId { get; init; } 
+        public string? Name { get; init; } 
+        public string? Title { get; init; }
         // for blob service
-        public IFormFile? DocumentBlob { get; set; }
-        public string? BlobFileName { get; set; }
+        public IFormFile? DocumentBlob { get; set; } 
+        public string? BlobFileName { get; set; } 
     }
 }

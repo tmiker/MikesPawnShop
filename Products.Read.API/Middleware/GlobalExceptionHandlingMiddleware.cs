@@ -52,6 +52,7 @@ namespace Products.Read.API.Middleware
         private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception)
         {
             var (statusCode, title, detail) = MapException(exception);
+
             ProblemDetails problemDetails = new ProblemDetails
             {
                 Status = statusCode,
@@ -61,6 +62,11 @@ namespace Products.Read.API.Middleware
                 Type = $"https://httpstatuses.com/{statusCode}",
                 Extensions = new Dictionary<string, object?>
                 {
+                    ["errors"] = exception is ValidationException validationException ? validationException.Errors
+                        .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()) : string.Empty,
                     ["traceId"] = context.TraceIdentifier,
                     ["timestamp"] = DateTime.UtcNow,
                     ["requestId"] = context.TraceIdentifier,
@@ -70,17 +76,17 @@ namespace Products.Read.API.Middleware
                 }
             };
 
-            if (exception is ValidationException validationException)
-            {
-                var errors = validationException.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.ErrorMessage).ToArray()
-                );
+            //if (exception is ValidationException validationException)
+            //{
+            //    var errors = validationException.Errors
+            //    .GroupBy(e => e.PropertyName)
+            //    .ToDictionary(
+            //        g => g.Key,
+            //        g => g.Select(e => e.ErrorMessage).ToArray()
+            //    );
 
-                problemDetails.Extensions["errors"] = errors;
-            }
+            //    problemDetails.Extensions["errors"] = errors;
+            //}
 
             return problemDetails;
         }

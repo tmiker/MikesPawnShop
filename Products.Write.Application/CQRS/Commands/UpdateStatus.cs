@@ -17,8 +17,8 @@ namespace Products.Write.Application.CQRS.Commands
 
         public UpdateStatus(UpdateStatusDTO updateStatusDTO, StringValues correlationId)
         {
-            ProductId = updateStatusDTO.ProductId;
-            Status = updateStatusDTO.Status;
+            ProductId = !string.IsNullOrWhiteSpace(updateStatusDTO.ProductId) ? Guid.Parse(updateStatusDTO.ProductId) : throw new ArgumentNullException(nameof(updateStatusDTO.ProductId));
+            Status = !string.IsNullOrWhiteSpace(updateStatusDTO.Status) ? updateStatusDTO.Status : throw new ArgumentNullException(nameof(updateStatusDTO.Status));
             CorrelationId = correlationId;
         }
     }

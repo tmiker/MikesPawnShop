@@ -25,10 +25,10 @@ namespace Products.Write.Application.CQRS.CommandHandlers
 
         public async Task<PurgeDataResult> Handle(PurgeData command, CancellationToken cancellationToken)
         {
-            string? pinString = _configuration["PurgeDataPinNumber"] ?? throw new InvalidOperationException("Pin Number is null");
+            string? pinString = _configuration["PurgeDataPinNumber"] ?? throw new InvalidOperationException("API configuration is missing the Pin Number for purging data.");
             int pin = Int32.Parse(pinString);
 
-            if (command.PinNumber != pin) throw new InvalidOperationException("Pin Number is invalid");
+            if (command.PinNumber != pin) throw new InvalidOperationException("The Pin Number provided is invalid");
 
             if (command.CorrelationId is null) command.CorrelationId = Guid.NewGuid().ToString();
 

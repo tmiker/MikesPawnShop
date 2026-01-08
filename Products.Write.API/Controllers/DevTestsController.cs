@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -11,6 +12,7 @@ using Products.Write.Application.Abstractions;
 using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.QueryResults;
 using Products.Write.Application.DTOs;
+using Products.Write.Application.Validators;
 using Products.Write.Auth;
 using Products.Write.Domain.Snapshots;
 using System.Security.Claims;
@@ -187,12 +189,15 @@ namespace Products.Write.API.Controllers
         // Command propagated endpoints
 
         [HttpPost("throwExceptionForTesting")]
-        [Authorize(Policy = "IsAdmin")]
+        // [Authorize(Policy = "IsAdmin")]
         public async Task<IActionResult> ThrowExceptionForTesting([FromBody] ThrowExceptionDTO throwExceptionDTO, CancellationToken cancellationToken)
         {
             // Note passing Correlation ID from the request headers to the command as Microsoft recommends
             // caution using IHttpContextAccessor to get http context if want to pull header in handlers
             // (https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.ihttpcontextaccessor?view=aspnetcore-9.0).
+
+            var validator = new ThrowExceptionDtoValidator();
+            validator.ValidateAndThrow(throwExceptionDTO);
 
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             ThrowException command = new ThrowException(throwExceptionDTO, correlationId);
@@ -212,9 +217,12 @@ namespace Products.Write.API.Controllers
         }
 
         [HttpPost("purgeData")]
-        [Authorize(Policy = "IsAdmin")]
+        // [Authorize(Policy = "IsAdmin")]
         public async Task<IActionResult> PurgeData([FromBody] PurgeDataDTO purgeDataDTO, CancellationToken cancellationToken)
         {
+            var validator = new PurgeDataDtoValidator();
+            validator.ValidateAndThrow(purgeDataDTO);
+
             var correlationId = HttpContext.Request.Headers["X-Correlation-ID"];
             PurgeData command = new PurgeData(purgeDataDTO.PinNumber, correlationId);
             PurgeDataResult result = await _sender.Send(command, cancellationToken);
