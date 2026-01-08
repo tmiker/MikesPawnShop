@@ -10,11 +10,10 @@ CorrelationId Middleware
 	check overall flow from client to apis for both commands and queries
 	see and update correlationid_notes.txt
 
-Check layaout Admin Cient
+Check layaout Admin Cient - split read v write v ES
 
 
 
-Change buttons to custom buttons if fit ok
 
 Http Responses need a using block
 
