@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using FluentValidation;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Products.Write.Application.Abstractions;
@@ -10,6 +11,7 @@ using Products.Write.Application.CQRS.DevTests;
 using Products.Write.Application.CQRS.Dispatchers;
 using Products.Write.Application.EventManagement;
 using Products.Write.Application.Services;
+using Products.Write.Application.Validators;
 using System.Security.Authentication;
 
 namespace Products.Write.Application
@@ -42,6 +44,9 @@ namespace Products.Write.Application
                     });
                 });
             });
+
+            // Register FluentValidation validators
+            services.AddValidatorsFromAssemblyContaining<AddProductDtoValidator>();
 
             // Register the SingleThreadedEventAggregator as a singleton
             services.AddScoped<SingleThreadedEventAggregator>();

@@ -14,12 +14,18 @@ Add Fluent Validation for API Controller DTOs, or use Data Annotations
 		updated GlobalExceptionHandler backup handling of validation exception
 		updated GlobalExceptionHandlerTests
 		updated ProblemDetailsFactory and StructuredLoggingExceptionHandler (NOT USED FOLDER)
-		--- NEED TO ADD VALIDATORS FOR APPLICATION.DTOS
+		Added validators for commands 
+		Registered validators
+		--- NEED TO CHECK VALIDATION IN CONTROLLERS
 	Products.Read.API
 		installed nugets
 		updated GlobalExceptionHandlingMiddleware
 		updated logic in DevTestsController to throw FluentValidation.ValidationException with two errors enumerated.
-		--- NEED TO ADD VALIDATOR FOR THROW EXCEPTION DTO
+		Added validators for commands (ThrowExceptionDtoValidator only)
+		Registered validators
+		--- NEED TO CHECK VALIDATION IN CONTROLLERS
+
+Add MediatR Behaviors for validation success ??? and any others desired ???
 
 Change buttons to custom buttons if fit ok
 

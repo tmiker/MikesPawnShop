@@ -19,7 +19,7 @@ namespace Products.Write.API.ExceptionHandling.ExceptionHandlers
             if (exception is not ValidationException validationException) return false;   // Exception not handled
 
             _logger.LogWarning("Validation failed: Exception Type: {Type} | {Message} | RequestId: {RequestId}", exception.GetType().FullName, validationException.Message, httpContext.TraceIdentifier);
-            _logger.LogWarning("FluentValidation error occurred with {ErrorCount} errors", validationException.Errors.Count());
+            // _logger.LogWarning("FluentValidation error occurred with {ErrorCount} errors", validationException.Errors.Count());
 
             var errors = validationException.Errors
                 .GroupBy(e => e.PropertyName)

@@ -29,40 +29,6 @@ namespace Products.Write.API.Controllers
             _config = config;
         }
 
-        ///// <summary>
-        ///// Health check endpoint to verify API and dependencies.
-        ///// </summary>
-        //[HttpGet("health")]
-        //public async Task<IActionResult> Get()
-        //{
-        //    try
-        //    {
-        //        // Example: Check database connectivity
-        //        using (var connection = new SqlConnection(_config.GetConnectionString("LocalDevelopmentConnectionString")))
-        //        {
-        //            await connection.OpenAsync();
-        //        }
-
-        //        // If all checks pass
-        //        return Ok(new
-        //        {
-        //            status = "Healthy",
-        //            timestamp = DateTime.UtcNow
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Health check failed");
-
-        //        return StatusCode(503, new
-        //        {
-        //            status = "Unhealthy",
-        //            error = ex.Message,
-        //            timestamp = DateTime.UtcNow
-        //        });
-        //    }
-        //}
-
         [HttpPost]
         [Authorize(Policy = "IsAdminOrManager")]
         public async Task<ActionResult<AddProductResult>> AddProduct([FromBody] AddProductDTO addProductDTO, CancellationToken cancellationToken)

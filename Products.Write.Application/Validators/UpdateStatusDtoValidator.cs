@@ -1,0 +1,21 @@
+﻿using FluentValidation;
+using Products.Write.Application.DTOs;
+
+namespace Products.Write.Application.Validators
+{
+    public class UpdateStatusDtoValidator : AbstractValidator<UpdateStatusDTO>
+    {
+        public UpdateStatusDtoValidator()
+        {
+            RuleFor(x => x.ProductId)
+                .NotEmpty().WithMessage("A product Id must be provided.");
+            RuleFor(x => x.Status)
+                .NotEmpty().WithMessage($"A status must be provided.");
+        }
+    }
+}
+
+// All required
+
+//public Guid ProductId { get; set; }
+//public string Status { get; set; } = default!;
