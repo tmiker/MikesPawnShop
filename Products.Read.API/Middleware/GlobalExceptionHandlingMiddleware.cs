@@ -11,14 +11,18 @@ namespace Products.Read.API.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly IProblemDetailsService _problemDetailsService;
+
         public GlobalExceptionHandlingMiddleware(
             RequestDelegate next,
             ILogger<GlobalExceptionHandlingMiddleware> logger,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IProblemDetailsService problemDetailsService)
         {
             _next = next;
             _logger = logger;
             _environment = environment;
+            _problemDetailsService = problemDetailsService;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -41,12 +45,22 @@ namespace Products.Read.API.Middleware
             var problemDetails = CreateProblemDetails(context, exception);
 
             context.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-            var options = new JsonSerializerOptions
+
+            /// Write the ProblemDetails response directly as JSON with camelCase property names
+            //var options = new JsonSerializerOptions
+            //{
+            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            //};
+            //var json = JsonSerializer.Serialize(problemDetails, options);
+            //await context.Response.WriteAsync(json);
+
+            /// Write the ProblemDetails response using Microsoft.AspNetCore.Http IProblemDetailsService 
+            bool writeSuccess = await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var json = JsonSerializer.Serialize(problemDetails, options);
-            await context.Response.WriteAsync(json);
+                HttpContext = context,
+                ProblemDetails = problemDetails,
+                Exception = exception
+            });
         }
 
         private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception)
@@ -57,16 +71,12 @@ namespace Products.Read.API.Middleware
             {
                 Status = statusCode,
                 Title = title,
-                Detail = detail,    // _environment.IsDevelopment() ? exception.Message : detail,
+                Detail = detail,                                        // _environment.IsDevelopment() ? exception.Message : detail,
                 Instance = context.Request.Path,
                 Type = $"https://httpstatuses.com/{statusCode}",
                 Extensions = new Dictionary<string, object?>
                 {
-                    ["errors"] = exception is ValidationException validationException ? validationException.Errors
-                        .GroupBy(e => e.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()) : string.Empty,
+                    ["errors"] = detail,
                     ["traceId"] = context.TraceIdentifier,
                     ["timestamp"] = DateTime.UtcNow,
                     ["requestId"] = context.TraceIdentifier,
@@ -76,17 +86,17 @@ namespace Products.Read.API.Middleware
                 }
             };
 
-            //if (exception is ValidationException validationException)
-            //{
-            //    var errors = validationException.Errors
-            //    .GroupBy(e => e.PropertyName)
-            //    .ToDictionary(
-            //        g => g.Key,
-            //        g => g.Select(e => e.ErrorMessage).ToArray()
-            //    );
+            if (exception is ValidationException validationException)
+            {
+                var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
 
-            //    problemDetails.Extensions["errors"] = errors;
-            //}
+                problemDetails.Extensions["errors"] = errors;
+            }
 
             return problemDetails;
         }

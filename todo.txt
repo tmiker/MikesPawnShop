@@ -1,3 +1,7 @@
+Hide/Show elements based on auth
+Consumer Client Products > Dev Testing - fix error handling testing or remove it
+Remove logging of sensitive info
+
 Check Auth in Controllers is uncommented
 
 Add MediatR Behaviors for validation success ??? and any others desired ???
@@ -11,9 +15,6 @@ CorrelationId Middleware
 	see and update correlationid_notes.txt
 
 Check layaout Admin Cient - split read v write v ES
-
-
-
 
 Http Responses need a using block
 

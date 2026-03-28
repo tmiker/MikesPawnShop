@@ -92,8 +92,9 @@ namespace Products.Read.API.Controllers
                         "This is a test FluentValidation.ValidationException thrown from ThrowExceptionHandler and should enumerate two validation errors.",
                         new List<ValidationFailure>()
                         {
-                            new ValidationFailure("Error 1", "This is the first error"),
-                            new ValidationFailure("Error 2", "This is the second error")
+                            new ValidationFailure("Property 1", "This is a Property 1 error"),
+                            new ValidationFailure("Property 2", "This is Property 2's first error"),
+                            new ValidationFailure("Property 2", "This is Property 2's second error")
                         }),
                 "unauthorizedaccessexception" => throw new UnauthorizedAccessException("This is a test UnauthorizedAccessException thrown from ThrowExceptionHandler."),
                 "forbiddenexception" => throw new ForbiddenException("This is a test ForbiddenException thrown from ThrowExceptionHandler."),

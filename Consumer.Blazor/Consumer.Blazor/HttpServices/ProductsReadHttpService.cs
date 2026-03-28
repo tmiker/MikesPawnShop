@@ -249,11 +249,6 @@ namespace Consumer.Blazor.HttpServices
             if (response.Content.Headers.ContentType?.MediaType == "application/problem+json")
             {
                 CustomProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-                string? traceId = problemDetails?.Extensions?["traceId"]?.ToString();
-                string? correlationId = problemDetails?.Extensions?["correlationId"]?.ToString();
-                string? title = problemDetails?.Title;
-                string? detail = problemDetails?.Detail;
-
                 return problemDetails?.ToString()!;
             }
             else

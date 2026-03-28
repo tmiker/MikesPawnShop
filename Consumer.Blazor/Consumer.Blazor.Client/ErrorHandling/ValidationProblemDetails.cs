@@ -1,16 +1,17 @@
 ﻿using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Consumer.Blazor.Client.ErrorHandling
 {
-    public class CustomProblemDetails
+    public class ValidationProblemDetails
     {
         public string? Type { get; set; }
         public string? Title { get; set; }
         public int? Status { get; set; }
         public string? Detail { get; set; }
         public string? Instance { get; set; }
+
+        public IDictionary<string, string[]>? Errors { get; set; }
 
         [JsonExtensionData]
         public IDictionary<string, object?>? Extensions { get; set; }
@@ -22,24 +23,16 @@ namespace Consumer.Blazor.Client.ErrorHandling
             sb.AppendLine($"{nameof(Title)}: {Title}");
             sb.AppendLine($"{nameof(Status)}: {Status}");
             sb.AppendLine($"{nameof(Detail)}: {Detail}");
-            
-            if (Title == "Validation Error" && Extensions is not null)
+            sb.AppendLine($"{nameof(Instance)}: {Instance}");
+
+            if (Errors != null)
             {
-                if (Extensions.TryGetValue("errors", out object? errorJsonElement))
+                sb.AppendLine("Errors:");
+                foreach (var error in Errors)
                 {
-                    Dictionary<string, string[]>? errorsDict = JsonSerializer.Deserialize<Dictionary<string, string[]>>(errorJsonElement?.ToString()!);
-                    if (errorsDict is not null)
-                    {
-                        sb.AppendLine("Errors:");
-                        foreach (var error in errorsDict!)
-                        {
-                            sb.AppendLine($"  {error.Key}: {string.Join(", ", error.Value)}");
-                        }
-                    }
+                    sb.AppendLine($"  {error.Key}: [{string.Join(", ", error.Value)}]");
                 }
             }
-
-            sb.AppendLine($"{nameof(Instance)}: {Instance}");
 
             if (Extensions != null)
             {
@@ -52,6 +45,5 @@ namespace Consumer.Blazor.Client.ErrorHandling
 
             return sb.ToString();
         }
-
     }
 }
