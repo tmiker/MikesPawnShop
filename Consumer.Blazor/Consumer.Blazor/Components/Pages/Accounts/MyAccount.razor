@@ -5,7 +5,7 @@
 
 <div class="row mt-2">
     
-    <div class="col-8 offset-2 text-center">
+    <div class="col-8">
         <h4><b>My Account</b></h4>
     </div>
     @if (_accountInfo is null)
@@ -35,7 +35,7 @@
 
 @if (_accountInfo is not null)
 {
-    <div class="form-group row">
+    <div class="form-group row mt-2">
         <div class="col-3 text-center">
             <label for="id">Account Id:</label>
         </div>
@@ -103,13 +103,19 @@ else
     </div>
 }
 
-<div class="row mt-4 text-center">
-    <div class="col-12">
+<div class="row mt-4">
+    <div class="col-10">
         <h4>My Addresses</h4>
-
+    </div>
+    @* <div class="col-2">
+        <a class="btn btn-success form-control" @onclick="AddAddress">Add Address</a>
+    </div> *@
+</div>
+<div class="row mt-2">
+    <div class="col-12">
         @if (_accountInfo?.Addresses != null && _accountInfo.Addresses.Any())
         {
-            <table class="table table-dark table-bordered">
+            <table class="table table-dark table-bordered text-center">
                 <thead>
                     <tr>
                         <th>Street 1</th>
