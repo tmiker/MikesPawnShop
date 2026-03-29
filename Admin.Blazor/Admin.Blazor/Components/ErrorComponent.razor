@@ -1,0 +1,40 @@
+﻿@if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <div class="alert alert-dark alert alert-dismissible bg-dark text-danger">
+        <i>Error: @ErrorMessage</i>
+        <div class="button-container-flex-right">
+            <i class="bi-trash text-danger" role="button" @onclick="ClearErrorMessage"></i>
+        </div>
+    </div>
+}
+@if (!string.IsNullOrWhiteSpace(SuccessMessage))
+{
+    <div class="alert alert-dark alert alert-dismissible bg-dark text-success-alt">
+        <i>Success: @SuccessMessage</i>
+        <div class="button-container-flex-right">
+            <i class="bi-trash text-success-alt" role="button" @onclick="ClearSuccessMessage"></i>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+    [Parameter]
+    public string? SuccessMessage { get; set; }
+    [Parameter]
+    public EventCallback ClearErrorCallback { get; set; }
+    [Parameter]
+    public EventCallback ClearSuccessCallback { get; set; }
+
+    private async Task ClearErrorMessage() 
+    {
+        await ClearErrorCallback.InvokeAsync();
+    }
+
+    private async Task ClearSuccessMessage() 
+    {
+        await ClearSuccessCallback.InvokeAsync();
+    }
+}
