@@ -26,6 +26,29 @@ namespace Orders.API.Controllers
             _tokenDecoder = tokenDecoder;
         }
 
+        //[HttpGet("accountStatus")]    // THIS IS DONE WHEN POST ORDER TO VERIFY ACCOUNT STATUS - VERIFY CLIENT INFO
+        //[Authorize]
+        //public async Task<ActionResult<AccountStatusResponseDTO?>> GetAccountStatus()
+        //{
+        //    Console.WriteLine("OrdersController.GetAccountStatus() called.");
+
+        //    string? ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        //    if (ownerId == null) throw new InvalidUserCredentitalsException($"User identity information unavailable. Unauthorized access to restricted resource.");
+
+        //    CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+        //    // REFACTOR TO USE INTERNAL ORDER SERVICE, I.E. _internalOrdersService.GetAccountStatusAsync()
+        //    AccountStatusResponseDTO result = await _orderService.GetAccountStatusAsync(ownerId, tokenSource.Token);
+        //    if (result.IsSuccess)
+        //    {
+        //        return Ok(result);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(result);
+        //    }
+        //}
+
         [HttpGet("reviewOrder")]
         [Authorize]
         public async Task<ActionResult<ReviewOrderResultDTO?>> ReviewOrder()

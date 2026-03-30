@@ -12,6 +12,8 @@ namespace Orders.API.Domain.Models
         public string? State { get; set; }
         public string? PostalCode { get; set; }
 
+        private Address() { }
+
         public Address(AddressDTO dto)
         {
             IsPrimaryBilling = dto.IsPrimaryBilling;

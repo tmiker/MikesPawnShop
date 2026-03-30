@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Orders.API.Abstractions;
 using Orders.API.Auth;
+using Orders.API.Crypto;
 using Orders.API.Health;
 using Orders.API.Infrastructure.Mongo;
 using Orders.API.Middleware;
@@ -14,8 +15,8 @@ using Orders.API.Utility;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
-using System.Security.Claims;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 
 // Configure static logger early for capturing startup issues
 Log.Logger = new LoggerConfiguration()
@@ -97,6 +98,13 @@ try
         config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1.0));
     });
     builder.Services.AddSingleton<IInternalAccountsHttpService, InternalAccountsHttpService>();
+
+    // *** Crypto Services *** //
+    builder.Services.AddScoped<IAesSymmetricEncryptionManager, AesSymmetricEncryptionManager>();
+    builder.Services.AddScoped<IRsaAsymmetricEncryptionManager, RsaAsymmetricEncryptionManager>();
+    builder.Services.AddScoped<IRsaAsymmetricKeyContainerManager, RsaAsymmetricKeyContainerManager>();
+    builder.Services.AddScoped<IKeyContainerService, KeyContainerService>();
+    // *** Crypto Services *** //
 
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

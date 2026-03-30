@@ -165,6 +165,11 @@ else
                 <a class="btn btn-outline-success form-control" @onclick="SubmitOrder">Submit Order</a>
             </div>
         </div>
+        <div class="row mt-2">
+            <div class="col-12 text-center">
+                <h6 class="text-info-alt"><i>Note the Orders API will validate account status allows placing orders and get the billing and shipping address from the Accounts API via API to API encrypted comm with ApiKey Auth</i></h6>
+            </div>
+        </div>
     }
 }
 
@@ -197,7 +202,7 @@ else
             _submitOrderResult = new SubmitOrderResultDTO(submitOrderResult.IsSuccess, submitOrderResult.OrderId, submitOrderResult.ErrorMessage);
             var deleteCartResult = await _cartService.RemoveShoppingCartAsync();
             // instead of doing a bunch of callbacks on storefront pages to remove MyCart object in client, just redirect to orders page.
-            _nav.NavigateTo("/orders");
+            _nav.NavigateTo("/orders/myOrders");
         }
         else _errorMessage = submitOrderResult.ErrorMessage;
     }

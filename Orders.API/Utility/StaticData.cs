@@ -7,10 +7,14 @@
         public const string OrderStatus_Updated = "Updated";
         public const string OrderStatus_Complete = "Complete";
 
-        // ACCOUNT HTTP CLIENT 
+        // INTERNAL ACCOUNT HTTP CLIENT (API KEY AUTH)
         public const string InternalAccounts_HttpClient_Name = "InternalAccountsHttpClient";
         public const string InternalAccounts_HttpClient_BaseUrl = "https://localhost:7033";
-        public const string InternalAccounts_HttpClient_AccountsPath = "/api/accounts";         
-        // [HttpGet] [Authorize] public async Task<ActionResult<AccountDTO>> GetByOwnerId()
+        public const string InternalAccounts_HttpClient_AccountsPath = "/api/internalAccounts";
+
+        // API KEY AUTH
+        public const string OrdersToAccountsApiKeyHeaderName = "X-OrdersToAccounts-API-Key";
+        public const string OrdersToAccountsApiKeyName = "OrdersToAccountsApiKey";
+
     }
 }

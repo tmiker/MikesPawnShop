@@ -1,4 +1,5 @@
 ﻿using Admin.Blazor.Client.Abstractions;
+using Admin.Blazor.Client.DTOs.Accounts;
 using Admin.Blazor.Client.DTOs.Health;
 using Admin.Blazor.Client.DTOs.Orders;
 using Admin.Blazor.Client.Paging;
@@ -48,6 +49,26 @@ namespace Admin.Blazor.HttpServices
             {
                 _logger.LogError($"OrdersHttpService CheckHealthAsync() at path '{request.RequestUri}' Exception: {ex.Message}");
                 return (false, null, ex.Message);
+            }
+        }
+
+        public async Task<AccountStatusResponseDTO> GetAccountStatusAsync(string? token = null)
+        {
+            string uri = $"{StaticData.OrdersHttpClient_OrdersPath}/accountStatus";
+            var client = _httpClientFactory.CreateClient(StaticData.OrdersHttpClient_ClientName);
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                AccountStatusResponseDTO? accountStatusResponse = await response.Content.ReadFromJsonAsync<AccountStatusResponseDTO>();
+                return accountStatusResponse ?? new AccountStatusResponseDTO() { Errors = new List<string>() { "Account status response was not received." } };
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessageAsync(response);
+                return new AccountStatusResponseDTO() { Errors = new List<string>() { errorMessage } };
             }
         }
 

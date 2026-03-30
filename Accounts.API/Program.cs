@@ -1,5 +1,7 @@
 using Accounts.API.Abstractions;
 using Accounts.API.Auth;
+using Accounts.API.Crypto;
+using Accounts.API.Filters;
 using Accounts.API.Health;
 using Accounts.API.Infrastructure.Mongo;
 using Accounts.API.Mappers;
@@ -94,6 +96,20 @@ try
     builder.Services.AddScoped<ITokenDecoder, TokenDecoder>();
     builder.Services.AddScoped<IAccountService, AccountService>();
     builder.Services.AddScoped<IAccountDataMapper, AccountDataMapper>();
+    builder.Services.AddScoped<IInternalAccountService, InternalAccountService>();
+
+    // *** API KEY AUTH *** //
+    builder.Services.AddTransient<IOrdersApiKeyValidator, OrdersApiKeyValidator>();
+    builder.Services.AddScoped<OrdersApiKeyAuthFilter>();
+    builder.Services.AddHttpContextAccessor();
+    // *** API KEY AUTH *** //
+
+    // *** Crypto Services *** //
+    builder.Services.AddScoped<IAesSymmetricEncryptionManager, AesSymmetricEncryptionManager>();
+    builder.Services.AddScoped<IRsaAsymmetricEncryptionManager, RsaAsymmetricEncryptionManager>();
+    builder.Services.AddScoped<IRsaAsymmetricKeyContainerManager, RsaAsymmetricKeyContainerManager>();
+    builder.Services.AddScoped<IKeyContainerService, KeyContainerService>();
+    // *** Crypto Services *** //
 
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

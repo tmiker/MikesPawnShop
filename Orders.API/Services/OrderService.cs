@@ -11,69 +11,85 @@ namespace Orders.API.Services
     public class OrderService : IOrderService
     {
         private readonly IMongoCollection<Order> _orders;
+        private readonly IInternalAccountsHttpService _internalAccountsHttpService;
+        private readonly IAesSymmetricEncryptionManager _aesSymmetricEncryptor;
+        private readonly IRsaAsymmetricEncryptionManager _rsaAsymmetricEncryptor;
+        private readonly IConfiguration _config;
         private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IMongoSettings mongoSettings, ILogger<OrderService> logger)
+        public OrderService(
+            IMongoSettings mongoSettings, 
+            IInternalAccountsHttpService internalAccountsHttpService, 
+            IAesSymmetricEncryptionManager aesSymmetricEncryptor, 
+            IRsaAsymmetricEncryptionManager rsaAsymmetricEncryptor, 
+            IConfiguration config,
+            ILogger<OrderService> logger)
         {
             var client = new MongoClient(mongoSettings.MongoLocalConnection);
             var database = client.GetDatabase(mongoSettings.Database);
             _orders = database.GetCollection<Order>(mongoSettings.OrderCollection);
+            _internalAccountsHttpService = internalAccountsHttpService;
+            _aesSymmetricEncryptor = aesSymmetricEncryptor;
+            _rsaAsymmetricEncryptor = rsaAsymmetricEncryptor;
+            _config = config;
             _logger = logger;
         }
 
-        public async Task<(bool IsSuccess, ReviewOrderResultDTO? ReviewDTO, string? ErrorMessage)> ReviewOrderAsync(string ownerId, CancellationToken cancellationToken)
-        {
-            // THIS ENDPOINT MOVED TO INTERNAL ORDERS SERVICE
+        
 
-            string errors = string.Empty;
-            ReviewOrderResultDTO resultDTO = new ReviewOrderResultDTO();
+        //public async Task<(bool IsSuccess, ReviewOrderResultDTO? ReviewDTO, string? ErrorMessage)> ReviewOrderAsync(string ownerId, CancellationToken cancellationToken)
+        //{
+        //    string errors = string.Empty;
+        //    ReviewOrderResultDTO resultDTO = new ReviewOrderResultDTO();
 
-            // ORIGINAL
-            // 1. Get account detail dto from internal accounts services - note the http service will add api key for internal account api call and encrypt data
-            // var accountResult = await _internalAccountsHttpService.GetAccountDetailsFromInternalApiAsync(ownerId);
-            //if (accountResult.IsSuccess)
-            //{
-            //    resultDTO.AccountOwnerId = accountResult.AccountDetail?.AccountOwnerId;
-            //    resultDTO.AccountDetail = accountResult.AccountDetail;
-            //}
-            // else errors += $"{accountResult.ErrorMessage} \n";
+        //    // ORIGINAL
+        //    // 1. Get account detail dto from internal accounts services - note the http service will add api key for internal account api call and encrypt data
+        //    // var accountResult = await _internalAccountsHttpService.GetAccountDetailsFromInternalApiAsync(ownerId);
+        //    //if (accountResult.IsSuccess)
+        //    //{
+        //    //    resultDTO.AccountOwnerId = accountResult.AccountDetail?.AccountOwnerId;
+        //    //    resultDTO.AccountDetail = accountResult.AccountDetail;
+        //    //}
+        //    // else errors += $"{accountResult.ErrorMessage} \n";
 
-            // 2. Get cart from internal cart services - note the http service will add api key for internal cart api call and encrypt data
+        //    // 2. Get cart from internal cart services - note the http service will add api key for internal cart api call and encrypt data
 
-            //var cartResult = await _internalCartsHttpService.GetShoppingCartAsync(ownerId);
-            //if (cartResult.IsSuccess)
-            //{
-            //    resultDTO.ShoppingCart = cartResult.ShoppingCart;
-            //}
-            //else errors += $"{cartResult.ErrorMessage}";
+        //    //var cartResult = await _internalCartsHttpService.GetShoppingCartAsync(ownerId);
+        //    //if (cartResult.IsSuccess)
+        //    //{
+        //    //    resultDTO.ShoppingCart = cartResult.ShoppingCart;
+        //    //}
+        //    //else errors += $"{cartResult.ErrorMessage}";
 
-            //if (string.IsNullOrWhiteSpace(errors)) return (true, resultDTO, null);
-            //else return (false, resultDTO, errors);
+        //    //if (string.IsNullOrWhiteSpace(errors)) return (true, resultDTO, null);
+        //    //else return (false, resultDTO, errors);
 
-            return (true, new ReviewOrderResultDTO() { IsSuccess = true, ErrorMessage = null }, null);
-        }
+        //    return (true, new ReviewOrderResultDTO() { IsSuccess = true, ErrorMessage = null }, null);
+        //}
 
         public async Task<(bool IsSuccess, string? OrderId, string? ErrorMessage)> AddOrderAsync(string ownerId, AddOrderDTO addOrderDTO, CancellationToken cancellationToken)
         {
-            // SET ORDER ID HERE
-            // string orderId = Guid.NewGuid().ToString();              // done by domain model
+            // 1. Check Account Status and get Shipping and Billing Address, return with errors if any
+            AccountStatusResponseDTO accountStatusDTO = await GetAccountStatusAsync(ownerId, cancellationToken);
+            int errorCount = accountStatusDTO.Errors is null ? 0 : accountStatusDTO.Errors.Count;
+            _logger.LogInformation("{this}: Account status retrieval complete for order review. Account Status: {status}, Account Error Count: {count} ***", this.GetType().Name, accountStatusDTO.Status, errorCount);
+            if (errorCount > 0) return (false, null, $"Error retrieving account status. Errors: {string.Join(" | ", accountStatusDTO.Errors!)}");
 
-            Address? shipping = addOrderDTO.ShippingAddress is null ? null : new Address(addOrderDTO.ShippingAddress);
-            Address? billing = addOrderDTO.BillingAddress is null ? null : new Address(addOrderDTO.BillingAddress);
-            // Ensure order addresses are in user account addresses
-            // ...
+            // 2. Check AddOrderDTO for presence of order items and return with errors if none
+            if (addOrderDTO.Items is null || addOrderDTO.Items.Count == 0) return (false, null, "No order items were found in the place order request.");
 
+            // 3. If no errors, place new order
+            // ORDER ID AND SETTING OF LINE NUMBERS IS HANDLED BY DOMAIN MODEL
             List<OrderItem> items = new List<OrderItem>();
             addOrderDTO.Items.ForEach(itemDTO => items.Add(new OrderItem(itemDTO)));
-            // int lineNumber = 1;
-            // items.ForEach(i => i.LineNumber = lineNumber++);         // done by domain model
-            // items.ForEach(i => i.OrderId = orderId);                 // done by domain model
-            Order order = new Order(ownerId, items, shipping, billing);
+            Address shippingAddress = new Address(accountStatusDTO.ShippingAddress!);   // if accountStatusDTO.ShippingAddress is null, error result is returned above
+            Address billingAddress = new Address(accountStatusDTO.BillingAddress!);     // if accountStatusDTO.BillingAddress is null, error result is returned above
+            Order order = new Order(ownerId, items, shippingAddress, billingAddress);
             await _orders.InsertOneAsync(order);
 
             return (true, order.OrderId, null);
 
-            //// NEED TO REMOVE CART IF SUCCESS 
+            //// FOR CART REMOVAL ON SUCCESS PLACING ORDER - THIS IS CURRENTLY THE RESPONSIBILITY OF THE FRONT END CLIENT
             //var deleteCartResult = await _internalOrdersService.RemoveShoppingCartAsync(ownerId, cancellationToken);
             //if (deleteCartResult.IsSuccess)
             //{
@@ -81,6 +97,42 @@ namespace Orders.API.Services
             //    return (true, order.OrderId, null);
             //}
             //else return (false, order.OrderId, deleteCartResult.ErrorMessage);
+        }
+
+        private async Task<AccountStatusResponseDTO> GetAccountStatusAsync(string ownerId, CancellationToken cancellationToken)
+        {
+            AccountStatusResponseDTO responseDTO = new AccountStatusResponseDTO();
+
+            // 1. Get account detail dto from internal accounts services - note the service will add api key for authorization and encrypt data
+            var accountKeyResult = await _internalAccountsHttpService.GetKeyContainerDataForAccountsAsync();
+            if (accountKeyResult.IsSuccess)
+            {
+                if (string.IsNullOrWhiteSpace(accountKeyResult.KeyContainerResponse?.EncryptedPublicKey) || string.IsNullOrWhiteSpace(accountKeyResult.KeyContainerResponse?.KeyContainerName))
+                {
+                    responseDTO.Errors.Add("Missing Key Container Information.");
+                    return responseDTO;
+                }
+                else
+                {
+                    // DELETE AES PUBLIC KEY
+                    string? aesKey = _config["IntAcctsAesSymEncryption:Key"];
+                    string? iv = _config["IntAcctsAesSymEncryption:IV"];
+                    string publicKey = _aesSymmetricEncryptor.DecryptSymmetric(accountKeyResult.KeyContainerResponse.EncryptedPublicKey, aesKey!, iv!);
+
+                    // ASYM ENCRYPT OWNER ID USING RSA PUBLIC KEY AND SET PROPERTY IN REQUEST
+                    string encryptedOwnerId = _rsaAsymmetricEncryptor.EncryptUsingPublicKeyXmlString(ownerId, publicKey);
+                    _logger.LogInformation("*** {this}: OwnerId encryption complete for sending to private api. Encrypted Owner Id: {id} ***", this.GetType().Name, encryptedOwnerId);
+
+                    AccountStatusRequestDTO statusRequestDTO = new AccountStatusRequestDTO() { EncryptedOwnerId = encryptedOwnerId, KeyContainerName = accountKeyResult.KeyContainerResponse?.KeyContainerName! };
+                    responseDTO = await _internalAccountsHttpService.GetUserAccountStatusAsync(statusRequestDTO, cancellationToken);   // ownerId, accountKeyResult.KeyContainerResponse?.KeyContainerName!, accountKeyResult.KeyContainerResponse?.EncryptedPublicKey!);
+                    return responseDTO;
+                }
+            }
+            else
+            {
+                responseDTO.Errors.Add(accountKeyResult.ErrorMessage ?? "Error retrieving account key container data.");
+                return responseDTO;
+            }
         }
 
         public async Task<(bool IsSuccess, IEnumerable<OrderDTO>? OrderDTOs, PaginationMetadata? PagingData, string? ErrorMessage)> GetAllUserOrdersAsync(string ownerId, string? filter, int pageNumber, int pageSize, string? sortColumn = null, string? sortOrder = null)
@@ -175,36 +227,5 @@ namespace Orders.API.Services
             if (result.DeletedCount > 0) return (true, null);
             return (false, $"An order was found, but was not deleted.");
         }
-
-        //public async Task<(bool IsSuccess, ReviewOrderResultDTO? ReviewDTO, string? ErrorMessage)> ReviewOrderAsync(string ownerId, CancellationToken cancellationToken)
-        //{
-            
-        //    //// THIS ENDPOINT MOVED TO INTERNAL ORDERS SERVICE
-
-        //    //string errors = string.Empty;
-        //    //ReviewOrderResultDTO resultDTO = new ReviewOrderResultDTO();
-
-        //    //// ORIGINAL
-        //    //// 1. Get account detail dto from internal accounts services - note the http service will add api key for internal account api call and encrypt data
-        //    //var accountResult = await _internalAccountsHttpService.GetAccountDetailsFromInternalApiAsync(ownerId);
-        //    //if (accountResult.IsSuccess)
-        //    //{
-        //    //    resultDTO.AccountOwnerId = accountResult.AccountDetail?.AccountOwnerId;
-        //    //    resultDTO.AccountDetail = accountResult.AccountDetail;
-        //    //}
-        //    //else errors += $"{accountResult.ErrorMessage} \n";
-
-        //    //// 2. Get cart from internal cart services - note the http service will add api key for internal cart api call and encrypt data
-
-        //    //var cartResult = await _internalCartsHttpService.GetShoppingCartAsync(ownerId);
-        //    //if (cartResult.IsSuccess)
-        //    //{
-        //    //    resultDTO.ShoppingCart = cartResult.ShoppingCart;
-        //    //}
-        //    //else errors += $"{cartResult.ErrorMessage}";
-
-        //    //if (string.IsNullOrWhiteSpace(errors)) return (true, resultDTO, null);
-        //    //else return (false, resultDTO, errors);
-        //}
     }
 }

@@ -1,4 +1,5 @@
-﻿using Admin.Blazor.Client.DTOs.Health;
+﻿using Admin.Blazor.Client.DTOs.Accounts;
+using Admin.Blazor.Client.DTOs.Health;
 using Admin.Blazor.Client.DTOs.Orders;
 using Admin.Blazor.Client.Paging;
 
@@ -7,6 +8,7 @@ namespace Admin.Blazor.Client.Abstractions
     public interface IOrdersHttpService
     {
         Task<(bool IsSuccess, HealthCheckResultDTO? HealthCheckResultDTO, string? ErrorMessage)> CheckHealthAsync(string? token = null);
+        Task<AccountStatusResponseDTO> GetAccountStatusAsync(string? token = null);
         Task<(bool IsSuccess, ReviewOrderResultDTO? ReviewOrderResult, string? ErrorMessage)> ReviewOrderAsync(string? token = null);
         Task<(bool IsSuccess, string? OrderId, string? ErrorMessage)> SubmitOrderAsync(AddOrderDTO addOrderDTO, string? token = null);
         Task<(bool IsSuccess, IEnumerable<OrderDTO>? OrderDTOs, PaginationMetadata? PagingData, string? ErrorMessage)> GetAllUserOrdersAsync(

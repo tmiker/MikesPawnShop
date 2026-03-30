@@ -4,6 +4,7 @@ namespace Orders.API.Abstractions
 {
     public interface IInternalAccountsHttpService
     {
-        Task<(bool IsSuccess, AccountDTO? AccountDTO, string? ErrorMessage)> GetUserAccountDataAsync(CancellationToken? cancellationToken = null);
+        Task<(bool IsSuccess, KeyContainerResponseDTO? KeyContainerResponse, string? ErrorMessage)> GetKeyContainerDataForAccountsAsync();
+        Task<AccountStatusResponseDTO> GetUserAccountStatusAsync(AccountStatusRequestDTO accountStatusRequestDTO, CancellationToken? cancellationToken = null);
     }
 }

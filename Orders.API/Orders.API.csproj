@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Infrastructure\Sql\" />
+    <Folder Include="Temp\" />
   </ItemGroup>
 
 </Project>
