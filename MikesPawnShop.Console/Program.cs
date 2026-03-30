@@ -47,7 +47,7 @@ async Task LoadData()
                 {
                     // client = new HttpClient();
                     string status = i % 2 == 0 ? "InActive" : "Obsolete";
-                    UpdateStatusDTO updateStatusDTO = new UpdateStatusDTO(Guid.Parse(aggregateIdStrings[i]), status);
+                    UpdateStatusDTO updateStatusDTO = new UpdateStatusDTO() { ProductId = aggregateIdStrings[i], Status = status };
                     string statusUri = $"{baseUrl}/status";
                     HttpRequestMessage statusRequest = new HttpRequestMessage(HttpMethod.Post, statusUri);
                     statusRequest.Content = new StringContent(JsonSerializer.Serialize(updateStatusDTO), Encoding.UTF8, "application/json");

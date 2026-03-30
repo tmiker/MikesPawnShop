@@ -1,5 +1,4 @@
 using HealthChecks.UI.Client;
-using k8s.KubeConfigModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -11,10 +10,12 @@ using Orders.API.Health;
 using Orders.API.Infrastructure.Mongo;
 using Orders.API.Middleware;
 using Orders.API.Services;
+using Orders.API.Utility;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using System.Security.Claims;
+using System.Net.Http.Headers;
 
 // Configure static logger early for capturing startup issues
 Log.Logger = new LoggerConfiguration()
@@ -88,6 +89,14 @@ try
     builder.Services.AddSingleton<IMongoSettings>(sp => sp.GetRequiredService<IOptions<MongoSettings>>().Value);
 
     builder.Services.AddScoped<IOrderService, OrderService>();
+
+    builder.Services.AddHttpClient(name: StaticData.InternalAccounts_HttpClient_Name, configureClient: config =>
+    {
+        // uses API Key auth for intermal api to api communication
+        config.BaseAddress = new Uri(StaticData.InternalAccounts_HttpClient_BaseUrl);
+        config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1.0));
+    });
+    builder.Services.AddSingleton<IInternalAccountsHttpService, InternalAccountsHttpService>();
 
     builder.Services.AddControllers();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

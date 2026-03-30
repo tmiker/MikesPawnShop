@@ -1,5 +1,13 @@
+Admin and Consumer Clients
+	when Review order is called 
+		need to send AddOrderDTO as an argument and in the Orders.API check that their are items in the order and both billing and shipping addresses
+		WORKING ON ACCOUNT STATUS CHECK USING API-KEY AUTH
+			OrderService in Orders.API should have dependency InternalAccountsHttpService injected and used to call Accounts.API to check account status before placing order
+		ensure if review fails that the order is not placed
+		check the cart is emptied after an order is placed successfully
+
+
 Hide/Show elements based on auth
-Consumer Client Products > Dev Testing - fix error handling testing or remove it
 Remove logging of sensitive info
 
 Check Auth in Controllers is uncommented
