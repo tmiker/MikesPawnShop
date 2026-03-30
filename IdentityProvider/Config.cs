@@ -96,29 +96,29 @@ public static class Config
                         },
                         ClientSecrets = { new Secret("adminBlazorServer".Sha256()) }    // *** move to secrets 
                     },
-                new Client()
-                    {
-                        ClientName = "DevTestBlazorServer",
-                        ClientId = "devTestBlazorServer",
-                        AllowedGrantTypes = GrantTypes.Code,
-                        RequirePkce = true,
-                        RequireConsent = true,   // default = false
-                        RedirectUris = { "https://localhost:7030/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
-                        PostLogoutRedirectUris = { "https://localhost:7030/signout-callback-oidc" },       
-                        // FrontChannelLogoutUri =    "https://localhost:7030/signout-callback-oidc",      
-                        AllowedScopes =
-                        {
-                            IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile,
-                            "roles",
-                            "cartsapi.fullaccess",
-                            "productsreadapi.fullaccess",
-                            "productswriteapi.fullaccess",
-                            "accountsapi.fullaccess",
-                            "ordersapi.fullaccess"
-                        },
-                        ClientSecrets = { new Secret("wendyandmarlowFSD".Sha256()) }    // *** move to secrets 
-                    }
+                //new Client()
+                //    {
+                //        ClientName = "DevTestBlazorServer",
+                //        ClientId = "devTestBlazorServer",
+                //        AllowedGrantTypes = GrantTypes.Code,
+                //        RequirePkce = true,
+                //        RequireConsent = true,   // default = false
+                //        RedirectUris = { "https://localhost:7030/signin-oidc" },        //  where client will receive tokens, default = base uri + /signin-oidc
+                //        PostLogoutRedirectUris = { "https://localhost:7030/signout-callback-oidc" },       
+                //        // FrontChannelLogoutUri =    "https://localhost:7030/signout-callback-oidc",      
+                //        AllowedScopes =
+                //        {
+                //            IdentityServerConstants.StandardScopes.OpenId,
+                //            IdentityServerConstants.StandardScopes.Profile,
+                //            "roles",
+                //            "cartsapi.fullaccess",
+                //            "productsreadapi.fullaccess",
+                //            "productswriteapi.fullaccess",
+                //            "accountsapi.fullaccess",
+                //            "ordersapi.fullaccess"
+                //        },
+                //        ClientSecrets = { new Secret("wendyandmarlowFSD".Sha256()) }    // *** move to secrets 
+                //    }
 
             };
 }
