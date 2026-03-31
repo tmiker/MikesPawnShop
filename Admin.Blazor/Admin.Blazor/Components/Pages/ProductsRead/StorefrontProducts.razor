@@ -11,22 +11,19 @@
     </div>
 </div>
 
-@if (!string.IsNullOrWhiteSpace(_errorMessage))
-{
-    <div class="row mt-2">
-        <div class="col-10">
-            <h5 class="text-danger"><b>Error:</b></h5>
-        </div>
-        <div class="col-2">
-            <a class="btn btn-outline-warning form-control" @onclick="ClearErrorMessage">Clear Errors</a>
-        </div>
+@* <div class="row mt-2">
+    <div class="col-1">
+        <h5>DEV: </h5>
     </div>
-    <div class="row mt-2">
-        <div class="col-12 text-center">
-            <textarea rows="2" class="bg-dark text-danger form-control">@_errorMessage</textarea>
-        </div>
+    <div class="col-3">
+        <a class="btn button-custom-success" @onclick="TestHandleSuccess">Test Handle Success</a>
     </div>
-}
+    <div class="col-3">
+        <a class="btn button-custom-danger" @onclick="TestHandleError">Test Handle Error</a>
+    </div>
+    <div class="col-5">
+    </div>
+</div> *@
 
 @if (_tableView)
 {
@@ -167,6 +164,24 @@ else
     public PaginationMetadata? PagingData { get; set; }
 
     [Parameter]
+    public EventCallback<string> ErrorMessageCallback { get; set; }
+    private async Task ShowErrorMessage(string errorMessage)
+    {
+        if (ErrorMessageCallback.HasDelegate) await ErrorMessageCallback.InvokeAsync(errorMessage);
+    }
+
+    [Parameter]
+    public EventCallback<string> SuccessMessageCallback { get; set; }
+    private async Task ShowSuccessMessage(string successMessage)
+    {
+        if (SuccessMessageCallback.HasDelegate) await SuccessMessageCallback.InvokeAsync(successMessage);
+    }
+
+    // Dev Test Messaging from this component
+    private async Task TestHandleError() => await ShowErrorMessage($"This is a test error message");
+    private async Task TestHandleSuccess() => await ShowSuccessMessage($"This is a test success message");
+
+    [Parameter]
     public EventCallback PageForwardCallback { get; set; }
     [Parameter]
     public EventCallback PageBackwardCallback { get; set; }
@@ -176,9 +191,6 @@ else
     public EventCallback<int> DetailCallback { get; set; }
     [Parameter]
     public EventCallback<Guid> AddToCartCallback { get; set; }
-
-    private string? _errorMessage;
-    private void ClearErrorMessage() => _errorMessage = null;
 
     private bool _tableView = true;
     private string _tableViewButtonText = "Card View";
@@ -234,15 +246,15 @@ else
                 Products = productsResult.Products.ToList();
             }
         }
-        else Console.WriteLine(productsResult.ErrorMessage);
+        else await ShowErrorMessage(productsResult.ErrorMessage ?? "An unspecified error occurred.");
     }
 
-    protected override void OnAfterRender(bool isFirstRender)
-    {
-        if (isFirstRender)
-        {
-            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
-            // this.StateHasChanged();
-        }
-    }
+    // protected override void OnAfterRender(bool isFirstRender)
+    // {
+    //     if (isFirstRender)
+    //     {
+    //         Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
+    //         // this.StateHasChanged();
+    //     }
+    // }
 }

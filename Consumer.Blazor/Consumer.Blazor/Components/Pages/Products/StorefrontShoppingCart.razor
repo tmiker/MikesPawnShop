@@ -31,11 +31,25 @@
 
 @if (_addOrderDTO is not null)
 {
-    <StorefrontCheckoutView AddOrderDTO="@_addOrderDTO" />
+    <StorefrontCheckoutView AddOrderDTO="@_addOrderDTO" ErrorMessageCallback="HandleComponentError" SuccessMessageCallback="HandleComponentSuccess" />
 }
 else
 {
-    <div class="row">
+    @* <div class="row mt-2">
+        <div class="col-1">
+            <h5>DEV: </h5>
+        </div>
+        <div class="col-3">
+            <a class="btn button-custom-success" @onclick="TestHandleSuccess">Test Handle Success</a>
+        </div>
+        <div class="col-3">
+            <a class="btn button-custom-danger" @onclick="TestHandleError">Test Handle Error</a>
+        </div>
+        <div class="col-5">
+        </div>
+    </div> *@
+
+    <div class="row mt-2">
         <div class="col-12">
             @if (MyCart?.Items != null)
             {
@@ -121,7 +135,6 @@ else
 
     [Parameter]
     public EventCallback<int> DetailCallback { get; set; }
-
     private async Task Detail(int id)
     {
         if (DetailCallback.HasDelegate) await DetailCallback.InvokeAsync(id);
@@ -129,12 +142,32 @@ else
 
     [Parameter]
     public EventCallback<int> CartItemQuantityChangedCallback { get; set; }
-
     private async Task CartItemQuantityChanged(int count)
     {
         if (CartItemQuantityChangedCallback.HasDelegate) await CartItemQuantityChangedCallback.InvokeAsync(count);
     }
 
+    [Parameter]
+    public EventCallback<string> ErrorMessageCallback { get; set; }
+    private async Task ShowErrorMessage(string errorMessage)
+    {
+        if (ErrorMessageCallback.HasDelegate) await ErrorMessageCallback.InvokeAsync(errorMessage);
+    }
+
+    [Parameter]
+    public EventCallback<string> SuccessMessageCallback { get; set; }
+    private async Task ShowSuccessMessage(string successMessage)
+    {
+        if (SuccessMessageCallback.HasDelegate) await SuccessMessageCallback.InvokeAsync(successMessage);
+    }
+
+    // Handlers for StorefrontCheckoutView Child Component Message Parameters
+    private async Task HandleComponentError(string message) => await ShowErrorMessage(message);
+    private async Task HandleComponentSuccess(string message) => await ShowSuccessMessage(message);
+
+    // Dev Test Messaging from this component
+    private async Task TestHandleError() => await ShowErrorMessage($"This is a test error message");
+    private async Task TestHandleSuccess() => await ShowSuccessMessage($"This is a test success message");
     
     private AddOrderDTO? _addOrderDTO;
 
@@ -184,15 +217,6 @@ else
                 MyCart.Items!.Remove(item);
                 if (CartItemQuantityChangedCallback.HasDelegate) await CartItemQuantityChangedCallback.InvokeAsync(MyCart.Items.Count);
             }
-        }
-    }
-
-    protected override void OnAfterRender(bool isFirstRender)
-    {
-        if (isFirstRender)
-        {
-            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontShoppingCart.razor OnAfterRender was called. *************** @@@@@@@@@");
-            // this.StateHasChanged();
         }
     }
 }

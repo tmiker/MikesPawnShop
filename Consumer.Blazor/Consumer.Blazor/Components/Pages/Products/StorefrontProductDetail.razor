@@ -2,14 +2,19 @@
 @rendermode InteractiveServer
 @inject IProductsReadHttpService _readSideHttpClient
 
-@if (!string.IsNullOrWhiteSpace(_errorMessage))
-{
-    <h4 class="text-danger"><b>@_errorMessage</b></h4>
-}
-@if (!string.IsNullOrWhiteSpace(_successMessage))
-{
-    <h4 class="text-success"><b>@_successMessage</b></h4>
-}
+@* <div class="row mt-2">
+    <div class="col-1">
+        <h5>DEV: </h5>
+    </div>
+    <div class="col-3">
+        <a class="btn button-custom-success" @onclick="TestHandleSuccess">Test Handle Success</a>
+    </div>
+    <div class="col-3">
+        <a class="btn button-custom-danger" @onclick="TestHandleError">Test Handle Error</a>
+    </div>
+    <div class="col-5">
+    </div>
+</div> *@
 
 @if (_product is not null)
 {
@@ -316,33 +321,45 @@
 
     [CascadingParameter(Name = "SelectedProductId")]
     public int SelectedProductId { get; set; }
+
     [Parameter]
     public EventCallback<int> AddToCartWithQuantityCallback { get; set; }
-    [Parameter]
-    public EventCallback BackToListCallback { get; set; }
-
-    public DateTime? ProductFetchTime { get; set; }
-
-    private int _quantityToAdd = 1;
-
     private async Task AddToCart(int quantityToAdd)
     {
         if (AddToCartWithQuantityCallback.HasDelegate) await AddToCartWithQuantityCallback.InvokeAsync(_quantityToAdd);
     }
 
+    [Parameter]
+    public EventCallback BackToListCallback { get; set; }
     private async Task BackToList()
     {
-        if (BackToListCallback.HasDelegate)
-        {
-            await BackToListCallback.InvokeAsync();
-        }
+        if (BackToListCallback.HasDelegate) await BackToListCallback.InvokeAsync();
     }
+
+    [Parameter]
+    public EventCallback<string> ErrorMessageCallback { get; set; }
+    private async Task ShowErrorMessage(string errorMessage)
+    {
+        if (ErrorMessageCallback.HasDelegate) await ErrorMessageCallback.InvokeAsync(errorMessage);
+    }
+
+    [Parameter]
+    public EventCallback<string> SuccessMessageCallback { get; set; }
+    private async Task ShowSuccessMessage(string successMessage)
+    {
+        if (SuccessMessageCallback.HasDelegate) await SuccessMessageCallback.InvokeAsync(successMessage);
+    }
+
+    // Dev Test Messaging from this component
+    private async Task TestHandleError() => await ShowErrorMessage($"This is a test error message");
+    private async Task TestHandleSuccess() => await ShowSuccessMessage($"This is a test success message");
+
+    public DateTime? ProductFetchTime { get; set; }
+
+    private int _quantityToAdd = 1;
 
     private ProductDTO? _product;
     private string? _productAggregateId;
-
-    private string? _errorMessage;
-    private string? _successMessage;
 
     private ImageDataDTO? _primaryImage { get; set; }
 
@@ -371,7 +388,7 @@
                 if (_product?.Images is not null && _product.Images.Any()) _primaryImage = _product.Images.FirstOrDefault();
                 ProductFetchTime = result.Product?.FetchTime;
             }
-            else _errorMessage = result.ErrorMessage;
+            else await ShowErrorMessage(result.ErrorMessage ?? "An unspecified error occurred.");
             this.StateHasChanged();
         }
     }

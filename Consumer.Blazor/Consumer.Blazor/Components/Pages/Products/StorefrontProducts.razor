@@ -3,25 +3,33 @@
 
 <p class="text-secondary mt-2"><b><i>Product summaries sourced from Products Read Side API</i></b></p>
 
+@* <div class="row mt-2">
+    <div class="col-1">
+        <h5>DEV: </h5>
+    </div>
+    <div class="col-3">
+        <a class="btn button-custom-success" @onclick="TestHandleSuccess">Test Handle Success</a>
+    </div>
+    <div class="col-3">
+        <a class="btn button-custom-danger" @onclick="TestHandleError">Test Handle Error</a>
+    </div>
+    <div class="col-5">
+    </div>
+</div> *@
+
 <div class="row mt-2">
     @if (ProductSummaries != null && ProductSummaries.Any())
     {
-        @* <div class="product-section"> *@
 
             @foreach (var product in ProductSummaries)
             {
-                @* <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" /> *@
-
                 <div class="col-3">
                     <ProductCard Product="product" AddToCartCallback="() => AddToCart(product.AggregateId)" ProductDetailCallback="() => Detail(product.Id)" />
                 </div>
 
             }
-
-        @* </div> *@
     }
 </div>
-
 
 @if (PagingData is not null)
 {
@@ -82,6 +90,24 @@
     public PaginationMetadata? PagingData { get; set; }
 
     [Parameter]
+    public EventCallback<string> ErrorMessageCallback { get; set; }
+    private async Task ShowErrorMessage(string errorMessage)
+    {
+        if (ErrorMessageCallback.HasDelegate) await ErrorMessageCallback.InvokeAsync(errorMessage);
+    }
+
+    [Parameter]
+    public EventCallback<string> SuccessMessageCallback { get; set; }
+    private async Task ShowSuccessMessage(string successMessage)
+    {
+        if (SuccessMessageCallback.HasDelegate) await SuccessMessageCallback.InvokeAsync(successMessage);
+    }
+
+    // Dev Test Messaging from this component
+    private async Task TestHandleError() => await ShowErrorMessage($"This is a test error message");
+    private async Task TestHandleSuccess() => await ShowSuccessMessage($"This is a test success message");
+
+    [Parameter]
     public EventCallback PageForwardCallback { get; set; }
     [Parameter]
     public EventCallback PageBackwardCallback { get; set; }
@@ -129,15 +155,15 @@
     //             Products = productsResult.Products.ToList();
     //         }
     //     }
-    //     else Console.WriteLine(productsResult.ErrorMessage);
+    //     else await ShowErrorMessage(productsResult.ErrorMessage ?? "An unspecified error occurred.");
     // }
 
-    protected override void OnAfterRender(bool isFirstRender)
-    {
-        if (isFirstRender)
-        {
-            Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
-            // this.StateHasChanged();
-        }
-    }
+    // protected override void OnAfterRender(bool isFirstRender)
+    // {
+    //     if (isFirstRender)
+    //     {
+    //         Console.WriteLine($"@@@@@@@@@@ **************** StorefrontProducts.razor OnAfterRender was called. *************** @@@@@@@@@");
+    //         // this.StateHasChanged();
+    //     }
+    // }
 }
